@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqdj7xxv5d8ks"]
+[gd_scene load_steps=5 format=3 uid="uid://cqdj7xxv5d8ks"]
 
 [ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_66qum"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_carousel.gd" id="2_h38de"]
+[ext_resource type="Script" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="3_l8btc"]
+[ext_resource type="Texture2D" uid="uid://dounln3l35d26" path="res://addons/mpf-gmc/images/logo_mpf.png" id="4_art57"]
 
 [node name="Attract" type="Control"]
 layout_mode = 3
@@ -13,12 +16,189 @@ offset_right = 1280.0
 offset_bottom = 1024.0
 color = Color(0.0117647, 0.0392157, 1, 1)
 
-[node name="Label" type="Label" parent="ColorRect"]
-layout_mode = 0
-offset_top = 343.0
+[node name="MPFCarousel" type="Node2D" parent="."]
+script = ExtResource("2_h38de")
+carousel_name = "attract"
+
+[node name="title" type="Label" parent="MPFCarousel"]
+visible = false
+offset_top = 7.0
 offset_right = 1275.0
-offset_bottom = 545.0
+offset_bottom = 1026.0
 theme_override_font_sizes/font_size = 80
 text = "Welcome to RB "
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="credits" type="Label" parent="MPFCarousel"]
+visible = false
+offset_right = 1277.0
+offset_bottom = 1021.0
+theme_override_font_sizes/font_size = 80
+text = "sample"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "credits_string"
+
+[node name="mpf_logo" type="Sprite2D" parent="MPFCarousel"]
+visible = false
+position = Vector2(643, 509)
+texture = ExtResource("4_art57")
+
+[node name="last_scores_1p" type="Node2D" parent="MPFCarousel"]
+visible = false
+
+[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_1p"]
+offset_right = 1273.0
+offset_bottom = 1030.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player1_score"
+comma_separate = true
+min_digits = 2
+
+[node name="last_scores_2p" type="Node2D" parent="MPFCarousel"]
+visible = false
+
+[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_2p"]
+offset_right = 1273.0
+offset_bottom = 465.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player1_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_2p"]
+offset_left = -5.0
+offset_top = 565.0
+offset_right = 1268.0
+offset_bottom = 1030.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player2_score"
+comma_separate = true
+min_digits = 2
+
+[node name="last_scores_3p" type="Node2D" parent="MPFCarousel"]
+visible = false
+
+[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_3p"]
+offset_top = 28.0
+offset_right = 1273.0
+offset_bottom = 315.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player1_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_3p"]
+offset_left = 4.0
+offset_top = 334.0
+offset_right = 1277.0
+offset_bottom = 677.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player2_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player3_score" type="Label" parent="MPFCarousel/last_scores_3p"]
+offset_left = -1.0
+offset_top = 677.0
+offset_right = 1272.0
+offset_bottom = 1006.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player3_score"
+comma_separate = true
+min_digits = 2
+
+[node name="last_scores_4p" type="Node2D" parent="MPFCarousel"]
+
+[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_4p"]
+offset_left = 5.0
+offset_top = -2.0
+offset_right = 1271.0
+offset_bottom = 253.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player1_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_4p"]
+offset_left = 4.0
+offset_top = 262.0
+offset_right = 1277.0
+offset_bottom = 497.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player2_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player3_score" type="Label" parent="MPFCarousel/last_scores_4p"]
+offset_left = 6.0
+offset_top = 532.0
+offset_right = 1279.0
+offset_bottom = 732.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player3_score"
+comma_separate = true
+min_digits = 2
+
+[node name="player4_score" type="Label" parent="MPFCarousel/last_scores_4p"]
+offset_left = 3.0
+offset_top = 785.0
+offset_right = 1276.0
+offset_bottom = 1002.0
+theme_override_font_sizes/font_size = 80
+text = "123,345"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_l8btc")
+variable_type = 2
+variable_name = "player4_score"
+comma_separate = true
+min_digits = 2
