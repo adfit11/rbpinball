@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://csppfia2avlxp"]
 
-[ext_resource type="Script" path="res://addons/mpf-gmc/editor/gmc_panel.gd" id="1_7ovm7"]
+[ext_resource type="Script" uid="uid://br4obrhtfyfao" path="res://addons/mpf-gmc/editor/gmc_panel.gd" id="1_7ovm7"]
 
 [node name="GMC" type="Control"]
 layout_mode = 3
@@ -226,7 +226,6 @@ text = "Exit Game on ESC"
 
 [node name="exit_on_esc" type="CheckButton" parent="main/flags_bottom"]
 layout_mode = 2
-button_pressed = true
 
 [node name="fullscreen-label" type="Label" parent="main/flags_bottom"]
 visible = false

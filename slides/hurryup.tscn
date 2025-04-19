@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://ccygwnfntiqkf"]
+
+[ext_resource type="Script" uid="uid://gan0qfjhl6tq" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_mdrpy"]
+[ext_resource type="Texture2D" uid="uid://gexx1f6waeuk" path="res://images/hurryup.png" id="2_vkuta"]
+[ext_resource type="Script" uid="uid://db252vlyreqrf" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="3_ndsnu"]
+
+[node name="Hurryup" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+script = ExtResource("1_mdrpy")
+metadata/_custom_type_script = "uid://gan0qfjhl6tq"
+
+[node name="Hurryup" type="Sprite2D" parent="."]
+position = Vector2(640, 360)
+scale = Vector2(0.833333, 0.703125)
+texture = ExtResource("2_vkuta")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 529.0
+offset_right = 1255.0
+offset_bottom = 137.0
+theme_override_font_sizes/font_size = 100
+text = "Shoot the Juke "
+
+[node name="MPFVariable" type="Label" parent="."]
+layout_mode = 0
+offset_left = 540.0
+offset_top = 113.0
+offset_right = 1232.0
+offset_bottom = 329.0
+theme_override_font_sizes/font_size = 120
+text = "100,000"
+horizontal_alignment = 2
+script = ExtResource("3_ndsnu")
+variable_type = 1
+variable_name = "current_hurryup"
+initialize_empty = false
+update_event = "hurryup_value"
+metadata/_custom_type_script = "uid://db252vlyreqrf"

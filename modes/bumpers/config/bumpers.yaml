@@ -1,0 +1,26 @@
+#config_version=6
+
+# Bumper Scoring.
+
+mode:
+  start_events: start_mode_bumpers
+  stop_events: stop_mode_bumpers
+  priority: 200
+
+shots:
+  bumper_top:
+    switch: s_top_pop_bumpers_x2
+  bumper_bottom:
+    switch: s_bottom_pop_bumpers_x2
+
+shot_groups:
+  bumpers:
+    shots: bumper_top, bumper_bottom
+
+variable_player:
+  bumpers_hit:
+    score: 1_000
+
+sound_player:
+    bumper_top_hit: bumper_effect
+    bumper_bottom_hit: bumper_effect

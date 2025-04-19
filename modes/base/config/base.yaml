@@ -7,3 +7,25 @@ mode:
   start_events: ball_starting
   stop_events: ball_will_end
   priority: 100
+
+event_player:
+  mode_base_started:
+   - start_mode_bumpers
+  mode_base_will_stop:
+   - stop_mode_bumpers
+  return_rollover_left_hit: start_mode_hurryup
+  
+
+shots:
+  return_rollover_left:
+    switches: s_return_rollover_left
+
+slide_player:
+  mode_base_started: base_slide
+
+sound_player:
+  mode_base_started:
+    base_music:
+      bus: music
+      fade_out: 500ms
+      loops: -1

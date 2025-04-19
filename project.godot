@@ -12,7 +12,7 @@ config_version=5
 
 config/name="rbpinball"
 run/main_scene="res://addons/mpf-gmc/slides/window.tscn"
-config/features=PackedStringArray("4.3", "Mobile")
+config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -22,7 +22,7 @@ MPF="*res://addons/mpf-gmc/mpf_gmc.gd"
 [display]
 
 window/size/viewport_width=1280
-window/size/viewport_height=1024
+window/size/viewport_height=720
 
 [editor_plugins]
 

@@ -142,8 +142,10 @@ func play(filename: String, settings: Dictionary = {}) -> void:
 	# If this is a solo bus, stop any other playback
 	if self.type == BusType.SOLO:
 		for c in self.channels:
-			if c.playing and c != available_channel:
-				c.stop_with_settings(settings)
+			if c.playing and c != available_channel and not c.get_meta("is_stopping", false):
+				# Do not pass the settings, because that includes actions and
+				# fade times that should not apply to the stopping track.
+				c.stop_with_settings()
 
 	if not available_channel:
 		# Queue the filename if this bus type has a queue
@@ -278,7 +280,7 @@ func _find_available_channel(filepath: String, settings: Dictionary, ignore_exis
 				if channel.has_meta("tween") and is_instance_valid(channel.get_meta("tween")):
 					# Stop the tween
 					var tween = channel.get_meta("tween")
-					tween.stop_all()
+					tween.stop()
 					# AVW: DISABLING DURING REFACTOR
 					#self._on_fade_complete(channel, tween,  "cancel")
 				# If the channel does not have a tween, let it continue playing
