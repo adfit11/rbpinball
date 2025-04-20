@@ -12,13 +12,14 @@ config:
   - config_coils.yaml
   - config_switches.yaml
   - config_lights.yaml
+  - config_drop_targets.yaml
 
 modes:
   - attract
   - base
   - bumpers
   - hurryup
-  - rightdrops
+  - right_drops
 
 playfields:
   playfield:

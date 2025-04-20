@@ -11,10 +11,10 @@ mode:
 event_player:
   mode_base_started:
     - start_mode_bumpers
-    - start_mode_rightdrops
+    - start_mode_right_drops
   mode_base_will_stop:
     - stop_mode_bumpers
-    - stop_mode_rightdrops
+    - stop_mode_right_drops
 
   return_rollover_left_hit: start_mode_hurryup
   

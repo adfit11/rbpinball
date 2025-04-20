@@ -3,3 +3,43 @@
 coils:
   c_trough_eject:
     number:
+  c_subway_lock:
+    number: 1
+    default_hold_power: .1
+    default_pulse_ms: 300
+  c_top_drops:
+    number: 2
+    default_hold_power: .1
+    default_pulse_ms: 300
+  # c_CCC:
+  #   number: 3
+  # c_DDD:
+  #   number: 4
+  c_subway_kicker:
+    number: 5
+    default_pulse_ms: 40
+  c_right_drops:
+    number: 6
+    default_hold_power: .1
+    default_pulse_ms: 300     
+  c_GGG:
+    number: 7
+  c_Replay_Knock:
+    number: 8
+    default_pulse_ms: 50
+  c_outhole:
+    number: 9
+    default_pulse_ms: 65 
+  c_trough_release:
+    number: 115 # uses light bank
+    default_hold_power: 0.075
+    default_pulse_ms: 30   
+  c_side_kicker_left:
+    number: 108 # uses light bank
+    default_pulse_ms: 15
+  c_hole_kicker_top:
+    number: 116 # uses light bank
+    default_pulse_ms: 55
+  c_skill_motor:
+    number: 112 # uses light bank
+    default_pulse_ms: 5000

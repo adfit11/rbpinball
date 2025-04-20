@@ -1,0 +1,23 @@
+#config_version=6
+
+drop_targets:
+  right_drop_1:
+    switch: s_right_drop_1_1
+  right_drop_2:
+    switch: s_right_drop_2_11
+  right_drop_3:
+    switch: s_right_drop_3_21
+  right_drop_4:
+    switch: s_right_drop_4_31
+  right_drop_5:
+    switch: s_right_drop_5_41
+
+drop_target_banks:
+  right_bank:
+    drop_targets: right_drop_1, right_drop_2, right_drop_3, right_drop_4, right_drop_5
+    reset_coil: c_right_drops
+    reset_coil_max_wait_ms: 150
+    reset_events: 
+      machine_reset_phase_3: 100ms
+      ball_will_end: 100ms
+      resetRightDrops: 500ms

@@ -1,43 +1,44 @@
 events:
   game_ended: 0
-  game_started: 32
+  game_started: 37
 missing_switches:
-  s_10_points_15: 32
-  s_flipper_left: 32
-  s_flipper_right: 32
-  s_green_button_right_56: 32
-  s_hole_kicker_top_23: 32
-  s_kicking_target_26: 32
+  s_10_points_15: 37
+  s_flipper_left: 37
+  s_flipper_right: 37
+  s_green_button_right_56: 37
+  s_hole_kicker_top_23: 37
+  s_kicking_target_26: 37
   s_outhole: 17
-  s_outlane_left_6: 32
-  s_outlane_right_5: 32
-  s_plunger_lane: 32
-  s_ramp_1_34: 18
-  s_ramp_2_24: 32
-  s_ramp_3_14: 32
-  s_ramp_4_4: 32
+  s_outlane_left_6: 37
+  s_outlane_right_5: 37
+  s_plunger_lane: 37
+  s_ramp_1_34: 23
+  s_ramp_2_24: 37
+  s_ramp_3_14: 4
+  s_ramp_4_4: 37
   s_return_left_16: 2
-  s_right_drop_2_11: 3
-  s_right_drop_3_21: 3
-  s_right_drop_4_31: 3
-  s_rollunder_25: 32
-  s_side_kicker_left_43: 32
-  s_spinner_44: 32
-  s_spot_target_36: 32
-  s_start_47: 2
-  s_subway_kicker_0: 32
-  s_subway_lock_10: 32
-  s_subway_one_3: 32
-  s_test_switch_7: 32
-  s_tilt_46: 32
-  s_top_drop_1_2: 32
-  s_top_drop_2_12: 32
-  s_top_drop_3_22: 32
-  s_top_drop_4_32: 32
-  s_top_drop_5_42: 32
-  s_trough_1_40: 32
-  s_trough_2_30: 32
-  s_trough_3_20: 32
+  s_right_drop_2_11: 8
+  s_right_drop_3_21: 8
+  s_right_drop_4_31: 8
+  s_right_drop_5_41: 5
+  s_rollunder_25: 4
+  s_side_kicker_left_43: 4
+  s_spinner_44: 37
+  s_spot_target_36: 37
+  s_start_47: 7
+  s_subway_kicker_0: 37
+  s_subway_lock_10: 37
+  s_subway_one_3: 37
+  s_test_switch_7: 37
+  s_tilt_46: 37
+  s_top_drop_1_2: 37
+  s_top_drop_2_12: 37
+  s_top_drop_3_22: 37
+  s_top_drop_4_32: 37
+  s_top_drop_5_42: 37
+  s_trough_1_40: 37
+  s_trough_2_30: 37
+  s_trough_3_20: 37
   s_trough_left: 17
 player:
   score:
@@ -45,17 +46,17 @@ player:
     top: []
     total: 0
 shots:
-  bumper_bottom: 135
-  bumper_top: 78
-  return_rollover_left: 17
-  right_drop_target_1: 54
-  right_drop_target_2: 7
-  right_drop_target_3: 6
-  right_drop_target_4: 4
-  right_drop_target_5: 7
+  bumper_bottom: 150
+  bumper_top: 90
+  return_rollover_left: 19
+  right_drop_1: 110
+  right_drop_2: 7
+  right_drop_3: 6
+  right_drop_4: 4
+  right_drop_5: 7
 switches:
   s_10_points_15: 0
-  s_bottom_bumpers_13: 135
+  s_bottom_bumpers_13: 150
   s_flipper_left: 0
   s_flipper_right: 0
   s_green_button_right_56: 0
@@ -67,16 +68,16 @@ switches:
   s_plunger_lane: 0
   s_ramp_1_34: 1
   s_ramp_2_24: 0
-  s_ramp_3_14: 0
+  s_ramp_3_14: 2
   s_ramp_4_4: 0
-  s_return_left_16: 17
-  s_right_drop_1_1: 54
+  s_return_left_16: 19
+  s_right_drop_1_1: 110
   s_right_drop_2_11: 7
   s_right_drop_3_21: 6
   s_right_drop_4_31: 4
   s_right_drop_5_41: 7
-  s_rollunder_25: 0
-  s_side_kicker_left_43: 0
+  s_rollunder_25: 3
+  s_side_kicker_left_43: 1
   s_spinner_44: 0
   s_spot_target_36: 0
   s_start_47: 16
@@ -85,7 +86,7 @@ switches:
   s_subway_one_3: 0
   s_test_switch_7: 0
   s_tilt_46: 0
-  s_top_bumpers_35: 78
+  s_top_bumpers_35: 90
   s_top_drop_1_2: 0
   s_top_drop_2_12: 0
   s_top_drop_3_22: 0

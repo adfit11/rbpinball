@@ -1,0 +1,46 @@
+#config_version=6
+
+# Hitting drop targets on right
+
+mode:
+  start_events: start_mode_right_drops
+  stop_events: stop_mode_right_drops
+  priority: 201
+
+
+
+
+     
+
+
+
+
+
+shots:
+  right_drop_1:
+    switch: s_right_drop_1_1
+  right_drop_2:
+    switch: s_right_drop_2_11
+  right_drop_3:
+    switch: s_right_drop_3_21
+  right_drop_4:
+    switch: s_right_drop_4_31
+  right_drop_5:
+    switch: s_right_drop_5_41
+
+
+shot_groups:
+  right_drops:
+    shots: 
+      right_drop_1,
+      right_drop_2,
+      right_drop_3,
+      right_drop_4,
+      right_drop_5
+
+variable_player:
+  right_drops_hit:
+    score: 5_000
+
+sound_player:
+    right_drops_hit: right_drops_effect
