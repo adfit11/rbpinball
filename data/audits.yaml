@@ -1,40 +1,42 @@
 events:
   game_ended: 0
-  game_started: 29
+  game_started: 30
 missing_switches:
-  s_10_point_switches_x7: 29
-  s_crater_1: 15
-  s_crater_2: 29
-  s_crater_3: 29
-  s_crater_4: 29
-  s_flipper_left: 29
-  s_flipper_right: 29
-  s_green_button_right: 29
-  s_hole_kicker_top: 29
-  s_kicking_target: 29
+  s_10_point_switches_x7: 30
+  s_crater_1: 16
+  s_crater_2: 30
+  s_crater_3: 30
+  s_crater_4: 30
+  s_flipper_left: 30
+  s_flipper_right: 30
+  s_green_button_right: 30
+  s_hole_kicker_top: 30
+  s_kicking_target: 30
   s_outhole: 17
-  s_outlane_rollover_left: 29
-  s_outlane_rollover_right: 29
-  s_plunger_lane: 29
-  s_return_rollover_left: 1
-  s_rollunder: 29
-  s_side_kicker_left: 29
-  s_spinner: 29
-  s_spot_target: 29
-  s_start: 17
-  s_subway_kicker: 29
-  s_subway_lock: 29
-  s_subway_one: 29
-  s_test_switch: 29
-  s_tilt_playboard: 29
-  s_top_drop_target_1: 29
-  s_top_drop_target_2: 29
-  s_top_drop_target_3: 29
-  s_top_drop_target_4: 29
-  s_top_drop_target_5: 29
-  s_trough_1: 29
-  s_trough_2: 29
-  s_trough_3: 29
+  s_outlane_rollover_left: 30
+  s_outlane_rollover_right: 30
+  s_plunger_lane: 30
+  s_right_drop_target_2: 1
+  s_right_drop_target_3: 1
+  s_right_drop_target_4: 1
+  s_right_drop_target_5: 1
+  s_rollunder: 30
+  s_side_kicker_left: 30
+  s_spinner: 30
+  s_spot_target: 30
+  s_subway_kicker: 30
+  s_subway_lock: 30
+  s_subway_one: 30
+  s_test_switch: 30
+  s_tilt_playboard: 30
+  s_top_drop_target_1: 30
+  s_top_drop_target_2: 30
+  s_top_drop_target_3: 30
+  s_top_drop_target_4: 30
+  s_top_drop_target_5: 30
+  s_trough_1: 30
+  s_trough_2: 30
+  s_trough_3: 30
   s_trough_left: 17
 player:
   score:
@@ -42,17 +44,17 @@ player:
     top: []
     total: 0
 shots:
-  bumper_bottom: 125
-  bumper_top: 74
-  return_rollover_left: 16
-  right_drop_target_1: 41
+  bumper_bottom: 129
+  bumper_top: 75
+  return_rollover_left: 17
+  right_drop_target_1: 46
   right_drop_target_2: 7
   right_drop_target_3: 6
   right_drop_target_4: 4
   right_drop_target_5: 6
 switches:
   s_10_point_switches_x7: 0
-  s_bottom_pop_bumpers_x2: 125
+  s_bottom_pop_bumpers_x2: 129
   s_crater_1: 1
   s_crater_2: 0
   s_crater_3: 0
@@ -66,8 +68,8 @@ switches:
   s_outlane_rollover_left: 0
   s_outlane_rollover_right: 0
   s_plunger_lane: 0
-  s_return_rollover_left: 16
-  s_right_drop_target_1: 41
+  s_return_rollover_left: 17
+  s_right_drop_target_1: 46
   s_right_drop_target_2: 7
   s_right_drop_target_3: 6
   s_right_drop_target_4: 4
@@ -76,7 +78,7 @@ switches:
   s_side_kicker_left: 0
   s_spinner: 0
   s_spot_target: 0
-  s_start: 13
+  s_start: 16
   s_subway_kicker: 0
   s_subway_lock: 0
   s_subway_one: 0
@@ -87,7 +89,7 @@ switches:
   s_top_drop_target_3: 0
   s_top_drop_target_4: 0
   s_top_drop_target_5: 0
-  s_top_pop_bumpers_x2: 74
+  s_top_pop_bumpers_x2: 75
   s_trough_1: 0
   s_trough_2: 0
   s_trough_3: 0

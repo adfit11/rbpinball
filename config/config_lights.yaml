@@ -1,0 +1,113 @@
+#config_version=6
+
+lights:
+#   l_tilt_relay:
+#     number: 
+#   l_high_game_to date:
+#     number: 
+#   l_same_player_shoots_again:
+#     number: 
+#   l_game_over_relay:
+#     number: 0  
+  # l_2000_Bonus:
+  #   number: 34
+  l_Game_Over_Relay:
+    number: 00
+  l_BK_Shoot_Again:
+    number: 01
+  l_Coin_Lockout_Coil:
+    number: 02
+  l_Bottom_Sht_Again:
+    number: 03
+  l_2x_Multiplier:
+    number: 04
+  l_3x_Multiplier:
+    number: 05
+  l_4x_Multiplier:
+    number: 06
+  l_5x_Multiplier:
+    number: 07
+  l_$$_LH_Lava_Pit:
+    number: 08
+  l_$$_Skill:
+    number: 12
+  l_$$_RH_Bl_Save:
+    number: 14
+  l_$$_RH_Bl_Reset:
+    number: 15
+  l_$$_Top_Hole:
+    number: 16
+  l_Lava_Level_One:
+    number: 17
+  l_Lava_Level_Two:
+    number: 18
+  l_1_Right_Drop_Target:
+    number: 19
+  l_2_Right_Drop_Target:
+    number: 20
+  l_3_Right_Drop_Target:
+    number: 21
+  l_4_Right_Drop_Target:
+    number: 22
+  l_5_Right_Drop_Target:
+    number: 23
+  l_Crater_4:
+    number: 24
+  l_Crater_3:
+    number: 25
+  l_Crater_2:
+    number: 26
+  l_Crater_1:
+    number: 27
+  l_Top_Drop_Target:
+    number: 28
+  l_Bottom_Drop_Target:
+    number: 29
+  l_2x_Lava_Flow_Multiplier:
+    number: 30
+  l_3x_Lava_Flow_Multiplier:
+    number: 31
+  l_4x_Lava_Flow_Multiplier:
+    number: 32
+  l_1000_Bonus:
+    number: 33
+  l_l_2000_Bonus:
+    number: 34
+  l_3000_Bonus:
+    number: 35
+  l_4000_Bonus:
+    number: 36
+  l_5000_Bonus:
+    number: 37
+  l_6000_Bonus:
+    number: 38
+  l_7000_Bonus:
+    number: 39
+  l_8000_Bonus:
+    number: 40
+  l_9000_Bonus:
+    number: 41
+  l_10000_Bonus:
+    number: 42
+  l_Spot_Target:
+    number: 43
+  l_Special:
+    number: 44
+  l_Extra_Ball:
+    number: 45
+  l_Spinner:
+    number: 46
+  l_Collect_Seismic_Value:
+    number: 47
+
+
+  
+  # n/a lights:
+  #   number: 09
+  #   number: 10
+  #   number: 11
+  #   number: 13
+  #   number: 48
+  #   number: 49
+  #   number: 50
+  #   number: 51
