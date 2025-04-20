@@ -4,6 +4,7 @@
 [ext_resource type="AudioStream" uid="uid://bgb2oqtufaae0" path="res://sounds/effects/Bumper02.mp3" id="2_fy21i"]
 
 [resource]
+playback_mode = 1
 streams_count = 2
 stream_0/stream = ExtResource("1_kpg62")
 stream_1/stream = ExtResource("2_fy21i")

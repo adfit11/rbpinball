@@ -1,0 +1,16 @@
+[gd_resource type="AudioStreamRandomizer" load_steps=6 format=3 uid="uid://d388q76ph8h2c"]
+
+[ext_resource type="AudioStream" uid="uid://cbig2dyvwxsrq" path="res://sounds/effects/rightdrop01.mp3" id="1_adqtw"]
+[ext_resource type="AudioStream" uid="uid://csex6c82irbde" path="res://sounds/effects/rightdrop02.mp3" id="2_ajceb"]
+[ext_resource type="AudioStream" uid="uid://g0iqd7bv402n" path="res://sounds/effects/rightdrop03.mp3" id="3_thm3c"]
+[ext_resource type="AudioStream" uid="uid://dq6hi0onmrr11" path="res://sounds/effects/rightdrop04.mp3" id="4_15oqp"]
+[ext_resource type="AudioStream" uid="uid://dnxt3vu7beqqv" path="res://sounds/effects/rightdrop05.mp3" id="5_hy35w"]
+
+[resource]
+playback_mode = 1
+streams_count = 5
+stream_0/stream = ExtResource("1_adqtw")
+stream_1/stream = ExtResource("2_ajceb")
+stream_2/stream = ExtResource("3_thm3c")
+stream_3/stream = ExtResource("4_15oqp")
+stream_4/stream = ExtResource("5_hy35w")

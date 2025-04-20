@@ -9,12 +9,6 @@ switches:
   s_flipper_right:
     number:
     tags: right_flipper
-  s_trough_1:
-    number:
-  s_trough_2:
-    number:
-  s_trough_3:
-    number:
   s_plunger_lane:
     number:
 
@@ -30,11 +24,11 @@ switches:
     tags: start
   
   # TROUGH --------------------------------------
-  s_trough_left:
+  s_trough_1:
     number: 40
-  s_trough_right:
+  s_trough_2:
     number: 30
-  s_outhole:
+  s_trough_3:
     number: 20
 
   # SUBWAY --------------------------------------
@@ -48,6 +42,7 @@ switches:
   # RIGHT DROP TARGETS --------------------------
   s_right_drop_target_1:
     number: 1
+
   s_right_drop_target_2:
     number: 11
   s_right_drop_target_3:
@@ -72,56 +67,56 @@ switches:
   # CRATERS -------------------------------------
   s_crater_1:
     number: 34 
-    tags: playfield_active
+
   s_crater_2:
     number: 24    
-    tags: playfield_active
+
   s_crater_3:
     number: 14    
-    tags: playfield_active
+
   s_crater_4:
     number: 4
-    tags: playfield_active
+
 
   # OUTLANES ------------------------------------
   s_outlane_rollover_right:
     number: 5
-    tags: playfield_active
+
   s_outlane_rollover_left:
     number: 6
-    tags: playfield_active
+
 
   # POP BUMPERS --------------------------------
   s_top_pop_bumpers_x2:
     number: 35
-    tags: playfield_active
+
   s_bottom_pop_bumpers_x2:
     number: 13
-    tags: playfield_active
+
 
   # OTHER SWITCHES ------------------------------
   s_10_point_switches_x7:
     number: 15
-    tags: playfield_active
+
   s_return_rollover_left:
     number: 16
-    tags: playfield_active
+
   s_hole_kicker_top:
     number: 23
   s_rollunder:
     number: 25
-    tags: playfield_active
+
   s_kicking_target:
     number: 26
-    tags: playfield_active
+
   s_spot_target:
     number: 36
-    tags: playfield_active
+
   s_side_kicker_left:
     number: 43
   s_spinner:
     number: 44
-    tags: playfield_active
+
   s_tilt_playboard:
     number: 46
-    tags: playfield_active
+
