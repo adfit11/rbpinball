@@ -7,14 +7,8 @@ mode:
   stop_events: stop_mode_right_drops
   priority: 201
 
-
-
-
-     
-
-
-
-
+event_player:
+   drop_target_bank_right_bank_down: reset_right_drops
 
 shots:
   right_drop_1:
@@ -27,7 +21,6 @@ shots:
     switch: s_right_drop_4_31
   right_drop_5:
     switch: s_right_drop_5_41
-
 
 shot_groups:
   right_drops:
