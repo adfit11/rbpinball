@@ -1,42 +1,47 @@
 events:
   game_ended: 0
-  game_started: 30
+  game_started: 31
 missing_switches:
-  s_10_point_switches_x7: 30
-  s_crater_1: 16
-  s_crater_2: 30
-  s_crater_3: 30
-  s_crater_4: 30
-  s_flipper_left: 30
-  s_flipper_right: 30
-  s_green_button_right: 30
-  s_hole_kicker_top: 30
-  s_kicking_target: 30
+  s_10_point_switches_x7: 31
+  s_bottom_pop_bumpers_x2: 1
+  s_crater_1: 17
+  s_crater_2: 31
+  s_crater_3: 31
+  s_crater_4: 31
+  s_flipper_left: 31
+  s_flipper_right: 31
+  s_green_button_right: 31
+  s_hole_kicker_top: 31
+  s_kicking_target: 31
   s_outhole: 17
-  s_outlane_rollover_left: 30
-  s_outlane_rollover_right: 30
-  s_plunger_lane: 30
-  s_right_drop_target_2: 1
-  s_right_drop_target_3: 1
-  s_right_drop_target_4: 1
-  s_right_drop_target_5: 1
-  s_rollunder: 30
-  s_side_kicker_left: 30
-  s_spinner: 30
-  s_spot_target: 30
-  s_subway_kicker: 30
-  s_subway_lock: 30
-  s_subway_one: 30
-  s_test_switch: 30
-  s_tilt_playboard: 30
-  s_top_drop_target_1: 30
-  s_top_drop_target_2: 30
-  s_top_drop_target_3: 30
-  s_top_drop_target_4: 30
-  s_top_drop_target_5: 30
-  s_trough_1: 30
-  s_trough_2: 30
-  s_trough_3: 30
+  s_outlane_rollover_left: 31
+  s_outlane_rollover_right: 31
+  s_plunger_lane: 31
+  s_return_rollover_left: 1
+  s_right_drop_target_1: 1
+  s_right_drop_target_2: 2
+  s_right_drop_target_3: 2
+  s_right_drop_target_4: 2
+  s_right_drop_target_5: 2
+  s_rollunder: 31
+  s_side_kicker_left: 31
+  s_spinner: 31
+  s_spot_target: 31
+  s_start: 1
+  s_subway_kicker: 31
+  s_subway_lock: 31
+  s_subway_one: 31
+  s_test_switch: 31
+  s_tilt_playboard: 31
+  s_top_drop_target_1: 31
+  s_top_drop_target_2: 31
+  s_top_drop_target_3: 31
+  s_top_drop_target_4: 31
+  s_top_drop_target_5: 31
+  s_top_pop_bumpers_x2: 1
+  s_trough_1: 31
+  s_trough_2: 31
+  s_trough_3: 31
   s_trough_left: 17
 player:
   score:
