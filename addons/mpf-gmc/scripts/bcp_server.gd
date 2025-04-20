@@ -206,7 +206,7 @@ func stop(is_exiting: bool = false) -> void:
 	if did_lock:
 		_mutex.unlock()
 
-	if _thread and _thread.is_started():
+	if _thread and _thread.is_start_47ed():
 		_thread.wait_to_finish()
 	_thread = null
 

@@ -1,47 +1,43 @@
 events:
   game_ended: 0
-  game_started: 31
+  game_started: 32
 missing_switches:
-  s_10_point_switches_x7: 31
-  s_bottom_pop_bumpers_x2: 1
-  s_crater_1: 17
-  s_crater_2: 31
-  s_crater_3: 31
-  s_crater_4: 31
-  s_flipper_left: 31
-  s_flipper_right: 31
-  s_green_button_right: 31
-  s_hole_kicker_top: 31
-  s_kicking_target: 31
+  s_10_points_15: 32
+  s_flipper_left: 32
+  s_flipper_right: 32
+  s_green_button_right_56: 32
+  s_hole_kicker_top_23: 32
+  s_kicking_target_26: 32
   s_outhole: 17
-  s_outlane_rollover_left: 31
-  s_outlane_rollover_right: 31
-  s_plunger_lane: 31
-  s_return_rollover_left: 1
-  s_right_drop_target_1: 1
-  s_right_drop_target_2: 2
-  s_right_drop_target_3: 2
-  s_right_drop_target_4: 2
-  s_right_drop_target_5: 2
-  s_rollunder: 31
-  s_side_kicker_left: 31
-  s_spinner: 31
-  s_spot_target: 31
-  s_start: 1
-  s_subway_kicker: 31
-  s_subway_lock: 31
-  s_subway_one: 31
-  s_test_switch: 31
-  s_tilt_playboard: 31
-  s_top_drop_target_1: 31
-  s_top_drop_target_2: 31
-  s_top_drop_target_3: 31
-  s_top_drop_target_4: 31
-  s_top_drop_target_5: 31
-  s_top_pop_bumpers_x2: 1
-  s_trough_1: 31
-  s_trough_2: 31
-  s_trough_3: 31
+  s_outlane_left_6: 32
+  s_outlane_right_5: 32
+  s_plunger_lane: 32
+  s_ramp_1_34: 18
+  s_ramp_2_24: 32
+  s_ramp_3_14: 32
+  s_ramp_4_4: 32
+  s_return_left_16: 2
+  s_right_drop_2_11: 3
+  s_right_drop_3_21: 3
+  s_right_drop_4_31: 3
+  s_rollunder_25: 32
+  s_side_kicker_left_43: 32
+  s_spinner_44: 32
+  s_spot_target_36: 32
+  s_start_47: 2
+  s_subway_kicker_0: 32
+  s_subway_lock_10: 32
+  s_subway_one_3: 32
+  s_test_switch_7: 32
+  s_tilt_46: 32
+  s_top_drop_1_2: 32
+  s_top_drop_2_12: 32
+  s_top_drop_3_22: 32
+  s_top_drop_4_32: 32
+  s_top_drop_5_42: 32
+  s_trough_1_40: 32
+  s_trough_2_30: 32
+  s_trough_3_20: 32
   s_trough_left: 17
 player:
   score:
@@ -49,54 +45,54 @@ player:
     top: []
     total: 0
 shots:
-  bumper_bottom: 129
-  bumper_top: 75
+  bumper_bottom: 135
+  bumper_top: 78
   return_rollover_left: 17
-  right_drop_target_1: 46
+  right_drop_target_1: 54
   right_drop_target_2: 7
   right_drop_target_3: 6
   right_drop_target_4: 4
-  right_drop_target_5: 6
+  right_drop_target_5: 7
 switches:
-  s_10_point_switches_x7: 0
-  s_bottom_pop_bumpers_x2: 129
-  s_crater_1: 1
-  s_crater_2: 0
-  s_crater_3: 0
-  s_crater_4: 0
+  s_10_points_15: 0
+  s_bottom_bumpers_13: 135
   s_flipper_left: 0
   s_flipper_right: 0
-  s_green_button_right: 0
-  s_hole_kicker_top: 0
-  s_kicking_target: 0
+  s_green_button_right_56: 0
+  s_hole_kicker_top_23: 0
+  s_kicking_target_26: 0
   s_outhole: 0
-  s_outlane_rollover_left: 0
-  s_outlane_rollover_right: 0
+  s_outlane_left_6: 0
+  s_outlane_right_5: 0
   s_plunger_lane: 0
-  s_return_rollover_left: 17
-  s_right_drop_target_1: 46
-  s_right_drop_target_2: 7
-  s_right_drop_target_3: 6
-  s_right_drop_target_4: 4
-  s_right_drop_target_5: 6
-  s_rollunder: 0
-  s_side_kicker_left: 0
-  s_spinner: 0
-  s_spot_target: 0
-  s_start: 16
-  s_subway_kicker: 0
-  s_subway_lock: 0
-  s_subway_one: 0
-  s_test_switch: 0
-  s_tilt_playboard: 0
-  s_top_drop_target_1: 0
-  s_top_drop_target_2: 0
-  s_top_drop_target_3: 0
-  s_top_drop_target_4: 0
-  s_top_drop_target_5: 0
-  s_top_pop_bumpers_x2: 75
-  s_trough_1: 0
-  s_trough_2: 0
-  s_trough_3: 0
+  s_ramp_1_34: 1
+  s_ramp_2_24: 0
+  s_ramp_3_14: 0
+  s_ramp_4_4: 0
+  s_return_left_16: 17
+  s_right_drop_1_1: 54
+  s_right_drop_2_11: 7
+  s_right_drop_3_21: 6
+  s_right_drop_4_31: 4
+  s_right_drop_5_41: 7
+  s_rollunder_25: 0
+  s_side_kicker_left_43: 0
+  s_spinner_44: 0
+  s_spot_target_36: 0
+  s_start_47: 16
+  s_subway_kicker_0: 0
+  s_subway_lock_10: 0
+  s_subway_one_3: 0
+  s_test_switch_7: 0
+  s_tilt_46: 0
+  s_top_bumpers_35: 78
+  s_top_drop_1_2: 0
+  s_top_drop_2_12: 0
+  s_top_drop_3_22: 0
+  s_top_drop_4_32: 0
+  s_top_drop_5_42: 0
+  s_trough_1_40: 0
+  s_trough_2_30: 0
+  s_trough_3_20: 0
   s_trough_left: 0
   s_trough_right: 1

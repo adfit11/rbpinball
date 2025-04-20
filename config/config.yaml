@@ -26,6 +26,6 @@ playfields:
     tags: default
 
 virtual_platform_start_active_switches:
-  - s_trough_1
-  - s_trough_2
-  - s_trough_3
+  - s_trough_1_40
+  - s_trough_2_30
+  - s_trough_3_20

@@ -13,110 +13,95 @@ switches:
     number:
 
   # CABINET --------------------------------------
-  s_green_button_right:
+  s_green_button_right_56:
     number: 56
 
   # ADMIN --------------------------------------
-  s_test_switch:
+  s_test_switch_7:
     number: 7
-  s_start:
+  s_start_47:
     number: 47
     tags: start
   
   # TROUGH --------------------------------------
-  s_trough_1:
+  s_trough_1_40:
     number: 40
-  s_trough_2:
+  s_trough_2_30:
     number: 30
-  s_trough_3:
+  s_trough_3_20:
     number: 20
 
   # SUBWAY --------------------------------------
-  s_subway_kicker:
+  s_subway_kicker_0:
     number: 0
-  s_subway_one:
+  s_subway_one_3:
     number: 3
-  s_subway_lock:
+  s_subway_lock_10:
     number: 10
 
   # RIGHT DROP TARGETS --------------------------
-  s_right_drop_target_1:
+  s_right_drop_1_1:
     number: 1
-
-  s_right_drop_target_2:
+  s_right_drop_2_11:
     number: 11
-  s_right_drop_target_3:
+  s_right_drop_3_21:
     number: 21
-  s_right_drop_target_4:
+  s_right_drop_4_31:
     number: 31  
-  s_right_drop_target_5:
+  s_right_drop_5_41:
     number: 41
 
   # TOP DROP TARGETS ----------------------------
-  s_top_drop_target_1:
+  s_top_drop_1_2:
     number: 2
-  s_top_drop_target_2:
+  s_top_drop_2_12:
     number: 12
-  s_top_drop_target_3:
+  s_top_drop_3_22:
     number: 22
-  s_top_drop_target_4:
+  s_top_drop_4_32:
     number: 32
-  s_top_drop_target_5:
+  s_top_drop_5_42:
     number: 42
 
-  # CRATERS -------------------------------------
-  s_crater_1:
+  # RAMP -------------------------------------
+  s_ramp_1_34:
     number: 34 
-
-  s_crater_2:
+  s_ramp_2_24:
     number: 24    
-
-  s_crater_3:
+  s_ramp_3_14:
     number: 14    
-
-  s_crater_4:
+  s_ramp_4_4:
     number: 4
 
-
   # OUTLANES ------------------------------------
-  s_outlane_rollover_right:
+  s_outlane_right_5:
     number: 5
-
-  s_outlane_rollover_left:
+  s_outlane_left_6:
     number: 6
 
-
   # POP BUMPERS --------------------------------
-  s_top_pop_bumpers_x2:
+  s_top_bumpers_35:
     number: 35
-
-  s_bottom_pop_bumpers_x2:
+  s_bottom_bumpers_13:
     number: 13
 
-
   # OTHER SWITCHES ------------------------------
-  s_10_point_switches_x7:
+  s_10_points_15:
     number: 15
-
-  s_return_rollover_left:
+  s_return_left_16:
     number: 16
-
-  s_hole_kicker_top:
+  s_hole_kicker_top_23:
     number: 23
-  s_rollunder:
+  s_rollunder_25:
     number: 25
-
-  s_kicking_target:
+  s_kicking_target_26:
     number: 26
-
-  s_spot_target:
+  s_spot_target_36:
     number: 36
-
-  s_side_kicker_left:
+  s_side_kicker_left_43:
     number: 43
-  s_spinner:
+  s_spinner_44:
     number: 44
-
-  s_tilt_playboard:
+  s_tilt_46:
     number: 46
 

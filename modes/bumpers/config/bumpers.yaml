@@ -9,9 +9,9 @@ mode:
 
 shots:
   bumper_top:
-    switch: s_top_pop_bumpers_x2
+    switch: s_top_bumpers_35
   bumper_bottom:
-    switch: s_bottom_pop_bumpers_x2
+    switch: s_bottom_bumpers_13
 
 shot_groups:
   bumpers:

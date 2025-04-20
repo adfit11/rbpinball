@@ -21,7 +21,7 @@ event_player:
 
 shots:
   return_rollover_left:
-    switches: s_return_rollover_left
+    switches: s_return_left_16
 
 slide_player:
   mode_base_started: base_slide
