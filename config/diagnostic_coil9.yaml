@@ -1,0 +1,15 @@
+#config_version=6
+
+# One-shot test: press Start to pulse output 9 for 30 ms.
+# Restart this diagnostic to arm another test. No game ball devices loaded.
+config:
+  - diagnostic_switches.yaml
+
+custom_code: custom_code.coil9_test.Coil9Test
+
+coils:
+  c_test_output9:
+    number: 9
+    default_pulse_ms: 30
+    max_pulse_ms: 30
+

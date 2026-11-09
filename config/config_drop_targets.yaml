@@ -11,6 +11,16 @@ drop_targets:
     switch: s_right_drop_4_31
   right_drop_5:
     switch: s_right_drop_5_41
+  top_drop_1:
+    switch: s_top_drop_1_2
+  top_drop_2:
+    switch: s_top_drop_2_12
+  top_drop_3:
+    switch: s_top_drop_3_22
+  top_drop_4:
+    switch: s_top_drop_4_32
+  top_drop_5:
+    switch: s_top_drop_5_42
 
 drop_target_banks:
   right_bank:
@@ -19,5 +29,13 @@ drop_target_banks:
     reset_coil_max_wait_ms: 150
     reset_events: 
       machine_reset_phase_3: 100ms
+      game_starting: 100ms
       ball_will_end: 100ms
       reset_right_drops: 500ms
+  top_bank:
+    drop_targets: top_drop_1, top_drop_2, top_drop_3, top_drop_4, top_drop_5
+    reset_coil: c_top_drops
+    reset_coil_max_wait_ms: 150
+    reset_events:
+      game_starting: 300ms
+      ball_will_end: 300ms

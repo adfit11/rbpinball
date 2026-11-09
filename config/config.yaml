@@ -18,15 +18,34 @@ modes:
   - attract
   - base
   - bumpers
+  - outlanes
   - hurryup
   - right_drops
+  - tilt
 
 playfields:
   playfield:
     default_source_device: bd_trough
     tags: default
 
+machine:
+  balls_installed: 3
+
 virtual_platform_start_active_switches:
   - s_trough_1_40
   - s_trough_2_30
-  - s_trough_3_20
+
+#hardware:
+#  platform: lisy
+#lisy:
+#  connection: network
+#  network_port: 5963
+#  network_host: lisy 
+
+hardware:
+  platform: lisy, virtual
+
+lisy:
+  connection: serial
+  port: /dev/cu.usbmodem1101
+  baud: 115200

@@ -4,13 +4,16 @@ switches:
 
   # TUTORIAL --------------------------------------
   s_flipper_left:
-    number:
+    platform: virtual
+    number: tutorial_flipper_left
     tags: left_flipper
   s_flipper_right:
-    number:
+    platform: virtual
+    number: tutorial_flipper_right
     tags: right_flipper
   s_plunger_lane:
-    number:
+    platform: virtual
+    number: tutorial_plunger_lane
 
   # CABINET --------------------------------------
   s_green_button_right_56:
@@ -104,4 +107,5 @@ switches:
     number: 44
   s_tilt_46:
     number: 46
+    tags: tilt
 

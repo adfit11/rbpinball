@@ -1,0 +1,9 @@
+#config_version=6
+
+# One output per Start press. No ball devices or drop banks are loaded.
+# /Users/adrian/mpf/bin/mpf -c diagnostic_coil_survey.yaml -b -t -v
+config:
+  - diagnostic_switches.yaml
+  - config_coils.yaml
+
+custom_code: custom_code.coil_survey.CoilSurvey

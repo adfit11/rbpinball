@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volcano · USB diagnostics</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#101617;color:#eaf0eb}*{box-sizing:border-box}body{max-width:1200px;margin:auto;padding:32px 24px}h1{font-size:32px;letter-spacing:-1px;margin:8px 0}h2{font-size:21px;margin:0 0 12px}p{line-height:1.5;color:#b1c2bb}.eyebrow{font-size:12px;letter-spacing:2px;color:#edb56c}header,.toolbar,.row{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap}.status{border:1px solid #38584c;padding:8px 12px;border-radius:30px}.toolbar{position:sticky;top:0;background:#101617f5;padding:14px 0;z-index:2;border-bottom:1px solid #34433e}button,input,select{font:inherit;border-radius:7px;border:1px solid #53645b;padding:10px;background:#22322c;color:#eaf0eb}button{cursor:pointer}button:hover{border-color:#edb56c}button:disabled{opacity:.4;cursor:not-allowed}button.primary{background:#edb56c;color:#171c19;border-color:#edb56c;font-weight:700}.danger{background:#6f2925;border-color:#bd6257}#notice{min-height:28px;color:#edb56c;line-height:1.5}section{margin-top:28px}.relay{background:#192622;border:1px solid #496653;border-radius:12px;padding:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:#182120;border:1px solid #35483f;border-radius:12px;padding:20px}.card h3{margin:10px 0 20px;font-size:19px}.number{color:#edb56c;font-size:12px;letter-spacing:1px}.duration{display:flex;gap:8px;align-items:center}input{width:95px}label{font-size:13px;color:#b1c2bb}.result{margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:8px}.result select{font-size:13px;max-width:150px}.help{font-size:13px;color:#9eb2a7}.switches{display:flex;gap:8px;flex-wrap:wrap}.switch{padding:7px 10px;background:#1d2a25;border:1px solid #35483f;border-radius:6px;font-size:13px}.switch.active{background:#e7b767;color:#141b17;border-color:#e7b767}.logs{font:13px ui-monospace,monospace;line-height:1.8;padding:18px;background:#0b1110;border-radius:8px;max-height:260px;overflow:auto}footer{margin:30px 0;color:#91a89a;font-size:13px}.virtual{color:#edb56c}
+.card[data-result="working"] {
+    background: #173754;
+    border-color: #91c9ff;
+    box-shadow: inset 5px 0 #91c9ff;
+}
+.card[data-result="no response"] {
+    background: #554017;
+    border: 2px dashed #ffcf73;
+    padding: 19px;
+}
+.card-result {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #101617;
+}
+.card-result:empty {
+    display: none;
+}
+.card[data-result="working"] .card-result {
+    background: #91c9ff;
+}
+.card[data-result="no response"] .card-result {
+    background: #ffcf73;
+}
+</style>
+<header><div><span class="eyebrow">VOLCANO / SERVICE BENCH</span><h1>USB diagnostics</h1></div><span id="connection" class="status">Connecting…</span></header>
+<p>Pulse one output, observe the mechanism, and record the result. No game or Godot session is needed.</p>
+<div class="toolbar"><span id="activity">Waiting for MPF</span><div><button class="danger" onclick="send({action:'all_off'})">All outputs off</button> <button onclick="send({action:'stop'})">Stop diagnostic</button></div></div>
+<p id="notice" role="status" aria-live="polite"></p>
+<section class="relay"><span class="eyebrow">FIRST CHECK · GAME-OVER RELAY</span><h2>Test relay output L0</h2><p>Observe whether the relay changes state. While commanded on, briefly test a bumper skirt or slingshot switch. These mechanisms cannot be fired individually from this panel with stock wiring.</p><div class="row"><div><button class="primary hardware" onclick="send({action:'relay_on'})">Command L0 on · 10 seconds</button> <button onclick="send({action:'relay_off'})">L0 off</button></div><strong id="relay">L0 commanded off</strong></div><p class="help">The timer turns L0 off automatically. Its effect on the fitted machine still needs physical confirmation. Stop immediately if a coil stays energized. Power off before reconnecting wiring.</p></section>
+<section><h2>Coil outputs</h2><p class="help">Durations are diagnostic limits, not certified coil ratings. A command log confirms a request, not physical movement. The motor test defaults to 250 ms, not a full cycle.</p><div id="coils" class="grid"></div></section>
+<section><h2>Physical switch inputs</h2><p class="help">Amber means active or hit in the last two seconds. Hit counts retain brief pulses. Top bumpers share input 35; bottom bumpers share input 13. A scoring input may depend on mechanical movement.</p><div id="switches" class="switches"></div></section>
+<section><h2>Command log</h2><div id="history" class="logs">No commands yet.</div></section>
+<footer>Local computer → USB serial → LISY80 · Results save on this computer. Close MPF with Ctrl+C when finished.</footer>
+<script>
+const token='__TOKEN__';let inFlight=false,online=false,latest=null;
+const coilCards = new Map();
+const $=id=>document.getElementById(id);
+function message(text){$('notice').textContent=text}
+function lock(){document.querySelectorAll('.hardware').forEach(b=>b.disabled=!online||!latest?.ready||inFlight||(b.classList.contains('pulse')&&latest?.busy))}
+function render(s){latest=s;online=true;$('connection').textContent=s.virtual?'Virtual hardware · no physical outputs':'LISY diagnostic connected';$('connection').classList.toggle('virtual',s.virtual);$('activity').textContent=s.busy?'Pulse / cooldown — wait':'Ready for one pulse';$('relay').textContent=s.relay_seconds>0?`L0 commanded on · ${s.relay_seconds}s remaining`:'L0 commanded off';
+for (const coil of s.coils) {
+    let card = coilCards.get(coil.name);
+    if (!card) {
+        card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `<div class="row"><span class="number"></span><span class="card-result"></span></div><h3></h3><div class="row"><div class="duration"><label>Pulse <input type="number" min="1" step="1" aria-label="Pulse duration in milliseconds"> ms</label></div><button class="primary hardware pulse">Pulse once</button></div><div class="result"><label>Observed result</label><select aria-label="Observed result"><option value="untested">Untested</option><option value="working">Working</option><option value="weak">Weak</option><option value="no response">No response</option></select></div>`;
+        card.querySelector('.number').textContent = 'OUTPUT ' + coil.output;
+        card.querySelector('h3').textContent = coil.label;
+        const input = card.querySelector('input');
+        input.value = coil.default_ms;
+        input.max = coil.max_ms;
+        input.title = 'Diagnostic range: 1–' + coil.max_ms + ' ms';
+        card.querySelector('button').onclick = () => {
+            if (input.reportValidity()) {
+                send({action: 'pulse', name: coil.name, ms: Number(input.value)});
+            }
+        };
+        const select = card.querySelector('select');
+        select.onchange = () => send({action: 'result', name: coil.name, result: select.value});
+        coilCards.set(coil.name, card);
+        $('coils').append(card);
+    }
+    card.dataset.result = coil.result;
+    const statusLabel = coil.result === 'working' ? '✓ Working'
+        : coil.result === 'no response' ? '! No response' : '';
+    const badge = card.querySelector('.card-result');
+    if (badge.textContent !== statusLabel) {
+        badge.textContent = statusLabel;
+    }
+    card.querySelector('select').value = coil.result;
+}
+$('switches').replaceChildren(...s.switches.map(sw=>{const el=document.createElement('span');el.className='switch'+(sw.active||sw.recent?' active':'');el.textContent=`${sw.number} · ${sw.name.replace(/^s_/,'')} · ${sw.hits} hits`;return el}));$('history').replaceChildren(...s.history.map(entry=>{const el=document.createElement('div');el.textContent=`${entry.time}  ${entry.message}`;return el}));lock()}
+async function send(command){if(inFlight&&command.action!=='all_off'&&command.action!=='relay_off')return;inFlight=true;lock();try{const res=await fetch('/api/command',{method:'POST',headers:{'Content-Type':'application/json','X-Panel-Token':token},body:JSON.stringify(command)});const data=await res.json();if(!res.ok)throw Error(data.error||'Request failed');render(data);message(command.action==='result'?'Observation saved.':command.action==='stop'?'Diagnostic stopping.': 'Command sent. Observe the machine.')}catch(e){message(e.message)}finally{inFlight=false;lock()}}
+async function poll(){try{const res=await fetch('/api/state');if(!res.ok)throw Error();render(await res.json())}catch(e){online=false;$('connection').textContent='Disconnected';$('activity').textContent='Check MPF in Terminal';lock()}setTimeout(poll,400)}poll();
+</script>
+</html>

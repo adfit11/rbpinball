@@ -1,0 +1,14 @@
+#config_version=6
+
+# USB diagnostic panel. Run without Godot or another MPF instance:
+# /Users/adrian/mpf/bin/mpf -c diagnostic_panel.yaml -b -t
+config:
+  - diagnostic_switches.yaml
+  - config_coils.yaml
+
+digital_outputs:
+  diagnostic_game_relay:
+    number: 0
+    type: light
+
+custom_code: custom_code.coil_panel.CoilPanel

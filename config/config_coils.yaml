@@ -1,8 +1,15 @@
 #config_version=6
 
+# L0 is a continuous-duty relay driven by the lamp output, not a pulse coil.
+# Re-enable at the next ball after a tilt; retain it between ordinary balls.
+digital_outputs:
+  game_over_relay:
+    number: 0
+    type: light
+    enable_events: game_started, ball_started
+    disable_events: tilt, slam_tilt, game_will_end
+
 coils:
-  c_trough_eject:
-    number:
   c_subway_lock:
     number: 1
     default_hold_power: .1
@@ -21,7 +28,7 @@ coils:
   c_right_drops:
     number: 6
     default_hold_power: .1
-    default_pulse_ms: 300     
+    default_pulse_ms: 100
   c_GGG:
     number: 7
   c_Replay_Knock:
@@ -33,7 +40,7 @@ coils:
   c_trough_release:
     number: 115 # uses light bank
     default_hold_power: 0.075
-    default_pulse_ms: 30   
+    default_pulse_ms: 270
   c_side_kicker_left:
     number: 108 # uses light bank
     default_pulse_ms: 15

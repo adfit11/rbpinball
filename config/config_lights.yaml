@@ -8,8 +8,6 @@ lights:
 #   l_same_player_shoots_again:
 #     number: 
 
-  l_game_over_relay_00:
-    number: 00
   l_xxx_01:
     number: 01
   l_xxx_02:

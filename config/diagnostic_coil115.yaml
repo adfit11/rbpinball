@@ -1,0 +1,14 @@
+#config_version=6
+
+# One-shot test: press Start to pulse output 115 for 270 ms.
+# Restart this diagnostic to arm another test. No game ball devices loaded.
+config:
+  - diagnostic_switches.yaml
+
+custom_code: custom_code.coil9_test.Coil115Test
+
+coils:
+  c_test_output115:
+    number: 115
+    default_pulse_ms: 270
+    max_pulse_ms: 270

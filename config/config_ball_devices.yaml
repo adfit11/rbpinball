@@ -1,11 +1,19 @@
 #config_version=6
 
 ball_devices:
-  bd_plunger:
-    ball_switches: s_plunger_lane
-    mechanical_eject: true
+  bd_outhole:
+    ball_switches: s_trough_3_20
+    eject_coil: c_outhole
+    eject_targets: bd_trough
+    eject_timeouts: 4s
+    tags: drain
+
   bd_trough:
-    ball_switches: s_trough_1_40, s_trough_2_30, s_trough_3_20
-    eject_coil: c_trough_eject
-    eject_targets: bd_plunger
-    tags: trough, home, drain
+    # Switch 40 is momentary for the first two balls and stays closed at three.
+    entrance_switch: s_trough_1_40
+    entrance_switch_full_timeout: 500ms
+    ball_capacity: 3
+    eject_coil: c_trough_release
+    # The mechanical plunger has no switch; its lane is part of the playfield.
+    eject_targets: playfield
+    tags: trough, home

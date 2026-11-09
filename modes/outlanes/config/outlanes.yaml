@@ -1,0 +1,26 @@
+#config_version=6
+
+# Bumper Scoring.
+
+mode:
+  start_events: start_mode_outlanes
+  stop_events: stop_mode_outlanes
+  priority: 201
+
+shots:
+  outlane_right:
+    switch:  s_outlane_right_5
+  outlane_left:
+    switch: s_outlane_left_6
+
+shot_groups:
+  outlanes:
+    shots: outlane_right, outlane_left
+
+variable_player:
+  outlanes_hit:
+    score: 100
+
+sound_player:
+    outlane_right_hit: outlane
+    outlane_left_hit: outlane

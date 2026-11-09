@@ -1,0 +1,37 @@
+#config_version=6
+
+# Run with: /Users/adrian/mpf/bin/mpf -c diagnostic_switches.yaml -b -t -v
+# Switch input only: no coils, lamps, ball devices, or media controller.
+config:
+  - config_switches.yaml
+
+hardware:
+  platform: lisy, virtual
+
+playfields:
+  playfield:
+    tags: default
+    default_source_device: null
+
+lisy:
+  connection: serial
+  port: /dev/cu.usbmodem1101
+  baud: 115200
+
+# Tutorial placeholders have no known physical switch assignment.
+switches:
+  s_flipper_left:
+    platform: virtual
+    number: tutorial_flipper_left
+  s_flipper_right:
+    platform: virtual
+    number: tutorial_flipper_right
+  s_plunger_lane:
+    platform: virtual
+    number: tutorial_plunger_lane
+
+logging:
+  console:
+    switch_controller: full
+  file:
+    switch_controller: full
