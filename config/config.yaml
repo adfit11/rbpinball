@@ -16,6 +16,7 @@ config:
 
 modes:
   - attract
+  - attract_lights
   - base
   - bumpers
   - outlanes

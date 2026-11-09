@@ -1,0 +1,18 @@
+#config_version=6
+
+mode:
+  start_events: mode_attract_started
+  stop_events: mode_attract_will_stop
+  game_mode: false
+  priority: 20
+
+show_player:
+  mode_attract_lights_started:
+    attract_bonus_show:
+      loops: -1
+    attract_crater_show:
+      loops: -1
+    attract_lavamult_show:
+      loops: -1
+    attract_drops_show:
+      loops: -1

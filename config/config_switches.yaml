@@ -11,9 +11,10 @@ switches:
     platform: virtual
     number: tutorial_flipper_right
     tags: right_flipper
-  s_plunger_lane:
-    platform: virtual
-    number: tutorial_plunger_lane
+  # No physical shooter-lane switch; retained as an unused tutorial placeholder.
+  # s_plunger_lane:
+  #   platform: virtual
+  #   number: tutorial_plunger_lane
 
   # CABINET --------------------------------------
   s_green_button_right_56:

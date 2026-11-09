@@ -14,9 +14,13 @@ class TestGameRelay(MpfGameTestCase):
     def test_game_and_tilt(self):
         relay = self.machine.digital_outputs['game_over_relay'].hw_driver
         self.assertEqual(relay.current_brightness, 0)
+        self.assertModeRunning('attract_lights')
+        self.advance_time_and_run(.4)
+        self.assertLightColor('l_xxx_24', 'on')
 
         self.hit_switch_and_run('s_trough_1_40', 1)
         self.start_game(start_switch='s_start_47')
+        self.assertModeNotRunning('attract_lights')
         self.advance_time_and_run(2)
         self.assertEqual(relay.current_brightness, 1)
         self.post_event('ball_will_end', 0.1)

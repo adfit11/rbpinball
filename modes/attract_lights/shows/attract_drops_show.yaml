@@ -1,0 +1,40 @@
+#show_version=6
+
+# Adapted from volcano-rb; original System 80 lamp outputs only.
+- duration: 1000ms
+  lights:
+    l_xxx_19: off
+    l_xxx_20: off
+    l_xxx_21: off
+    l_xxx_22: off
+    l_xxx_23: off
+- duration: 200ms
+  lights:
+    l_xxx_19: on
+- duration: 200ms
+  lights:
+    l_xxx_20: on
+- duration: 200ms
+  lights:
+    l_xxx_21: on
+- duration: 200ms
+  lights:
+    l_xxx_22: on
+- duration: 200ms
+  lights:
+    l_xxx_23: on
+- duration: 200ms
+  lights:
+    l_xxx_19: off
+- duration: 200ms
+  lights:
+    l_xxx_20: off
+- duration: 200ms
+  lights:
+    l_xxx_21: off
+- duration: 200ms
+  lights:
+    l_xxx_22: off
+- duration: 200ms
+  lights:
+    l_xxx_23: off

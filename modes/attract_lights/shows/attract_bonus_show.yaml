@@ -1,0 +1,65 @@
+#show_version=6
+
+# Adapted from volcano-rb; original System 80 lamp outputs only.
+- duration: 300ms
+  lights:
+    l_xxx_33: off
+    l_xxx_34: off
+    l_xxx_35: off
+    l_xxx_36: off
+    l_xxx_37: off
+    l_xxx_38: off
+    l_xxx_39: off
+    l_xxx_40: off
+    l_xxx_41: off
+    l_xxx_42: off
+    l_xxx_17: off
+    l_xxx_18: off
+    l_xxx_04: off
+    l_xxx_05: off
+    l_xxx_06: off
+    l_xxx_07: off
+- duration: 150ms
+  lights:
+    l_xxx_33: on
+- duration: 150ms
+  lights:
+    l_xxx_34: on
+- duration: 150ms
+  lights:
+    l_xxx_35: on
+- duration: 150ms
+  lights:
+    l_xxx_36: on
+- duration: 150ms
+  lights:
+    l_xxx_37: on
+- duration: 150ms
+  lights:
+    l_xxx_38: on
+- duration: 150ms
+  lights:
+    l_xxx_39: on
+- duration: 150ms
+  lights:
+    l_xxx_40: on
+- duration: 150ms
+  lights:
+    l_xxx_41: on
+- duration: 150ms
+  lights:
+    l_xxx_42: on
+- duration: 150ms
+  lights:
+    l_xxx_17: on
+- duration: 150ms
+  lights:
+    l_xxx_18: on
+- duration: 150ms
+  lights:
+    l_xxx_04: on
+    l_xxx_05: on
+- duration: 150ms
+  lights:
+    l_xxx_06: on
+    l_xxx_07: on
