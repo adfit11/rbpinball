@@ -1,0 +1,39 @@
+#config_version=6
+
+mode:
+  code: custom_code.classic_holes.ClassicHoles
+  start_events: mode_classic_started
+  stop_events: ball_will_end
+  priority: 104
+
+ball_holds:
+  classic_saucer:
+    balls_to_hold: 1
+    hold_devices: bd_classic_saucer
+    enable_events: mode_classic_holes_started
+    release_one_events: classic_release_saucer
+  classic_firepit:
+    balls_to_hold: 1
+    hold_devices: bd_classic_firepit
+    enable_events: mode_classic_holes_started
+    release_one_events: classic_release_firepit
+
+extra_balls:
+  classic_firepit_extra:
+    award_events: classic_award_firepit_extra
+  classic_outlane_extra:
+    award_events: classic_award_outlane_extra
+
+light_player:
+  player_classic_bonus_units{value == 19}:
+    l_xxx_47: on
+  player_classic_bonus_units{value < 19}:
+    l_xxx_47: off
+  player_classic_extra_ball_ready{value == 1}:
+    l_xxx_45: on
+  player_classic_extra_ball_ready{value == 0 and current_player.classic_outlane_extra_ready == 0}:
+    l_xxx_45: off
+  player_classic_outlane_extra_ready{value == 1}:
+    l_xxx_45: on
+  player_classic_outlane_extra_ready{value == 0 and current_player.classic_extra_ball_ready == 0}:
+    l_xxx_45: off

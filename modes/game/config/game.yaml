@@ -1,0 +1,4 @@
+#config_version=6
+
+mode:
+  code: custom_code.volcano_game.VolcanoGame

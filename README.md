@@ -10,24 +10,19 @@ cd dropbox/dev/rbpinball
 
 ### Running the game
 
-**to run MPF in virtual mode (no connection to actual machine)**
-mpf -xtb
-then start Godot and play the base-slide
+Open the project in Godot and press **F5** to run the main scene. Then start MPF from the project directory.
 
-**keys to emulate some switches (in virtual mode)**
-enter = start
-comma = flipper_left
-period = flipper_right
-1 = return_left
-8 = top_bumpers
-9 = bottom_bumpers
-q = right_drop_1
+For virtual hardware, run `mpf -xt`. On the attract screen, **comma** selects Classic and **period** selects Modern. **Enter** opens player selection. Use **comma** for fewer players and **period** for more, then press **Enter** again to start.
 
-**to run MPF against the actual machine, plugged in via USB**
-mpf -t
-then start Godot and play the base-slide
+In virtual play, **1** hits the left return, **8** and **9** hit the bumpers, **R** and **L** hit the outlanes, and **Q** hits a right drop target.
 
+For the USB cabinet, run `mpf -t` after starting Godot. The flipper inputs are currently virtual and still need their LISY switch numbers confirmed on the cabinet.
 
+### Adding rules to a game
+
+MPF's shared selector commits the game and roster before play. `modes/base/config/base.yaml` is the Modern entry point and starts the current scoring and feature modes. `modes/classic/config/classic.yaml` is the Classic entry point.
+
+For a new rule, use a game-owned MPF mode with a `modern_` or `classic_` name. Start it from that game's entry point or one of its own feature events. Use the shared physical switch and ball-device names for input, and keep feature-specific scoring, timers, slides, and sounds with the owning game. Test the feature in its game and hit the same switches in the other game to check that it stays inactive.
 
 ### **Diagnostic test for coils**
 

@@ -17,3 +17,28 @@ ball_devices:
     # The mechanical plunger has no switch; its lane is part of the playfield.
     eject_targets: playfield
     tags: trough, home
+
+  bd_classic_saucer:
+    ball_switches: s_hole_kicker_top_23
+    eject_coil: c_hole_kicker_top
+    eject_targets: playfield
+
+  bd_classic_firepit:
+    ball_switches: s_side_kicker_left_43
+    eject_coil: c_side_kicker_left
+    eject_targets: playfield
+
+  bd_classic_subway_lock:
+    entrance_switch: s_subway_lock_10
+    entrance_switch_ignore_window_ms: 500
+    ball_capacity: 3
+    eject_coil: c_subway_lock
+    eject_targets: bd_classic_subway_kicker
+    eject_timeouts: 2s
+    eject_all_events: tilt{machine.session_game == "classic"}, game_will_end{machine.session_game == "classic"}
+
+  bd_classic_subway_kicker:
+    ball_switches: s_subway_kicker_0
+    eject_coil: c_subway_kicker
+    eject_targets: playfield
+    eject_timeouts: 2s

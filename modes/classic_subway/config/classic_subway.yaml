@@ -1,0 +1,55 @@
+#config_version=6
+
+mode:
+  start_events: mode_classic_started
+  stop_events: ball_will_end
+  priority: 106
+
+multiball_locks:
+  classic_subway_lock:
+    balls_to_lock: 3
+    balls_to_replace: 2
+    lock_devices: bd_classic_subway_lock
+    locked_ball_counting_strategy: physical_only
+    enable_events: classic_lock_qualified{game.balls_in_play == 1 and current_player.classic_multiball == 0}
+    disable_events: multiball_lock_classic_subway_lock_locked_ball, tilt, slam_tilt
+
+multiballs:
+  classic_subway:
+    ball_count: 3
+    ball_count_type: total
+    ball_locks: bd_classic_subway_lock
+    replace_balls_in_play: true
+    shoot_again: 0
+    start_events: multiball_lock_classic_subway_lock_full
+
+variable_player:
+  mode_classic_subway_started:
+    classic_locks:
+      int: device.ball_devices.bd_classic_subway_lock.available_balls
+      action: set
+    classic_multiball:
+      int: 0
+      action: set
+  multiball_lock_classic_subway_lock_locked_ball:
+    classic_locks:
+      int: total_balls_locked
+      action: set
+  multiball_classic_subway_started:
+    classic_locks:
+      int: 0
+      action: set
+    classic_multiball:
+      int: 1
+      action: set
+  balls_in_play{balls == 1}:
+    classic_multiball:
+      int: 0
+      action: set
+  tilt:
+    classic_locks:
+      int: 0
+      action: set
+    classic_multiball:
+      int: 0
+      action: set

@@ -1,216 +1,114 @@
-[gd_scene load_steps=5 format=3 uid="uid://cqdj7xxv5d8ks"]
+[gd_scene load_steps=2 format=3 uid="uid://cqdj7xxv5d8ks"]
 
-[ext_resource type="Script" uid="uid://gan0qfjhl6tq" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_66qum"]
-[ext_resource type="Script" uid="uid://cdkc6j2245c6i" path="res://addons/mpf-gmc/classes/mpf_carousel.gd" id="2_h38de"]
-[ext_resource type="Script" uid="uid://db252vlyreqrf" path="res://addons/mpf-gmc/classes/mpf_variable.gd" id="3_l8btc"]
-[ext_resource type="Texture2D" uid="uid://dounln3l35d26" path="res://addons/mpf-gmc/images/logo_mpf.png" id="4_art57"]
+[ext_resource type="Script" uid="uid://e0s431ts0ccq" path="res://slides/attract.gd" id="1_attract"]
 
 [node name="Attract" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 1280.0
-offset_bottom = 720.0
-script = ExtResource("1_66qum")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_attract")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0117647, 0.0392157, 1, 1)
+mouse_filter = 2
+color = Color(0.055, 0.075, 0.105, 1)
 
-[node name="MPFCarousel" type="Control" parent="."]
+[node name="Center" type="CenterContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_h38de")
-carousel_name = "attract"
-metadata/_custom_type_script = "uid://cdkc6j2245c6i"
 
-[node name="title" type="Label" parent="MPFCarousel"]
-layout_mode = 0
-offset_left = 9.0
-offset_top = 5.0
-offset_right = 1284.0
-offset_bottom = 706.0
-theme_override_font_sizes/font_size = 80
-text = "Welcome to RB "
+[node name="Content" type="VBoxContainer" parent="Center"]
+layout_mode = 2
+theme_override_constants/separation = 34
+
+[node name="Title" type="Label" parent="Center/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.816, 0.541, 1)
+theme_override_font_sizes/font_size = 38
+text = "VOLCANO"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="credits" type="Label" parent="MPFCarousel"]
-layout_mode = 0
-offset_right = 1277.0
-offset_bottom = 713.0
-theme_override_font_sizes/font_size = 80
-text = "sample"
+[node name="GameSelection" type="VBoxContainer" parent="Center/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="Prompt" type="Label" parent="Center/Content/GameSelection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 54
+text = "Choose a game"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "credits_string"
 
-[node name="mpf_logo" type="Sprite2D" parent="MPFCarousel"]
-position = Vector2(643, 509)
-texture = ExtResource("4_art57")
+[node name="Choices" type="HBoxContainer" parent="Center/Content/GameSelection"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
 
-[node name="last_scores_1p" type="Node2D" parent="MPFCarousel"]
-
-[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_1p"]
-offset_top = 52.0
-offset_right = 619.0
-offset_bottom = 346.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="Classic" type="Label" parent="Center/Content/GameSelection/Choices"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 68
+text = "Classic"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player1_score"
-comma_separate = true
-min_digits = 2
 
-[node name="last_scores_2p" type="Node2D" parent="MPFCarousel"]
-
-[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_2p"]
-offset_left = -173.0
-offset_top = -16.0
-offset_right = 794.0
-offset_bottom = 409.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="Modern" type="Label" parent="Center/Content/GameSelection/Choices"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 68
+text = "[ Modern ]"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player1_score"
-comma_separate = true
-min_digits = 2
 
-[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_2p"]
-offset_left = 654.0
-offset_top = 65.0
-offset_right = 1322.0
-offset_bottom = 357.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="Instructions" type="Label" parent="Center/Content/GameSelection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Left flipper selects Classic. Right flipper selects Modern.
+Press Start to continue."
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player2_score"
-comma_separate = true
-min_digits = 2
 
-[node name="last_scores_3p" type="Node2D" parent="MPFCarousel"]
+[node name="PlayerSelection" type="VBoxContainer" parent="Center/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 18
 
-[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_3p"]
-offset_top = 84.0
-offset_right = 623.0
-offset_bottom = 315.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="SelectedGame" type="Label" parent="Center/Content/PlayerSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 54
+text = "Modern"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player1_score"
-comma_separate = true
-min_digits = 2
 
-[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_3p"]
-offset_left = 518.0
-offset_top = 53.0
-offset_right = 1452.0
-offset_bottom = 359.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="Prompt" type="Label" parent="Center/Content/PlayerSelection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Choose the number of players"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player2_score"
-comma_separate = true
-min_digits = 2
 
-[node name="player3_score" type="Label" parent="MPFCarousel/last_scores_3p"]
-offset_left = 9.0
-offset_top = 362.0
-offset_right = 618.0
-offset_bottom = 691.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="PlayerCount" type="Label" parent="Center/Content/PlayerSelection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.816, 0.541, 1)
+theme_override_font_sizes/font_size = 72
+text = "1 player"
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player3_score"
-comma_separate = true
-min_digits = 2
 
-[node name="last_scores_4p" type="Node2D" parent="MPFCarousel"]
-
-[node name="player1_score" type="Label" parent="MPFCarousel/last_scores_4p"]
-offset_left = 5.0
-offset_top = 70.0
-offset_right = 626.0
-offset_bottom = 325.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
+[node name="Instructions" type="Label" parent="Center/Content/PlayerSelection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Left flipper decreases the count. Right flipper increases it.
+Press Start to begin."
 horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player1_score"
-comma_separate = true
-min_digits = 2
-
-[node name="player2_score" type="Label" parent="MPFCarousel/last_scores_4p"]
-offset_left = 684.0
-offset_top = 96.0
-offset_right = 1275.0
-offset_bottom = 331.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player2_score"
-comma_separate = true
-min_digits = 2
-
-[node name="player3_score" type="Label" parent="MPFCarousel/last_scores_4p"]
-offset_left = -110.0
-offset_top = 425.0
-offset_right = 733.0
-offset_bottom = 625.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player3_score"
-comma_separate = true
-min_digits = 2
-
-[node name="player4_score" type="Label" parent="MPFCarousel/last_scores_4p"]
-offset_left = 667.0
-offset_top = 406.0
-offset_right = 1272.0
-offset_bottom = 623.0
-theme_override_font_sizes/font_size = 80
-text = "123,345"
-horizontal_alignment = 1
-vertical_alignment = 1
-script = ExtResource("3_l8btc")
-variable_type = 2
-variable_name = "player4_score"
-comma_separate = true
-min_digits = 2

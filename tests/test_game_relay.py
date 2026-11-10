@@ -19,6 +19,7 @@ class TestGameRelay(MpfGameTestCase):
         self.assertLightColor('l_xxx_24', 'on')
 
         self.hit_switch_and_run('s_trough_1_40', 1)
+        self.hit_and_release_switch('s_start_47')
         self.start_game(start_switch='s_start_47')
         self.assertModeNotRunning('attract_lights')
         self.advance_time_and_run(2)
@@ -38,6 +39,7 @@ class TestGameRelay(MpfGameTestCase):
         self.hit_switch_and_run('s_trough_1_40', 1)
         self.hit_switch_and_run('s_trough_2_30', 1)
         self.assertEqual(self.machine.ball_devices['bd_trough'].balls, 3)
+        self.hit_and_release_switch('s_start_47')
         self.start_game(start_switch='s_start_47')
         for ball in range(1, 4):
             self.release_switch_and_run('s_trough_1_40', 2)

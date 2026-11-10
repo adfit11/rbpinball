@@ -1,0 +1,55 @@
+#config_version=6
+
+mode:
+  start_events: ball_starting{machine.session_game == "classic"}
+  stop_events: ball_will_end
+  priority: 100
+
+shots:
+  classic_top_bumper:
+    switch: s_top_bumpers_35
+  classic_bottom_bumper:
+    switch: s_bottom_bumpers_13
+  classic_standing:
+    switch: s_10_points_15
+  classic_rollunder:
+    switch: s_rollunder_25
+  classic_kicking_target:
+    switch: s_kicking_target_26
+  classic_left_return:
+    switch: s_return_left_16
+  classic_left_outlane:
+    switch: s_outlane_left_6
+
+variable_player:
+  mode_classic_started:
+    classic_counting_bonus:
+      action: set
+      int: 0
+    classic_bonus_units:
+      action: set
+      int: 1
+    classic_bonus_multiplier:
+      action: set
+      int: 1
+    classic_playfield_multiplier:
+      action: set
+      int: 1
+  classic_top_bumper_hit:
+    score: 1000
+  classic_bottom_bumper_hit:
+    score: 100
+  classic_standing_hit:
+    score: 10 * current_player.classic_playfield_multiplier
+  classic_rollunder_hit:
+    score: 3000 * current_player.classic_playfield_multiplier
+  classic_kicking_target_hit:
+    score: 1000
+  classic_left_return_hit:
+    score: 100 * current_player.classic_playfield_multiplier
+  classic_left_outlane_hit:
+    score: 3000 * current_player.classic_playfield_multiplier
+  classic_rollunder_hit{current_player.classic_bonus_units < 19}:
+    classic_bonus_units: 1
+  classic_left_return_hit{current_player.classic_bonus_units < 19}:
+    classic_bonus_units: 1

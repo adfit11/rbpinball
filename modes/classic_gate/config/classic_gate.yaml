@@ -1,0 +1,90 @@
+#config_version=6
+
+mode:
+  start_events: mode_classic_started
+  stop_events: ball_will_end
+  priority: 104
+
+shots:
+  classic_spot:
+    switch: s_spot_target_36
+
+event_player:
+  classic_spot_hit{current_player.classic_gate_ready == 1}:
+    - classic_open_gate
+  tilt:
+    - classic_close_gate
+    - classic_clear_ball_save
+
+variable_player:
+  mode_classic_gate_started:
+    classic_gate_ready:
+      action: set
+      int: 0
+    classic_gate_open:
+      action: set
+      int: 0
+  drop_target_bank_top_bank_down:
+    classic_gate_ready:
+      action: set
+      int: 1
+  drop_target_bank_right_bank_down:
+    classic_gate_ready:
+      action: set
+      int: 1
+  classic_spot_hit:
+    score: 1000 * current_player.classic_playfield_multiplier
+  classic_open_gate:
+    classic_gate_ready:
+      action: set
+      int: 0
+    classic_gate_open:
+      action: set
+      int: 1
+  classic_close_gate:
+    classic_gate_ready:
+      action: set
+      int: 0
+    classic_gate_open:
+      action: set
+      int: 0
+  classic_ball_save_qualified:
+    classic_ball_save_ready:
+      action: set
+      int: 1
+  s_outlane_left_6_active:
+    classic_ball_save_ready:
+      action: set
+      int: 0
+  classic_clear_ball_save:
+    classic_ball_save_ready:
+      action: set
+      int: 0
+  mode_classic_gate_will_stop:
+    classic_gate_ready:
+      action: set
+      int: 0
+    classic_gate_open:
+      action: set
+      int: 0
+    classic_ball_save_ready:
+      action: set
+      int: 0
+
+coil_player:
+  player_classic_ball_save_ready{change > 0}:
+    c_classic_ball_saver: pulse
+
+light_player:
+  player_classic_gate_ready{value == 1}:
+    l_xxx_43: on
+  player_classic_gate_ready{value == 0}:
+    l_xxx_43: off
+  player_classic_ball_save_ready{value == 1}:
+    l_xxx_04: on
+    l_xxx_05: on
+    l_xxx_06: on
+  player_classic_ball_save_ready{value == 0}:
+    l_xxx_04: off
+    l_xxx_05: off
+    l_xxx_06: off

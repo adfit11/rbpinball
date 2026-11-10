@@ -1,10 +1,9 @@
 #config_version=6
 
-# Base mode that starts at the beginning of each ball
-# and stops at the end of each ball.
+# Entry point for the Modern game's ball-scoped rules and presentation.
 
 mode:
-  start_events: ball_starting
+  start_events: ball_starting{machine.session_game == "modern"}
   stop_events: ball_will_end
   priority: 100
 

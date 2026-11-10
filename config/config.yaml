@@ -17,12 +17,24 @@ config:
 modes:
   - attract
   - attract_lights
+  - classic
+  - classic_bonus
+  - classic_display
+  - classic_targets
+  - classic_holes
+  - classic_gate
+  - classic_subway
   - base
   - bumpers
   - outlanes
   - hurryup
   - right_drops
   - tilt
+
+game:
+  balls_per_game: 3
+  max_players: machine.session_players if machine.session_players > 0 else 1
+  add_player_switch_tag: ''
 
 playfields:
   playfield:
