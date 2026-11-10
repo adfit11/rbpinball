@@ -1,22 +1,28 @@
-### Start Up Routine
-
-**initiate the environment**
-source mpf/bin/activate
-
-**navigate to the folder**
-cd dropbox/dev/rbpinball
-
-
-
 ### Running the game
 
-Open the project in Godot and press **F5** to run the main scene. Then start MPF from the project directory.
+Open the project in Godot and press **F5** to run the main scene. Then open Terminal and go to the project folder.
 
-For virtual hardware, run `mpf -xt`. On the attract screen, **comma** selects Classic and **period** selects Modern. **Enter** opens player selection. Use **comma** for fewer players and **period** for more, then press **Enter** again to start.
+```sh
+cd "/Users/adrian/Library/CloudStorage/Dropbox/Dev/rbpinball"
+```
+
+#### USB cabinet
+
+```sh
+/Users/adrian/mpf/bin/mpf -t
+```
+
+Wait for MPF to report a connection to LISY and make sure all three balls are in the trough. Use the right green button to switch games, then press Start to continue. Use the same green button to cycle from one to four players and back to one. Press Start again to begin.
+
+#### Keyboard simulation
+
+```sh
+/Users/adrian/mpf/bin/mpf -xt
+```
+
+The `-x` flag forces virtual hardware and disables cabinet input. Godot shows the attract screen in both launch modes. On the keyboard, **comma** selects Classic and **period** selects Modern. **Enter** opens player selection. Use **comma** for fewer players and **period** for more, then press **Enter** again to start.
 
 In virtual play, **1** hits the left return, **8** and **9** hit the bumpers, **R** and **L** hit the outlanes, and **Q** hits a right drop target.
-
-For the USB cabinet, run `mpf -t` after starting Godot. The flipper inputs are currently virtual and still need their LISY switch numbers confirmed on the cabinet.
 
 ### Adding rules to a game
 

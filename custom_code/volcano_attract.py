@@ -6,9 +6,17 @@ from mpf.modes.attract.code.attract import Attract
 class VolcanoAttract(Attract):
     """Use the cabinet buttons to select a game, then its player count."""
 
+    GREEN_PRESS_MS = 30
+    GREEN_RELEASE_MS = 100
+
     def mode_start(self, retry_selection=None, **kwargs):
         variables = self.machine.variables
+        on_cabinet = bool(variables.get_machine_var("lisy_hardware"))
         self.start_pending = False
+        self._cabinet_input_ready_at = 0
+        if on_cabinet:
+            # LISY can replay queued button transitions as attract starts.
+            self._cabinet_input_ready_at = self.machine.clock.get_time() + .25
         variables.set_machine_var("session_game", "")
         variables.set_machine_var("session_players", 0)
         game, count = retry_selection or ("modern", 1)
@@ -17,7 +25,36 @@ class VolcanoAttract(Attract):
         variables.set_machine_var("selection_stage", "players" if retry_selection else "game")
         self.add_mode_event_handler("s_flipper_left_active", self._select_left)
         self.add_mode_event_handler("s_flipper_right_active", self._select_right)
+        if on_cabinet:
+            green_button = self.machine.switches["s_green_button_right_56"]
+            self._green_armed = not self.machine.switch_controller.is_active(green_button)
+            self.switch_handlers.append(green_button.add_handler(self._press_green, ms=self.GREEN_PRESS_MS))
+            self.switch_handlers.append(green_button.add_handler(self._arm_green, state=0, ms=self.GREEN_RELEASE_MS))
+        else:
+            self.add_mode_event_handler("s_green_button_right_56_active", self._cycle_selection)
         super().mode_start(**kwargs)
+
+    def _selection_input_ready(self):
+        return not self.start_pending and self.machine.clock.get_time() >= self._cabinet_input_ready_at
+
+    def _press_green(self):
+        if self._green_armed:
+            self._green_armed = False
+            self._cycle_selection()
+
+    def _arm_green(self):
+        self._green_armed = True
+
+    def _cycle_selection(self, **kwargs):
+        if not self._selection_input_ready():
+            return
+        variables = self.machine.variables
+        if variables.get_machine_var("selection_stage") == "game":
+            game = variables.get_machine_var("selection_game")
+            variables.set_machine_var("selection_game", "modern" if game == "classic" else "classic")
+        else:
+            count = variables.get_machine_var("selection_players")
+            variables.set_machine_var("selection_players", 1 if count == 4 else count + 1)
 
     def _select_left(self, **kwargs):
         self._move_selection("classic", -1)
@@ -26,7 +63,7 @@ class VolcanoAttract(Attract):
         self._move_selection("modern", 1)
 
     def _move_selection(self, game, player_delta):
-        if self.start_pending:
+        if not self._selection_input_ready():
             return
         variables = self.machine.variables
         if variables.get_machine_var("selection_stage") == "game":
@@ -36,7 +73,7 @@ class VolcanoAttract(Attract):
             variables.set_machine_var("selection_players", min(4, max(1, count + player_delta)))
 
     def start_button_released(self, **kwargs):
-        if self.start_pending:
+        if not self._selection_input_ready():
             return
         variables = self.machine.variables
         if variables.get_machine_var("selection_stage") == "game":

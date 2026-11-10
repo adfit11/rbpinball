@@ -75,7 +75,7 @@ horizontal_alignment = 1
 [node name="Instructions" type="Label" parent="Center/Content/GameSelection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "Left flipper selects Classic. Right flipper selects Modern.
+text = "Press the right green button to switch games.
 Press Start to continue."
 horizontal_alignment = 1
 
@@ -109,6 +109,6 @@ horizontal_alignment = 1
 [node name="Instructions" type="Label" parent="Center/Content/PlayerSelection"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "Left flipper decreases the count. Right flipper increases it.
+text = "Press the right green button to cycle from 1 to 4 players.
 Press Start to begin."
 horizontal_alignment = 1

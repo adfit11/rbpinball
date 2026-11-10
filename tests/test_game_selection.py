@@ -49,6 +49,77 @@ class TestGameSelection(MpfGameTestCase):
         self.hit_and_release_switch("s_flipper_left")
         self.assert_selection("players", "classic", 3)
 
+    def test_right_green_button_cycles_games_and_roster(self):
+        green_button = "s_green_button_right_56"
+        self.hit_switch_and_run("s_trough_1_40", 1)
+        for game in ("classic", "modern", "classic"):
+            self.hit_and_release_switch(green_button)
+            self.assert_selection("game", game, 1)
+
+        self.hit_and_release_switch("s_start_47")
+        self.assert_selection("players", "classic", 1)
+        for count in (2, 3, 4, 1, 2):
+            self.hit_and_release_switch(green_button)
+            self.assert_selection("players", "classic", count)
+
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(1)
+        self.assertModeRunning("classic")
+        self.assertPlayerCount(2)
+        self.hit_and_release_switch(green_button)
+        self.assertPlayerCount(2)
+        self.assertEqual(self.machine.variables.get_machine_var("session_game"), "classic")
+
+    def test_cabinet_selector_ignores_queued_presses_at_attract_start(self):
+        self.machine.variables.set_machine_var("lisy_hardware", "LISY80")
+        self.stop_mode("attract")
+        self.machine.modes["attract"].start()
+        self.advance_time_and_run(.05)
+
+        self.hit_and_release_switch("s_green_button_right_56")
+        self.hit_and_release_switch("s_start_47")
+        self.assert_selection("game", "modern", 1)
+
+        self.advance_time_and_run(.3)
+        self.hit_switch_and_run("s_green_button_right_56", .12)
+        self.release_switch_and_run("s_green_button_right_56", .12)
+        self.hit_and_release_switch("s_start_47")
+        self.assert_selection("players", "classic", 1)
+
+    def test_cabinet_green_button_counts_one_press_through_contact_bounce(self):
+        self.machine.variables.set_machine_var("lisy_hardware", "LISY80")
+        self.stop_mode("attract")
+        self.start_mode("attract")
+        self.advance_time_and_run(.3)
+
+        green_button = "s_green_button_right_56"
+        self.hit_switch_and_run(green_button, .005)
+        self.release_switch_and_run(green_button, .078)
+        self.hit_switch_and_run(green_button, .046)
+        self.release_switch_and_run(green_button, .011)
+        self.hit_switch_and_run(green_button, .26)
+        self.release_switch_and_run(green_button, .012)
+        self.hit_switch_and_run(green_button, .001)
+        self.release_switch_and_run(green_button, .12)
+        self.assert_selection("game", "classic", 1)
+
+        self.hit_and_release_switch("s_start_47")
+        self.hit_switch_and_run(green_button, .012)
+        self.release_switch_and_run(green_button, .012)
+        self.hit_switch_and_run(green_button, .012)
+        self.release_switch_and_run(green_button, .012)
+        self.hit_switch_and_run(green_button, .066)
+        self.release_switch_and_run(green_button, .012)
+        self.hit_switch_and_run(green_button, .034)
+        self.release_switch_and_run(green_button, .12)
+        self.assert_selection("players", "classic", 2)
+
+        self.hit_switch_and_run(green_button, .15)
+        self.release_switch_and_run(green_button, .012)
+        self.hit_switch_and_run(green_button, .15)
+        self.release_switch_and_run(green_button, .12)
+        self.assert_selection("players", "classic", 3)
+
     def test_denied_start_preserves_selection_and_can_retry(self):
         self.hit_switch_and_run("s_trough_1_40", 1)
         self.hit_and_release_switch("s_flipper_left")
