@@ -2,6 +2,9 @@
 
 from mpf.modes.attract.code.attract import Attract
 
+from custom_code.subway_ejector import InterlockedSubwayEjector
+from custom_code.subway_startup import SubwayStartupClear
+
 
 class VolcanoAttract(Attract):
     """Use the cabinet buttons to select a game, then its player count."""
@@ -33,6 +36,16 @@ class VolcanoAttract(Attract):
         else:
             self.add_mode_event_handler("s_green_button_right_56_active", self._cycle_selection)
         super().mode_start(**kwargs)
+        self.subway_startup = None
+        subway = self.machine.ball_devices.get("bd_classic_subway_lock")
+        if subway is not None and isinstance(subway.ejector, InterlockedSubwayEjector):
+            self.subway_startup = SubwayStartupClear(self.machine)
+            self.subway_startup.start()
+
+    def mode_stop(self, **kwargs):
+        if self.subway_startup is not None:
+            self.subway_startup.stop()
+        super().mode_stop(**kwargs)
 
     def _selection_input_ready(self):
         return not self.start_pending and self.machine.clock.get_time() >= self._cabinet_input_ready_at
@@ -82,7 +95,24 @@ class VolcanoAttract(Attract):
             return
 
         self.start_pending = True
-        super().start_button_released(**kwargs)
+        self._start_when_subway_ready()
+
+    def _start_when_subway_ready(self):
+        if not self.active or not self.start_pending:
+            return
+        if self.subway_startup is not None:
+            status = self.subway_startup.status
+            if status in ("running", "reconciling"):
+                self.machine.events.post("subway_startup_not_ready", status=status,
+                                         reason=self.subway_startup.reason)
+                self.delay.reset(ms=100, name="wait_for_subway", callback=self._start_when_subway_ready)
+                return
+            if status != "done":
+                self.start_pending = False
+                self.machine.events.post("subway_startup_not_ready", status=status,
+                                         reason=self.subway_startup.reason)
+                return
+        super().start_button_released()
 
     def result_of_start_request(self, ev_result=True):
         if not self.active:

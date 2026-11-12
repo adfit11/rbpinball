@@ -96,8 +96,6 @@ class ClassicTargets(Mode):
     def _crater_hit(self, crater, **kwargs):
         self._score(1000 * crater * crater)
         self.player.classic_bonus_units = min(19, self.player.classic_bonus_units + crater)
-        if crater == self.crater_index:
-            self.machine.events.post("classic_lock_qualified")
         self._schedule_scan("craters", 1000, self._advance_craters)
         if crater > 1:
             self.player.classic_playfield_multiplier = crater
@@ -122,7 +120,7 @@ class ClassicTargets(Mode):
     def _show_lamps(self):
         lit = {18 + self.drop_index}
         if self.crater_index:
-            lit.add(28 - self.crater_index)
+            lit.update(28 - crater for crater in range(self.crater_index, 5))
         if "top_bank" in self.completed_banks:
             lit.add(28)
         if "right_bank" in self.completed_banks:

@@ -1,6 +1,7 @@
 #config_version=6
 
 mode:
+  code: custom_code.classic_subway.ClassicSubway
   start_events: mode_classic_started
   stop_events: ball_will_end
   priority: 106
@@ -12,7 +13,7 @@ multiball_locks:
     lock_devices: bd_classic_subway_lock
     locked_ball_counting_strategy: physical_only
     enable_events: classic_lock_qualified{game.balls_in_play == 1 and current_player.classic_multiball == 0}
-    disable_events: multiball_lock_classic_subway_lock_locked_ball, tilt, slam_tilt
+    disable_events: multiball_lock_classic_subway_lock_locked_ball, classic_subway_arrival_unconfirmed, tilt, slam_tilt
 
 multiballs:
   classic_subway:

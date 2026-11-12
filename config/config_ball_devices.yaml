@@ -32,9 +32,14 @@ ball_devices:
     eject_targets: playfield
 
   bd_classic_subway_lock:
-    entrance_switch: s_subway_lock_10
-    entrance_switch_ignore_window_ms: 500
-    ball_capacity: 3
+    counter:
+      class: custom_code.volcano_subway_counter.VolcanoSubwayCounter
+      entrance_switch: s_subway_lock_10
+      # A ball can retrigger switch 10 over half a second after its first hit.
+      entrance_switch_ignore_window_ms: 1000
+      ball_capacity: 3
+    ejector:
+      class: custom_code.subway_ejector.InterlockedSubwayEjector
     eject_coil: c_subway_lock
     eject_targets: bd_classic_subway_kicker
     eject_timeouts: 2s
@@ -42,6 +47,8 @@ ball_devices:
 
   bd_classic_subway_kicker:
     ball_switches: s_subway_kicker_0
+    ejector:
+      class: custom_code.subway_kicker_ejector.GuardedSubwayKicker
     eject_coil: c_subway_kicker
     eject_targets: playfield
     eject_timeouts: 2s

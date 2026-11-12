@@ -24,6 +24,7 @@ OUTPUTS = (
     ("c_Replay_Knock", "Knocker", 100),
 )
 ALLOWED_HOSTS = {"127.0.0.1:8765", "localhost:8765"}
+LAMP_FLASH_INTERVAL_MS = 500
 
 
 class CoilPanel(CustomCode):
@@ -32,6 +33,9 @@ class CoilPanel(CustomCode):
         self.ready = False
         self.busy_until = 0
         self.relay_until = 0
+        self.lamps = {}
+        self.lamps_on = set()
+        self.lamps_flashing = False
         self.history = []
         self.switch_hits = {}
         self.last_hits = {}
@@ -45,6 +49,14 @@ class CoilPanel(CustomCode):
         self.machine.events.add_handler("shutdown", self.close)
 
     def start(self, **kwargs):
+        # LISY coil numbers 100–199 refer to outputs on the lamp bank.
+        reserved = {1, 2}  # Stock tilt relay and coin lockout.
+        reserved.update(int(output.config["number"]) for output in self.machine.digital_outputs.values()
+                        if output.config["type"] == "light")
+        reserved.update(int(coil.config["number"]) - 100 for coil in self.machine.coils.values()
+                        if 100 <= int(coil.config["number"]) < 200)
+        self.lamps = {lamp.name: lamp for lamp in self.machine.lights.values()
+                      if int(lamp.config["number"]) not in reserved}
         self.relay_off()
         self.machine.switch_controller.add_monitor(self.switch_change)
         self.ready = True
@@ -73,6 +85,10 @@ class CoilPanel(CustomCode):
                 "busy": time.monotonic() < self.busy_until,
                 "relay_seconds": max(0, round(self.relay_until - time.monotonic(), 1)),
                 "coils": coils, "history": self.history,
+                "lamps_flashing": self.lamps_flashing,
+                "lamps": [{"name": name, "label": lamp.config["label"],
+                           "output": lamp.config["number"], "on": name in self.lamps_on}
+                          for name, lamp in self.lamps.items()],
                 "switches": [{"name": switch.name, "number": switch.config["number"],
                               "active": bool(switch.state), "hits": self.switch_hits.get(switch.name, 0),
                               "recent": time.monotonic() - self.last_hits.get(switch.name, float('-inf')) < 2}
@@ -93,6 +109,23 @@ class CoilPanel(CustomCode):
             self.relay_until = time.monotonic() + 10
             self.delay.reset(name="relay_off", ms=10000, callback=self.relay_off)
             self.record("L0 commanded ON for 10 seconds. Observe relay and test local switches.")
+        elif action == "lamp_toggle":
+            name = data.get("name")
+            if not isinstance(name, str) or name not in self.lamps:
+                raise ValueError("Choose a listed lamp.")
+            if self.lamps_flashing:
+                raise ValueError("Stop flashing before testing a single lamp.")
+            on = name not in self.lamps_on
+            self.set_lamp(name, on)
+            self.record(f"{self.lamps[name].config['label']} commanded {'ON' if on else 'OFF'}.")
+        elif action == "lamps_flash_start":
+            if not self.lamps_flashing:
+                self.lamps_flashing = True
+                self.flash_lamps(on=True)
+                self.record("All diagnostic lamps flashing together.")
+        elif action == "lamps_flash_stop":
+            self.stop_lamps()
+            self.record("All diagnostic lamps commanded OFF.")
         elif action == "pulse":
             name = data.get("name")
             limits = {item[0]: item[2] for item in OUTPUTS}
@@ -121,17 +154,39 @@ class CoilPanel(CustomCode):
             raise ValueError("Unknown command.")
         return self.state()
 
+    def set_lamp(self, name, on):
+        lamp = self.lamps[name]
+        if on:
+            lamp.on(fade_ms=0, key="diagnostic_panel")
+            self.lamps_on.add(name)
+        else:
+            lamp.off(fade_ms=0, key="diagnostic_panel")
+            self.lamps_on.discard(name)
+
+    def flash_lamps(self, on):
+        for name in self.lamps:
+            self.set_lamp(name, on)
+        self.delay.reset(name="lamp_flash", ms=LAMP_FLASH_INTERVAL_MS,
+                         callback=self.flash_lamps, on=not on)
+
+    def stop_lamps(self):
+        self.delay.remove("lamp_flash")
+        self.lamps_flashing = False
+        for name in self.lamps:
+            self.set_lamp(name, on=False)
+
     def relay_off(self):
         self.relay_until = 0
         self.delay.remove("relay_off")
         self.machine.digital_outputs["diagnostic_game_relay"].disable()
 
     def all_off(self):
+        self.stop_lamps()
         for name, _, _ in OUTPUTS:
             self.machine.coils[name].disable()
         self.relay_off()
         self.busy_until = time.monotonic() + 2
-        self.record("All listed coil outputs and L0 commanded OFF.")
+        self.record("All listed coil and lamp outputs and L0 commanded OFF.")
 
     def close(self, **kwargs):
         self.ready = False

@@ -31,6 +31,25 @@
 .card[data-result="no response"] .card-result {
     background: #ffcf73;
 }
+.lamp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 8px;
+}
+.lamp-toggle {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+}
+.lamp-toggle[aria-pressed="true"] {
+    background: #173754;
+    border-color: #91c9ff;
+}
+.lamp-toggle:disabled {
+    opacity: .75;
+}
 </style>
 <header><div><span class="eyebrow">VOLCANO / SERVICE BENCH</span><h1>USB diagnostics</h1></div><span id="connection" class="status">Connecting…</span></header>
 <p>Pulse one output, observe the mechanism, and record the result. No game or Godot session is needed.</p>
@@ -38,16 +57,67 @@
 <p id="notice" role="status" aria-live="polite"></p>
 <section class="relay"><span class="eyebrow">FIRST CHECK · GAME-OVER RELAY</span><h2>Test relay output L0</h2><p>Observe whether the relay changes state. While commanded on, briefly test a bumper skirt or slingshot switch. These mechanisms cannot be fired individually from this panel with stock wiring.</p><div class="row"><div><button class="primary hardware" onclick="send({action:'relay_on'})">Command L0 on · 10 seconds</button> <button onclick="send({action:'relay_off'})">L0 off</button></div><strong id="relay">L0 commanded off</strong></div><p class="help">The timer turns L0 off automatically. Its effect on the fitted machine still needs physical confirmation. Stop immediately if a coil stays energized. Power off before reconnecting wiring.</p></section>
 <section><h2>Coil outputs</h2><p class="help">Durations are diagnostic limits, not certified coil ratings. A command log confirms a request, not physical movement. The motor test defaults to 250 ms, not a full cycle.</p><div id="coils" class="grid"></div></section>
+<section aria-labelledby="lamp-heading">
+    <h2 id="lamp-heading">Lamp tests</h2>
+    <p class="help">Click a lamp to turn it on or off. Stop flashing to turn all test lamps off and resume individual tests.</p>
+    <div class="row">
+        <div>
+            <button id="lamp-start" class="primary hardware" onclick="send({action: 'lamps_flash_start'})" disabled>Start flashing</button>
+            <button id="lamp-stop" class="hardware" onclick="send({action: 'lamps_flash_stop'})" disabled>Stop flashing</button>
+        </div>
+        <p id="lamp-status" role="status">Waiting for MPF</p>
+    </div>
+    <div id="lamps" class="lamp-grid"></div>
+</section>
 <section><h2>Physical switch inputs</h2><p class="help">Amber means active or hit in the last two seconds. Hit counts retain brief pulses. Top bumpers share input 35; bottom bumpers share input 13. A scoring input may depend on mechanical movement.</p><div id="switches" class="switches"></div></section>
 <section><h2>Command log</h2><div id="history" class="logs">No commands yet.</div></section>
 <footer>Local computer → USB serial → LISY80 · Results save on this computer. Close MPF with Ctrl+C when finished.</footer>
 <script>
 const token='__TOKEN__';let inFlight=false,online=false,latest=null;
 const coilCards = new Map();
+const lampButtons = new Map();
 const $=id=>document.getElementById(id);
 function message(text){$('notice').textContent=text}
-function lock(){document.querySelectorAll('.hardware').forEach(b=>b.disabled=!online||!latest?.ready||inFlight||(b.classList.contains('pulse')&&latest?.busy))}
+function lock() {
+    const unavailable = !online || !latest?.ready || inFlight;
+    const flashing = latest?.lamps_flashing;
+    document.querySelectorAll('.hardware').forEach(button => {
+        button.disabled = unavailable
+            || (button.classList.contains('pulse') && latest?.busy)
+            || (button.classList.contains('lamp-toggle') && flashing);
+    });
+    $('lamp-start').disabled = unavailable || !latest?.lamps?.length || flashing;
+    $('lamp-stop').disabled = unavailable || !flashing;
+}
+
+function renderLamps(lamps, flashing) {
+    for (const lamp of lamps) {
+        let button = lampButtons.get(lamp.name);
+        if (!button) {
+            button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'hardware lamp-toggle';
+            button.innerHTML = '<span class="number"></span><span class="lamp-label"></span><span class="lamp-state" aria-hidden="true"></span>';
+            button.querySelector('.number').textContent = 'L' + String(lamp.output).padStart(2, '0');
+            button.querySelector('.lamp-label').textContent = lamp.label;
+            button.onclick = () => send({action: 'lamp_toggle', name: lamp.name});
+            lampButtons.set(lamp.name, button);
+            $('lamps').append(button);
+        }
+        button.setAttribute('aria-pressed', String(lamp.on));
+        button.querySelector('.lamp-state').textContent = lamp.on ? 'On' : 'Off';
+    }
+    const summary = flashing ? 'Flashing together'
+        : lamps.length ? `${lamps.filter(lamp => lamp.on).length} of ${lamps.length} lamps on`
+        : 'No lamp outputs available';
+    const status = $('lamp-status');
+    if (status.textContent !== summary) {
+        status.textContent = summary;
+    }
+}
+
 function render(s){latest=s;online=true;$('connection').textContent=s.virtual?'Virtual hardware · no physical outputs':'LISY diagnostic connected';$('connection').classList.toggle('virtual',s.virtual);$('activity').textContent=s.busy?'Pulse / cooldown — wait':'Ready for one pulse';$('relay').textContent=s.relay_seconds>0?`L0 commanded on · ${s.relay_seconds}s remaining`:'L0 commanded off';
+renderLamps(s.lamps ?? [], s.lamps_flashing);
 for (const coil of s.coils) {
     let card = coilCards.get(coil.name);
     if (!card) {

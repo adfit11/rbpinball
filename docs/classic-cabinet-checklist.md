@@ -35,6 +35,32 @@ On 10 November 2026, the switch-only diagnostic ran on LISY80 firmware 5.26 (API
 
 The selector uses the confirmed right green button and Start. The two-player Classic start is confirmed. Repeat the cabinet check for Modern and verify turn changes after a real drain.
 
+## Startup subway clearing
+
+Startup recovery uses switch 10 as an occupied/not-occupied indication, not
+as a count of all queued balls. It releases at most one ball into an empty
+kicker, waits for switch 0 and the kicker to clear, then checks again. It stops
+for the preceding ball to be confirmed in the trough before releasing another.
+It stops on a missed arrival, blocked kicker, an unconfirmed return after 60
+seconds, or more than three balls. Start remains
+blocked until the subway is clear and MPF counts all three balls in the trough.
+Recovery kicks balls onto the playfield; allow them to drain to the trough.
+On 12 November 2026, a cabinet test with all three balls initially in the
+subway confirmed each ball reached the trough before the next was released.
+The log recorded exactly three subway releases, three kicker pulses, three
+outhole pulses, and completed startup with three balls in the trough.
+On the same date, a Classic cabinet play-through confirmed three lit crater
+passages counted as three locks despite switch 10 being held, three balls
+released into multiball, and ball two served after all three drained. The
+crater-to-subway travel delay still needs further cabinet verification.
+The same session also confirmed an unlit crater with one ball locked: the
+front ball returned to play, another remained locked, and the display and MPF
+continued to show one lock. The returned ball subsequently drained.
+The player carried that physical lock into ball three, earned two further
+locks, started a second multiball in the same game, and finished with all
+three balls in the trough. A second multiball on the same ball, multiplayer
+handoff, and tilt with locks remain to be checked on the cabinet.
+
 ## Outputs
 
 | Output | MPF command and expected response | Prior physical evidence | Command observed | Motion and result |
@@ -54,6 +80,21 @@ The selector uses the confirmed right green button and Start. The two-player Cla
 Check the current configuration before the visit and add a row for each additional output relied on by the installed revision. Record the observed relay behavior as well as any coil pulse.
 
 ## Cabinet play-through
+
+12 November 2026, controlled Classic lock test: a ball entering lit crater 4
+remained locked and one replacement reached the shooter lane. Adrian observed
+that the shooter-lane release may be a fraction short; test its strength later
+before changing the release setting. The MPF log recorded one lock and one
+replacement serve.
+The second ball entered lit crater 2, stayed locked, and one replacement was
+served. The third entered lit crater 3 and appeared to stay locked, but the
+display remained at 2/3 and multiball did not start. The log recorded crater 3
+qualification but no subsequent switch 10 transition. Switch 10 had remained
+active following the second capture; investigate the switch and lock mechanics.
+After the switch or balls were disturbed, switch 10 opened and closed; MPF
+counted the third lock and posted multiball started. Adrian observed all three
+balls release. The log later recorded an eject confirmation timeout, so release
+accounting and the normal, hands-free third capture still require verification.
 
 - [ ] Select both games and set their rosters with the confirmed cabinet controls. Check the on-screen instructions and that Start serves once after the final confirmation.
 - [ ] Check the first ball reaches the shooter lane in each game. In Classic, check a drain, a player handoff, scoreboard retention, bonus, and return to attract.

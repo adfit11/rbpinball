@@ -5,6 +5,7 @@
 config:
   - diagnostic_switches.yaml
   - config_coils.yaml
+  - diagnostic_lights.yaml
 
 digital_outputs:
   diagnostic_game_relay:

@@ -66,3 +66,40 @@ class TestCoilPanel(MpfTestCase):
         self.panel.command({"action": "stop"})
         self.advance_time_and_run(.3)
         self.assertTrue(self.machine.stop_future.done())
+
+    def test_only_mapped_lamps_can_be_toggled(self):
+        lamps = self.panel.state()["lamps"]
+        self.assertEqual([*range(3, 8), 10, 11, *range(17, 48)],
+                         [int(lamp["output"]) for lamp in lamps])
+        for name in ("l_diagnostic_08", "l_diagnostic_14", "diagnostic_game_relay"):
+            with self.assertRaises(ValueError):
+                self.panel.command({"action": "lamp_toggle", "name": name})
+
+        name = "l_diagnostic_10"
+        self.panel.command({"action": "lamp_toggle", "name": name})
+        self.assertLightChannel(name, 255)
+        self.assertLightChannel("l_diagnostic_11", 0)
+        self.panel.command({"action": "lamp_toggle", "name": name})
+        self.assertLightChannel(name, 0)
+
+    def test_flash_starts_together_and_cancels_on_stop_or_all_off(self):
+        for stop_action in ("lamps_flash_stop", "all_off"):
+            state = self.panel.command({"action": "lamps_flash_start"})
+            self.assertTrue(state["lamps_flashing"])
+            self.assertTrue(all(lamp["on"] for lamp in state["lamps"]))
+            for name in self.panel.lamps:
+                self.assertLightChannel(name, 255)
+            with self.assertRaises(ValueError):
+                self.panel.command({"action": "lamp_toggle", "name": "l_diagnostic_03"})
+            self.advance_time_and_run(.51)
+            for name in self.panel.lamps:
+                self.assertLightChannel(name, 0)
+            self.advance_time_and_run(.5)
+            for name in self.panel.lamps:
+                self.assertLightChannel(name, 255)
+
+            state = self.panel.command({"action": stop_action})
+            self.assertFalse(state["lamps_flashing"])
+            self.advance_time_and_run(1.1)
+            for name in self.panel.lamps:
+                self.assertLightChannel(name, 0)

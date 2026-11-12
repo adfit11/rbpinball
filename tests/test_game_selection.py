@@ -267,6 +267,7 @@ class TestGameSelection(MpfGameTestCase):
         self.hit_switch_and_run("s_trough_1_40", 1)
         self.choose_game_and_count("classic", 1)
         self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(1.2)
         self.hit_and_release_switch("s_green_button_right_56")
         self.release_switch_and_run("s_trough_1_40", 2)
         self.assertLightColor("l_xxx_19", "white")
@@ -357,6 +358,7 @@ class TestGameSelection(MpfGameTestCase):
         self.hit_switch_and_run("s_trough_1_40", 1)
         self.choose_game_and_count("classic", 1)
         self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(1.2)
         self.hit_and_release_switch("s_green_button_right_56")
         self.release_switch_and_run("s_trough_1_40", 2)
         player = self.machine.game.player

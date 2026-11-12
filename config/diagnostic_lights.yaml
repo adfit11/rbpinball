@@ -1,0 +1,43 @@
+#config_version=6
+
+# Volcano technical sheets, driverboard chart. Only CPU-controlled lamps.
+# L0–L2 and L8/L12–L16 drive mechanisms. L9 and L48–L51 are unused.
+lights:
+  l_diagnostic_03: {number: 3, label: "Same Player Shoot Again"}
+  l_diagnostic_04: {number: 4, label: "Seismic Multiplier 2X"}
+  l_diagnostic_05: {number: 5, label: "Seismic Multiplier 3X"}
+  l_diagnostic_06: {number: 6, label: "Seismic Multiplier 4X"}
+  l_diagnostic_07: {number: 7, label: "Seismic Multiplier 5X"}
+  l_diagnostic_10: {number: 10, label: "High Game To Date"}
+  l_diagnostic_11: {number: 11, label: "Game Over"}
+  l_diagnostic_17: {number: 17, label: "Lava Level One"}
+  l_diagnostic_18: {number: 18, label: "Lava Level Two"}
+  l_diagnostic_19: {number: 19, label: "#1 Drop Target (2)"}
+  l_diagnostic_20: {number: 20, label: "#2 Drop Target (2)"}
+  l_diagnostic_21: {number: 21, label: "#3 Drop Target (2)"}
+  l_diagnostic_22: {number: 22, label: "#4 Drop Target (2)"}
+  l_diagnostic_23: {number: 23, label: "#5 Drop Target (2)"}
+  l_diagnostic_24: {number: 24, label: "Crater 4"}
+  l_diagnostic_25: {number: 25, label: "Crater 3"}
+  l_diagnostic_26: {number: 26, label: "Crater 2"}
+  l_diagnostic_27: {number: 27, label: "Crater 1"}
+  l_diagnostic_28: {number: 28, label: "Top Drop Target"}
+  l_diagnostic_29: {number: 29, label: "Bottom Drop Target"}
+  l_diagnostic_30: {number: 30, label: "2X Lava Flow Multiplier"}
+  l_diagnostic_31: {number: 31, label: "3X Lava Flow Multiplier"}
+  l_diagnostic_32: {number: 32, label: "4X Lava Flow Multiplier"}
+  l_diagnostic_33: {number: 33, label: "1000 Bonus"}
+  l_diagnostic_34: {number: 34, label: "2000 Bonus"}
+  l_diagnostic_35: {number: 35, label: "3000 Bonus"}
+  l_diagnostic_36: {number: 36, label: "4000 Bonus"}
+  l_diagnostic_37: {number: 37, label: "5000 Bonus"}
+  l_diagnostic_38: {number: 38, label: "6000 Bonus"}
+  l_diagnostic_39: {number: 39, label: "7000 Bonus"}
+  l_diagnostic_40: {number: 40, label: "8000 Bonus"}
+  l_diagnostic_41: {number: 41, label: "9000 Bonus"}
+  l_diagnostic_42: {number: 42, label: "10,000 Bonus"}
+  l_diagnostic_43: {number: 43, label: "Spot Target"}
+  l_diagnostic_44: {number: 44, label: "Special"}
+  l_diagnostic_45: {number: 45, label: "Extra Ball"}
+  l_diagnostic_46: {number: 46, label: "Spinner"}
+  l_diagnostic_47: {number: 47, label: "Collect Seismic Value"}
