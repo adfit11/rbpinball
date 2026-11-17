@@ -21,4 +21,4 @@
 ## 4. Integration
 
 - [x] 4.1 Run `~/mpf/bin/python -m pytest tests -q` and `openspec validate --all`, and verify both pass.
-- [ ] 4.2 On the cabinet, verify the motor starts on ball 1 and a lock replacement ball, and stops on green, first playfield contact, timeout, and tilt. Record the timeout value chosen after play.
+- [x] 4.2 On the cabinet, verify the motor starts on ball 1 and a lock replacement ball, and stops on green, first playfield contact, timeout, and tilt. Record the timeout value chosen after play: 30 s kept.
