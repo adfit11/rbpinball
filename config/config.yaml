@@ -21,6 +21,7 @@ modes:
   - classic_bonus
   - classic_display
   - classic_targets
+  - classic_skill_shot
   - classic_holes
   - classic_gate
   - classic_subway

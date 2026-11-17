@@ -117,6 +117,13 @@ class SubwayReleaseInterlock:
         self.reason = reason
         self.deadline = None
 
+    def rearm(self):
+        """Clear a failure once the caller has proven the subway is empty."""
+        self.state = "ready"
+        self.reason = None
+        self.deadline = None
+        self.clear_since = None
+
 
 class SubwayRecoveryRunner:
     """Dispatch recovery actions through a single injected hardware owner.

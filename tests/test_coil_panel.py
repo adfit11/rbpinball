@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from mpf.tests.MpfTestCase import MpfTestCase
 from custom_code.coil_panel import CoilPanel
+from custom_code.coil_survey import CoilSurvey
 
 
 class TestCoilPanel(MpfTestCase):
@@ -103,3 +104,53 @@ class TestCoilPanel(MpfTestCase):
             self.advance_time_and_run(1.1)
             for name in self.panel.lamps:
                 self.assertLightChannel(name, 0)
+
+    def test_motor_holds_with_relay_and_stops_itself(self):
+        motor = self.machine.digital_outputs["skill_motor"].hw_driver
+        relay = self.machine.digital_outputs["diagnostic_game_relay"].hw_driver
+        self.assertNotIn("c_skill_motor", self.machine.coils)
+        state = self.panel.command({"action": "motor_run", "ms": 2000})
+        self.assertTrue(state["motor"]["running"])
+        self.assertEqual((1, 1), (motor.current_brightness, relay.current_brightness))
+        with self.assertRaises(ValueError):
+            self.panel.command({"action": "pulse", "name": "c_outhole", "ms": 65})
+        self.advance_time_and_run(1.9)
+        self.assertEqual(1, motor.current_brightness)
+        self.advance_time_and_run(.2)
+        self.assertEqual((0, 0), (motor.current_brightness, relay.current_brightness))
+        self.assertFalse(self.panel.state()["motor"]["running"])
+        for duration in (0, 5001, True, "2000"):
+            with self.assertRaises(ValueError):
+                self.panel.command({"action": "motor_run", "ms": duration})
+        self.panel.command({"action": "result", "name": "skill_motor", "result": "working"})
+        self.assertEqual("working", self.panel.state()["motor"]["result"])
+
+    def test_all_off_stops_motor(self):
+        motor = self.machine.digital_outputs["skill_motor"].hw_driver
+        self.panel.command({"action": "motor_run", "ms": 5000})
+        self.panel.command({"action": "all_off"})
+        self.assertEqual(0, motor.current_brightness)
+        self.assertNotIn("motor_off", self.panel.delay.delays)
+
+
+class TestCoilSurvey(MpfTestCase):
+    def get_machine_path(self):
+        return str(Path(__file__).resolve().parents[1])
+
+    def get_config_file(self):
+        return "diagnostic_coil_survey.yaml"
+
+    def test_motor_step_holds_l12_with_l0(self):
+        survey = next(code for code in self.machine.custom_code if isinstance(code, CoilSurvey))
+        motor = self.machine.digital_outputs["skill_motor"].hw_driver
+        relay = self.machine.digital_outputs["game_over_relay"].hw_driver
+        survey.index = len(survey.tests) - 1
+        self.advance_time_and_run(2)
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(.1)
+        self.assertEqual((1, 1), (motor.current_brightness, relay.current_brightness))
+        with patch.object(self.machine, "stop") as stop:
+            self.advance_time_and_run(2)
+            self.assertEqual((0, 0), (motor.current_brightness, relay.current_brightness))
+            self.advance_time_and_run(1.1)
+            stop.assert_called_once()

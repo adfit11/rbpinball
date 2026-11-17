@@ -56,7 +56,8 @@
 <div class="toolbar"><span id="activity">Waiting for MPF</span><div><button class="danger" onclick="send({action:'all_off'})">All outputs off</button> <button onclick="send({action:'stop'})">Stop diagnostic</button></div></div>
 <p id="notice" role="status" aria-live="polite"></p>
 <section class="relay"><span class="eyebrow">FIRST CHECK · GAME-OVER RELAY</span><h2>Test relay output L0</h2><p>Observe whether the relay changes state. While commanded on, briefly test a bumper skirt or slingshot switch. These mechanisms cannot be fired individually from this panel with stock wiring.</p><div class="row"><div><button class="primary hardware" onclick="send({action:'relay_on'})">Command L0 on · 10 seconds</button> <button onclick="send({action:'relay_off'})">L0 off</button></div><strong id="relay">L0 commanded off</strong></div><p class="help">The timer turns L0 off automatically. Its effect on the fitted machine still needs physical confirmation. Stop immediately if a coil stays energized. Power off before reconnecting wiring.</p></section>
-<section><h2>Coil outputs</h2><p class="help">Durations are diagnostic limits, not certified coil ratings. A command log confirms a request, not physical movement. The motor test defaults to 250 ms, not a full cycle.</p><div id="coils" class="grid"></div></section>
+<section><h2>Coil outputs</h2><p class="help">Durations are diagnostic limits, not certified coil ratings. A command log confirms a request, not physical movement.</p><div id="coils" class="grid"></div></section>
+<section class="relay"><span class="eyebrow">SKILL SHOT MOTOR · L12 WITH L0</span><h2>Run the skill shot motor</h2><p>The motor relay on L12 has power only while L0 is on, so this test switches both on and turns them off when the run time ends.</p><div class="row"><div class="duration"><label>Run <input id="motor-ms" type="number" min="1" max="5000" step="1" value="2000" aria-label="Motor run time in milliseconds"> ms</label> <button class="primary hardware pulse" onclick="runMotor()">Run motor</button></div><div class="result"><label>Observed result</label><select id="motor-result" aria-label="Observed motor result" onchange="send({action:'result',name:'skill_motor',result:this.value})"><option value="untested">Untested</option><option value="working">Working</option><option value="weak">Weak</option><option value="no response">No response</option></select></div></div><strong id="motor">Motor commanded off</strong></section>
 <section aria-labelledby="lamp-heading">
     <h2 id="lamp-heading">Lamp tests</h2>
     <p class="help">Click a lamp to turn it on or off. Stop flashing to turn all test lamps off and resume individual tests.</p>
@@ -78,6 +79,7 @@ const coilCards = new Map();
 const lampButtons = new Map();
 const $=id=>document.getElementById(id);
 function message(text){$('notice').textContent=text}
+function runMotor(){const input=$('motor-ms');if(input.reportValidity())send({action:'motor_run',ms:Number(input.value)})}
 function lock() {
     const unavailable = !online || !latest?.ready || inFlight;
     const flashing = latest?.lamps_flashing;
@@ -118,6 +120,12 @@ function renderLamps(lamps, flashing) {
 
 function render(s){latest=s;online=true;$('connection').textContent=s.virtual?'Virtual hardware · no physical outputs':'LISY diagnostic connected';$('connection').classList.toggle('virtual',s.virtual);$('activity').textContent=s.busy?'Pulse / cooldown — wait':'Ready for one pulse';$('relay').textContent=s.relay_seconds>0?`L0 commanded on · ${s.relay_seconds}s remaining`:'L0 commanded off';
 renderLamps(s.lamps ?? [], s.lamps_flashing);
+if (s.motor) {
+    $('motor').textContent = s.motor.running ? 'Motor commanded on' : 'Motor commanded off';
+    if (document.activeElement !== $('motor-result')) {
+        $('motor-result').value = s.motor.result;
+    }
+}
 for (const coil of s.coils) {
     let card = coilCards.get(coil.name);
     if (!card) {

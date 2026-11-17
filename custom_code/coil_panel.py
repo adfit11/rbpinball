@@ -20,11 +20,14 @@ OUTPUTS = (
     ("c_side_kicker_left", "Left / fire-pit kicker", 100),
     ("c_hole_kicker_top", "Top hole kicker", 100),
     ("c_trough_release", "Trough release", 400),
-    ("c_skill_motor", "Motor relay", 1000),
     ("c_Replay_Knock", "Knocker", 100),
 )
 ALLOWED_HOSTS = {"127.0.0.1:8765", "localhost:8765"}
 LAMP_FLASH_INTERVAL_MS = 500
+# The motor relay on L12 has power only while L0 is on, so it is held rather than pulsed.
+MOTOR = "skill_motor"
+MOTOR_DEFAULT_MS = 2000
+MOTOR_MAX_MS = 5000
 
 
 class CoilPanel(CustomCode):
@@ -77,14 +80,17 @@ class CoilPanel(CustomCode):
         coils = []
         for name, label, limit in OUTPUTS:
             coil = self.machine.coils[name]
-            default = 250 if name == "c_skill_motor" else coil.get_and_verify_pulse_ms(None)
             coils.append({"name": name, "label": label, "output": coil.config["number"],
-                          "default_ms": default, "max_ms": limit,
+                          "default_ms": coil.get_and_verify_pulse_ms(None), "max_ms": limit,
                           "result": self.results.get(name, "untested")})
         return {"ready": self.ready, "virtual": self.virtual,
                 "busy": time.monotonic() < self.busy_until,
                 "relay_seconds": max(0, round(self.relay_until - time.monotonic(), 1)),
                 "coils": coils, "history": self.history,
+                "motor": {"output": self.machine.digital_outputs[MOTOR].config["number"],
+                          "default_ms": MOTOR_DEFAULT_MS, "max_ms": MOTOR_MAX_MS,
+                          "running": "motor_off" in self.delay.delays,
+                          "result": self.results.get(MOTOR, "untested")},
                 "lamps_flashing": self.lamps_flashing,
                 "lamps": [{"name": name, "label": lamp.config["label"],
                            "output": lamp.config["number"], "on": name in self.lamps_on}
@@ -137,9 +143,20 @@ class CoilPanel(CustomCode):
             self.machine.coils[name].pulse(pulse_ms=duration)
             self.busy_until = time.monotonic() + duration / 1000 + 2
             self.record(f"Output {self.machine.coils[name].config['number']}: {duration} ms requested; observe mechanism.")
+        elif action == "motor_run":
+            duration = data.get("ms")
+            if type(duration) is not int or not 1 <= duration <= MOTOR_MAX_MS:
+                raise ValueError(f"Choose a motor run time from 1 to {MOTOR_MAX_MS} ms.")
+            if time.monotonic() < self.busy_until:
+                raise ValueError("Wait for the pulse and cooldown to finish.")
+            self.machine.digital_outputs["diagnostic_game_relay"].enable()
+            self.machine.digital_outputs[MOTOR].enable()
+            self.delay.reset(name="motor_off", ms=duration, callback=self.motor_off)
+            self.busy_until = time.monotonic() + duration / 1000 + 2
+            self.record(f"Motor relay L12 and L0 commanded ON for {duration} ms; observe the cam.")
         elif action == "result":
             name, result = data.get("name"), data.get("result")
-            if name not in {item[0] for item in OUTPUTS} or result not in {"working", "weak", "no response", "untested"}:
+            if name not in {item[0] for item in OUTPUTS} | {MOTOR} or result not in {"working", "weak", "no response", "untested"}:
                 raise ValueError("Invalid result.")
             self.results[name] = result
             self.results_path.parent.mkdir(exist_ok=True)
@@ -180,13 +197,20 @@ class CoilPanel(CustomCode):
         self.delay.remove("relay_off")
         self.machine.digital_outputs["diagnostic_game_relay"].disable()
 
+    def motor_off(self):
+        self.delay.remove("motor_off")
+        self.machine.digital_outputs[MOTOR].disable()
+        if time.monotonic() >= self.relay_until:
+            self.relay_off()
+
     def all_off(self):
         self.stop_lamps()
         for name, _, _ in OUTPUTS:
             self.machine.coils[name].disable()
+        self.motor_off()
         self.relay_off()
         self.busy_until = time.monotonic() + 2
-        self.record("All listed coil and lamp outputs and L0 commanded OFF.")
+        self.record("All listed coil, motor and lamp outputs and L0 commanded OFF.")
 
     def close(self, **kwargs):
         self.ready = False

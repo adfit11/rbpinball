@@ -41,9 +41,10 @@ arrangement before interpreting the test.
 - The server enforces a cooldown and per-output diagnostic duration bounds.
   Those bounds are not manufacturer-approved coil ratings.
 - Pulses above LISY's native 255 ms limit use MPF's timed enable/disable path.
-- The motor defaults to a short 250 ms response test rather than its configured
-  five-second game duration.
-- **All outputs off** disables the listed coils and L0 while MPF is responsive.
+- **Run motor** holds the skill shot motor relay (L12) and L0 on together for
+  the chosen time, 2 seconds by default and 5 seconds at most, then turns both
+  off. The motor has no power from L12 alone.
+- **All outputs off** disables the listed coils, the motor relay and L0 while MPF is responsive.
   This is a software control, not a replacement for removing machine power.
 - Choose **Working**, **Weak**, or **No response** to save a physical observation
   in `data/coil-panel-results.json`. Simulation uses a separate virtual file.
