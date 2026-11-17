@@ -1,0 +1,97 @@
+#config_version=6
+# Coil numbers are LISY80 format.
+# Numbers 1-9: main solenoid driver board (A3).
+# Numbers 100+: lamp driver board transistors (lamp number + 100).
+#
+# Gottlieb Volcano solenoid board (A3):
+#   Sol.1  Subway Ball Release      → c_subway_release     (1)
+#   Sol.2  Top Drop Target Reset    → c_left_targets_reset  (2)
+#   Sol.3  Coin Counter #1          → not needed
+#   Sol.4  Coin Counter #2          → not needed
+#   Sol.5  Subway Kicker            → c_subway_eject        (5)
+#   Sol.6  Right Drop Target Reset  → c_right_targets_reset (6)
+#   Sol.7  Coin Counter #3          → not needed
+#   Sol.8  Knocker                  → c_knocker             (8)
+#   Sol.9  Outhole                  → c_drain_eject         (9)
+#
+# Lamp driver board coils (lamp N → coil 100+N):
+#   L8   Fire Pit           → c_firepit_kicker   (108)
+#   L12  Motor Relay        → c_motor_relay      (112)
+#   L13  Ball Saver Relay   → c_ball_saver       (113)  ← arms the relay; actual kick coil fires directly
+#   L14  Right Ball Gate    → c_right_gate       (114)
+#   L15  Ball Release       → c_trough_release   (115)
+#   L16  Hole Kicker        → c_top_saucer       (116)
+#
+# NOT CPU-controlled (no MPF coil definitions needed):
+#   Pop bumpers      — dedicated Pop Bumper Boards, fire directly via own transistors
+#   Slingshots       — "kicking rubbers", fire directly from switch contact
+#   Kicking target   — fires directly from switch contact
+#   Flippers         — relay-based, handled entirely by LISY firmware
+#
+# IMPORTANT — Ball saver logic:
+#   c_ball_saver (L13, coil 113) is the RELAY coil that ARMS the ball save.
+#   It must be pulsed by MPF when a lit drop target is hit.
+#   The actual ball save kicker coil fires directly through the relay + EOS switch
+#   when the player presses the left cabinet button (SW.06). MPF does not fire it.
+#   TODO: refactor baseballsave.yaml — currently fires c_ball_saver on outlane hit
+#   instead of arming the relay on lit drop target hit.
+
+coils:
+
+  # TROUGH / DRAIN ---------------------------------
+  c_drain_eject:
+    number: 9                # Sol.9 Outhole
+    default_pulse_ms: 65
+  c_trough_release:
+    number: 115              # L15 Ball Release, lamp driver
+    default_hold_power: 0.075
+    default_pulse_ms: 30
+
+  # SUBWAY -----------------------------------------
+  c_subway_release:
+    number: 1                # Sol.1 Subway Ball Release
+    default_hold_power: 0.1
+    default_pulse_ms: 300
+  c_subway_eject:
+    number: 5                # Sol.5 Subway Kicker
+    default_pulse_ms: 40
+
+  # DROP TARGETS -----------------------------------
+  c_left_targets_reset:
+    number: 2                # Sol.2 Top Drop Target Bank Reset
+    default_hold_power: 0.1
+    default_pulse_ms: 300
+  c_right_targets_reset:
+    number: 6                # Sol.6 Right Drop Target Bank Reset
+    default_hold_power: 0.1
+    default_pulse_ms: 300
+
+  # KICKERS ----------------------------------------
+  c_firepit_kicker:
+    number: 108              # L8 Fire Pit, lamp driver
+    default_pulse_ms: 15
+  c_top_saucer:
+    number: 116              # L16 Hole Kicker, lamp driver
+    default_pulse_ms: 55
+
+  # MOTOR RELAY ------------------------------------
+  c_motor_relay:
+    number: 112              # L12 Motor Relay, lamp driver
+    default_pulse_ms: 5000
+
+  # KNOCKER ----------------------------------------
+  c_knocker:
+    number: 8                # Sol.8 Knocker
+    allow_enable: true
+    default_pulse_ms: 50
+
+  # BALL SAVER RELAY --------------------------------
+  # Pulsing this arms the relay. The kick coil fires directly through hardware.
+  # TODO: move pulse trigger to lit drop target hit event (not outlane hit).
+  c_ball_saver:
+    number: 113              # L13 Ball Saver Relay, lamp driver
+
+  # RIGHT GATE -------------------------------------
+  c_right_gate:
+    number: 114              # L14 Right Ball Gate, lamp driver
+    allow_enable: true

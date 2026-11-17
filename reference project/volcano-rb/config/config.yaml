@@ -1,0 +1,57 @@
+#config_version=6
+config:
+  - assets.yaml
+  - coils.yaml
+  - balldevices.yaml
+  - hardware.yaml
+  - lights.yaml
+  - switches.yaml
+  - segmentdisplays.yaml
+  - credits.yaml
+  - settings.yaml
+  - variables.yaml
+  - droptargets.yaml
+  - statemachines.yaml
+  - bcp.yaml
+  - keyboard.yaml
+
+modes:
+# base modules
+  - base
+  - game
+  - tilt
+  - displays
+  - service
+  - credits
+  - high_score
+  - bonus
+  - match
+# game logic
+  - basepops
+  - multiball
+  - basedrops
+  - backboxplumes
+  - basecraters
+  - basefirepit
+  - basesaucer
+  - basespinner
+  - baselanesandgate
+  - baseballsave
+  - outlanetoextraball
+
+custom_code:
+  - custom_code.bonus_counter.BonusCounter
+  - custom_code.bonus_light_controller.BonusLightController
+  - custom_code.match_alerter.MatchAlerter
+
+game:
+  balls_per_game: settings.balls_per_game
+  max_players: 4
+
+#logging:
+#  console:
+#    timers: none
+#    event_manager: none
+#  file:
+#    timers: none
+#    event_manager: none

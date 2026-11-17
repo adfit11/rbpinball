@@ -1,0 +1,3 @@
+#config_version=6
+
+# widget_styles: removed — Kivy MC only, not compatible with MPF 0.80

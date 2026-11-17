@@ -1,0 +1,19 @@
+#config_version=6
+
+# Override BCP config to remove the local_display connection (no GMC/display running).
+# Only keep the server on 5051 so mpf-monitor can connect.
+# Uses SafeBCPClientSocket to work around MPF 0.80.0.dev7 bug where the receive
+# loop starts with _receiver=None when the connection fails.
+bcp:
+  connections:
+    local_display:
+      host: localhost
+      port: 5050
+      type: custom_code.safe_bcp.SafeBCPClientSocket
+      required: false
+      exit_on_close: false
+  servers:
+    url_style:
+      ip: 127.0.0.1
+      port: 5051
+      type: mpf.core.bcp.bcp_socket_client.BCPClientSocket

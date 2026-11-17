@@ -1,0 +1,4 @@
+#config_version=6
+
+# sound_system: and sounds: removed — Kivy MC audio, not compatible with MPF 0.80
+# Audio is now handled by GMC (Godot Media Controller)

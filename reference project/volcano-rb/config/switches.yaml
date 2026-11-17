@@ -1,0 +1,162 @@
+#config_version=6
+# Switch numbers are LISY80 format: the two-digit matrix position from the Volcano manual
+# (row digit × 10 + col digit, e.g. row 4 col 0 = 40).
+# Source: pinitech.com Gottlieb Volcano switch matrix
+
+switches:
+
+  # COINS ----------------------------------------
+  s_coin_left:
+    number: 17               # LEFT COIN
+  s_coin_center:
+    number: 37               # CENTER COIN
+  s_coin_right:
+    number: 27               # RIGHT COIN
+
+  # ADMIN / SERVICE --------------------------------
+  s_start:
+    number: 47               # REPLAY button (doubles as START in game mode)
+    tags: start
+  s_service_enter:
+    number: 7                # PLAY/TEST button — the only service button on this machine
+    tags: service_enter
+  # s_service_esc, s_service_up, s_service_down not present on this machine
+
+  # FLIPPERS ---------------------------------------
+  # System 80 flipper buttons are hardwired to the flipper relay, not in the switch matrix.
+  # LISY80 handles flipper activation at the firmware level — no switch matrix numbers.
+  # platform: virtual keeps them functional in simulation and invisible to LISY hardware.
+  s_flipper_left:
+    number: 91
+    platform: virtual
+    tags: left_flipper
+  s_flipper_right:
+    number: 92
+    platform: virtual
+    tags: right_flipper
+  # EOS switches not defined — System 80 flipper relay circuit is handled entirely by LISY firmware
+
+  # TROUGH / DRAIN ---------------------------------
+  s_drain:
+    number: 20               # OUTHOLE
+  s_trough_left:
+    number: 40               # LEFT TROUGH
+  s_trough_right:
+    number: 30               # RIGHT TROUGH
+  s_trough_center:
+    number: 93
+    platform: virtual        # TODO: no physical switch — workaround until hardware is added
+
+  # PLUNGER ----------------------------------------
+  s_plunger:
+    number: 94
+    platform: virtual        # no plunger lane switch on original machine (spring plunger)
+
+  # SUBWAY -----------------------------------------
+  s_subway_1:
+    number: 0                # #1 SUBWAY (upper exit)
+  s_subway_2:
+    number: 10               # #2 SUBWAY (lower entry)
+
+  # POP BUMPERS ------------------------------------
+  # Physical machine has 2 switch positions: top pair share one switch, bottom pair share one.
+  s_pop_top:
+    number: 35               # TOP POP BUMPERS (2 bumpers, shared switch)
+  s_pop_bottom:
+    number: 13               # BOTTOM POP BUMPERS (2 bumpers, shared switch)
+
+  # SLINGSHOTS -------------------------------------
+  # Slingshots fire directly from switch contact — no CPU control, no MPF coil definitions.
+  # Physically wired in parallel with 10-point switches (all share SW15 = s_10pt).
+
+  # FIREPIT / LEFT SIDE KICKER ---------------------
+  s_firepit_kicker:
+    number: 43               # LEFT SIDE KICKER (bottom-left kicker device, confirmed from playfield map)
+
+  # TOP SAUCER -------------------------------------
+  s_top_saucer:
+    number: 23               # HOLE KICKER (top-right hole, confirmed from playfield map)
+
+  # KICKING TARGET ---------------------------------
+  s_kicking_target:
+    number: 26               # KICKING TARGET
+
+  # SPINNER ----------------------------------------
+  s_spinner:
+    number: 44               # SPINNER
+    tags: playfield_active
+
+  # LEFT DROP TARGETS (pinitech: "TOP DROP TARGETS") --
+  s_left_targets_1:
+    number: 2                # #1 TOP DROP TARGET
+  s_left_targets_2:
+    number: 12               # #2 TOP DROP TARGET
+  s_left_targets_3:
+    number: 22               # #3 TOP DROP TARGET
+  s_left_targets_4:
+    number: 32               # #4 TOP DROP TARGET
+  s_left_targets_5:
+    number: 42               # #5 TOP DROP TARGET
+
+  # RIGHT DROP TARGETS ------------------------------
+  s_right_targets_1:
+    number: 1                # #1 RIGHT DROP TARGET
+  s_right_targets_2:
+    number: 11               # #2 RIGHT DROP TARGET
+  s_right_targets_3:
+    number: 21               # #3 RIGHT DROP TARGET
+  s_right_targets_4:
+    number: 31               # #4 RIGHT DROP TARGET
+  s_right_targets_5:
+    number: 41               # #5 RIGHT DROP TARGET
+
+  # CRATERS ----------------------------------------
+  s_crater_1:
+    number: 34               # CRATER #1
+    tags: playfield_active
+  s_crater_2:
+    number: 24               # CRATER #2
+    tags: playfield_active
+  s_crater_3:
+    number: 14               # CRATER #3
+    tags: playfield_active
+  s_crater_4:
+    number: 4                # CRATER #4
+    tags: playfield_active
+
+  # 10-POINT SWITCHES ------------------------------
+  # Physical machine wires all 7 ten-point switches in parallel to a single switch matrix position.
+  s_10pt:
+    number: 15               # 10 POINT SWITCHES (7) — all share this switch
+    tags: playfield_active
+
+  # OTHER PLAYFIELD SWITCHES -----------------------
+  s_spot_target:
+    number: 36               # SPOT TARGET
+    tags: playfield_active
+  s_outlane_right:
+    number: 5                # RIGHT OUTLANE ROLLOVER
+    tags: playfield_active
+  s_outlane_left:
+    number: 6                # LEFT OUTLANE ROLLOVER
+    tags: playfield_active
+  s_return_left:
+    number: 16               # LEFT RETURN ROLLOVER
+    tags: playfield_active
+  s_rollunder:
+    number: 25               # ROLLUNDER
+    tags: playfield_active
+
+  # FREEZE -----------------------------------------
+  # Green button on right side of cabinet, next to right flipper button. Custom addition.
+  s_freeze:
+    number: 56
+
+  # BALLSAVE ---------------------------------------
+  # SW06 is shared with s_outlane_left — baseballsave.yaml references s_outlane_left directly.
+
+  # TILT -------------------------------------------
+  s_tilt:
+    number: 46               # TILT (PLAYBOARD)
+    tags: tilt_warning
+  # s_slam_tilt: SW.57 = Not Used per official switch matrix — no slam tilt on this machine

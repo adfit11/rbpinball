@@ -1,0 +1,47 @@
+#config_version=6
+
+ball_devices:
+  bd_drain:
+    ball_switches: s_drain
+    eject_coil: c_drain_eject
+    tags: drain
+    eject_timeouts: 3s
+    eject_targets: bd_trough
+  #TODO For bd_trough to work we'll need to add a ball detection switch to the middle of the trough.
+  bd_trough:
+    ball_switches: s_trough_left, s_trough_right , s_trough_center
+    eject_coil: c_trough_release
+    eject_targets: bd_plunger
+    tags: home, trough
+    eject_timeouts: 3s
+  #TODO For bd_plunger to work we'll need to add a ball detection switch to the shooter lane.
+  bd_plunger:
+    ball_switches: s_plunger
+    mechanical_eject: true
+    eject_targets: playfield
+  bd_subway:
+    ball_switches: s_subway_1
+    eject_coil: c_subway_eject
+    eject_targets: playfield
+    eject_timeouts: 2s
+  bd_subway_pre:
+    entrance_switch: s_subway_2
+    entrance_switch_ignore_window_ms: 500
+    ball_capacity: 3
+    eject_coil: c_subway_release
+    eject_targets: bd_subway
+    captures_from: playfield
+    eject_timeouts: 2s
+  bd_firepit:
+    ball_switches: s_firepit_kicker
+    eject_coil: c_firepit_kicker
+    eject_targets: playfield
+    captures_from: playfield
+    eject_events: firepit_eject
+  bd_top_saucer:
+    ball_switches: s_top_saucer
+    eject_coil: c_top_saucer
+    eject_targets: playfield
+    captures_from: playfield
+
+virtual_platform_start_active_switches: s_trough_left, s_trough_right, s_trough_center #s_drain,

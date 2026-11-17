@@ -1,0 +1,80 @@
+#config_version=6
+
+event_player:
+  mode_attract_started:
+    - init_done
+
+#Toggle between last game scores and high score during attract.
+timers:
+  display_loop_timer:
+    start_value: 0
+    end_value: 6
+    tick_interval: 1s
+    restart_on_complete: true
+    direction: up
+    control_events:
+      - action: start
+        event: init_done
+      - action: stop
+        event: mode_attract_will_stop
+
+segment_display_player:
+  timer_display_loop_timer_tick{ticks==2}:
+    display1:
+      text: "{(machine.player1_score):d}"
+      color: black
+      key: attr
+    display2:
+      text: "{(machine.player2_score):d}"
+      color: black
+      key: attr
+    display3:
+      text: "{(machine.player3_score):d}"
+      color: black
+      key: attr
+    display4:
+      text: "{(machine.player4_score):d}"
+      color: black
+      key: attr
+    display5:
+      text: "{(machine.credits_whole_num):d}  "
+      color: black
+      key: attr
+  timer_display_loop_timer_tick{ticks==5}:
+    display1:
+      text: "HIGH"
+      color: black
+      key: attr
+    display2:
+      text: " SCORE"
+      color: black
+      key: attr
+    display3:
+      text: ""
+      color: black
+      key: attr
+    display4:
+      text: "{(machine.score1_value):d}"
+      color: black
+      key: attr
+    display5:
+      text: "{(machine.credits_whole_num):d}  "
+      color: black
+      key: attr
+
+show_player:
+  init_done: attract_bonus_show, attract_crater_show, attract_ballsave_show, attract_drops_show, attract_lavamult_show, attract_misc_show, game_over_show
+  timer_display_loop_timer_tick{ticks==5}: hstd_show
+  timer_display_loop_timer_tick{ticks==2}:
+    hstd_show:
+      action: stop
+
+shows:
+  hstd_show:
+    - duration: 3s
+      lights:
+        l_bb_high_score: white
+  game_over_show:
+    - duration: 1s
+      lights:
+        l_bb_game_over: white

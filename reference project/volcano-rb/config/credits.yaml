@@ -1,0 +1,20 @@
+#config_version=6
+
+credits:
+  max_credits: 20
+  credits_string: CREDITS
+  free_play_string: FREE PLAY
+  switches:
+    - switch: s_coin_center
+      type: dollars
+      value: .25
+  pricing_tiers:
+    - price: .50
+      credits: 1
+  events:
+    - event: award_special_replay
+      type: special
+      credits: 1
+    - event: match_alert
+      type: match
+      credits: 1

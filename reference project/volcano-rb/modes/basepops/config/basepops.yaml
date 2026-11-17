@@ -1,0 +1,19 @@
+#config_version=6
+
+mode:
+  start_events: ball_started
+  priority: 100
+
+shots:
+  pop_top:
+    switch: s_pop_top
+  pop_bottom:
+    switch: s_pop_bottom
+
+variable_player:
+  pop_top_hit{settings.balls_per_game==3}:
+    score: 1000
+  pop_top_hit{settings.balls_per_game==5}:
+    score: 100
+  pop_bottom_hit:
+    score: 100

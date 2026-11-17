@@ -1,0 +1,26 @@
+#config_version=6
+
+hardware:
+  platform: smart_virtual   # switch to lisy for hardware
+  # platform: lisy
+
+# LISY80 connection settings.
+# Option A — network (MPF on a laptop/desktop, LISY80 Pi on local network):
+#   host: lisy80         (hostname) or the Pi's IP address
+#   port: 5963           (LISY default)
+# Option B — network localhost (MPF running directly on the LISY80 Pi):
+#   host: localhost
+#   port: 5963
+# Option C — serial (direct USB/UART connection):
+#   connection: serial
+#   port: /dev/ttyUSB0   (or /dev/ttyAMA0 for Pi hardware UART)
+#   baud: 115200
+lisy:
+  connection: network
+  host: lisy80
+  port: 5963
+
+playfields:
+  playfield:
+    tags: default
+    default_source_device: bd_trough

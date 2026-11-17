@@ -1,0 +1,17 @@
+#config_version=6
+
+mode_settings:
+  end_bonus_event: finish_up_bonus
+  keep_multiplier: false
+  bonus_entries:
+    - entry: bonus_go
+      score: 0
+      player_score_entry: bonus_val
+
+variable_player:
+  bonus_countdown_decrement:
+    score: 1000 * current_player.bonus_multiplier
+  bonus_start:
+    bonus_val_tmp:
+      int: 0
+      action: set

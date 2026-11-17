@@ -1,0 +1,49 @@
+#config_version=6
+
+mode:
+  start_events: mode_base_started
+  priority: 100
+  events_when_started: baseballsave_setup
+
+# Arm the ball save relay (L13, coil 113) whenever ball_save_ready is set to 1.
+# This is triggered by hitting a lit drop target (set in basedrops.yaml).
+# The relay self-latches via its own contacts + EOS switch.
+# The actual kick coil fires directly through hardware when the player presses
+# the left cabinet button (SW.06) while the relay is armed — MPF does not fire it.
+coil_player:
+  player_ball_save_ready{change > 0}:
+    c_ball_saver: pulse
+
+# Reset ball_save_ready when the ball enters the left outlane.
+# If the relay was armed, hardware will have already fired the kick automatically.
+# If not armed (ball_save_ready == 0), this event is ignored.
+variable_player:
+  s_outlane_left_active{current_player.ball_save_ready == 1}:
+    ball_save_ready:
+      action: set
+      int: 0
+
+# Light show — on while relay is armed, off when disarmed
+show_player:
+  player_ball_save_ready{value == 1}:
+    ballsave:
+      loops: -1
+      key: ballsave
+  player_ball_save_ready{value == 0 and change < 0}:
+    ballsave:
+      action: stop
+      key: ballsave
+
+shows:
+  ballsave:
+    - duration: 500ms
+      lights:
+        l_ball_save_1: on
+        l_ball_save_2: off
+        l_ball_save_3: off
+    - duration: 500ms
+      lights:
+        l_ball_save_2: on
+    - duration: 500ms
+      lights:
+        l_ball_save_3: on
