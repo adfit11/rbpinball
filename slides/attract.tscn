@@ -37,7 +37,7 @@ theme_override_constants/separation = 34
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.816, 0.541, 1)
 theme_override_font_sizes/font_size = 38
-text = "VOLCANO"
+text = "JUKE JOINT"
 horizontal_alignment = 1
 
 [node name="GameSelection" type="VBoxContainer" parent="Center/Content"]
