@@ -25,6 +25,8 @@ class TestClassicSubway(MpfGameTestCase):
         self.hit_and_release_switch("s_start_47")
         self.advance_time_and_run(1)
         self.hit_and_release_switch("s_10_points_15")
+        # Crater contact right after the serve's trough eject is ignored.
+        self.advance_time_and_run(1.5)
 
     def capture(self):
         # Shoot the lit crater before the ball reaches the lock entrance.
@@ -36,6 +38,8 @@ class TestClassicSubway(MpfGameTestCase):
         self.hit_and_release_switch(switch)
         self.hit_and_release_switch("s_subway_lock_10")
         self.advance_time_and_run(3.2)
+        # The replacement serve ignores crater contact briefly.
+        self.advance_time_and_run(1.5)
 
     def test_lock_entrance_repeat_does_not_release_locked_ball(self):
         self.start_classic(1)
@@ -54,7 +58,7 @@ class TestClassicSubway(MpfGameTestCase):
         targets = self.machine.modes["classic_targets"]
         targets.crater_index = 4
         self.hit_and_release_switch("s_ramp_4_4")
-        self.hit_switch_and_run("s_subway_lock_10", 3)
+        self.hit_switch_and_run("s_subway_lock_10", 4.5)
         self.assertEqual(self.machine.game.player.classic_locks, 1)
         targets.crater_index = 3
         self.hit_and_release_switch("s_ramp_3_14")
@@ -86,7 +90,7 @@ class TestClassicSubway(MpfGameTestCase):
             self.hit_and_release_switch(switch)
             if crater == 4:
                 self.hit_switch_and_run("s_subway_lock_10", .1)
-            self.advance_time_and_run(3.2)
+            self.advance_time_and_run(4.7)
         self.advance_time_and_run(10)
         self.assertEventCalled("multiball_classic_subway_started", 1)
         self.assertBallsInPlay(3)
@@ -101,6 +105,29 @@ class TestClassicSubway(MpfGameTestCase):
         self.advance_time_and_run(4)
         self.assertEqual(self.machine.game.player.classic_locks, 1)
         self.assertEqual(self.machine.ball_devices["bd_classic_subway_lock"].balls, 1)
+
+    def test_contact_blip_on_held_crater_is_not_a_new_ball(self):
+        self.start_classic(1)
+        targets = self.machine.modes["classic_targets"]
+        targets.crater_index = 4
+        self.hit_switch_and_run("s_ramp_4_4", 4)
+        self.release_switch_and_run("s_ramp_4_4", .01)
+        self.hit_switch_and_run("s_ramp_4_4", 4)
+        self.assertEqual(self.machine.game.player.classic_locks, 1)
+        self.assertEqual(self.machine.ball_devices["bd_classic_subway_lock"].balls, 1)
+
+    def test_crater_hits_during_an_eject_are_ignored(self):
+        self.start_classic(1)
+        self.machine.modes["classic_targets"].crater_index = 4
+        self.hit_and_release_switch("s_ramp_4_4")
+        self.advance_time_and_run(3.2)
+        self.assertEqual(self.machine.game.player.classic_locks, 1)
+        self.hit_and_release_switch("s_ramp_4_4")
+        self.advance_time_and_run(4)
+        self.assertEqual(self.machine.game.player.classic_locks, 1)
+        self.hit_and_release_switch("s_ramp_4_4")
+        self.advance_time_and_run(4)
+        self.assertEqual(self.machine.game.player.classic_locks, 2)
 
     def test_cabinet_first_ball_requires_subway_switch(self):
         self.start_classic(1)
