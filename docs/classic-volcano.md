@@ -12,7 +12,9 @@ countdown in the Classic bonus mode so its delay and player state follow the
 current turn.
 
 Classic infers subway arrivals from debounced crater passages after a 2.5-second
-travel delay. On the LISY cabinet, the first ball also needs switch 10 to be
+travel delay. Crater contact within 1.5 s of a trough, subway release, or
+kicker eject is ignored because those coils shake crater 4, and a crater only
+counts after its switch has been open for 50 ms. On the LISY cabinet, the first ball also needs switch 10 to be
 active; subsequent arrivals cannot be independently confirmed while the first
 ball holds that switch closed. The physical lock count is visible to the next player on an ordinary handoff,
 and the subway is released on tilt or game end. Both the shared two-game flow

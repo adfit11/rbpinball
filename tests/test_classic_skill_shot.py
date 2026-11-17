@@ -28,6 +28,8 @@ class TestClassicSkillShot(MpfGameTestCase):
         return self.machine.digital_outputs["skill_motor"].hw_driver.current_brightness == 1
 
     def capture(self):
+        # Crater contact right after a trough eject is ignored.
+        self.advance_time_and_run(1.5)
         targets = self.machine.modes["classic_targets"]
         if targets.crater_index == 0:
             self.advance_time_and_run(.3)
