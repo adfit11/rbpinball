@@ -135,6 +135,39 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
         self.assertEqual(attract.subway_startup.status, "done")
         self.assertEventCalled("request_to_start_game", 1)
 
+    def fail_release_and_restart_attract(self):
+        self.advance_time_and_run(1.2)
+        ejector = self.machine.ball_devices["bd_classic_subway_lock"].ejector
+        ejector.guard._fail("Released ball did not reach the kicker")
+        ejector._reported_fault = True
+        self.stop_mode("attract")
+        self.machine.modes["attract"].start()
+        self.advance_time_and_run(.1)
+        return ejector
+
+    def test_failed_release_rearms_when_all_balls_are_home(self):
+        self.mock_event("subway_release_interlock_rearmed")
+        self.mock_event("request_to_start_game")
+        ejector = self.fail_release_and_restart_attract()
+        self.hit_and_release_switch("s_start_47")
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(1.5)
+        self.assertEventCalled("subway_release_interlock_rearmed", 1)
+        self.assertEqual("ready", ejector.guard.state)
+        self.assertFalse(ejector._reported_fault)
+        self.assertEqual("done", self.machine.modes["attract"].subway_startup.status)
+        self.assertEventCalled("request_to_start_game", 1)
+
+    def test_failed_release_stays_failed_without_a_full_trough(self):
+        self.mock_event("request_to_start_game")
+        self.release_switch_and_run("s_trough_1_40", .1)
+        ejector = self.fail_release_and_restart_attract()
+        self.hit_and_release_switch("s_start_47")
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(3)
+        self.assertEqual("failed", ejector.guard.state)
+        self.assertEventNotCalled("request_to_start_game")
+
     def test_virtual_mpf_blocks_occupied_kicker_and_repeat(self):
         device = self.machine.ball_devices["bd_classic_subway_lock"]
         ejector = device.ejector

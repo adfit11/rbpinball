@@ -39,6 +39,13 @@ power, mechanical binding, and pulse duration remain possible causes.
   retest the non-responsive mechanisms. No failed coil or driver has been
   established by this survey.
 
+## Motor relay follow-up
+
+A later direct test found that the skill shot motor runs only while lamp
+output 12 and L0 are both held on. L12 alone, L0 alone and a 255 ms pulse on
+112 did not move it. The survey now holds L12 with L0 for 2 seconds as its
+motor step, and MPF drives the motor as the `skill_motor` digital output.
+
 ## Pop bumpers — separate tests completed
 
 The Volcano technical sheets, PDF page 3, list a dedicated pop-bumper board

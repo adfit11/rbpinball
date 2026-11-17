@@ -82,15 +82,24 @@ class SubwayStartupClear:
             return True
         return kicker.request_recovery_kick()
 
+    def _trough_full(self):
+        trough = self.machine.ball_devices["bd_trough"]
+        return (trough.balls == 3 and trough.available_balls == 3
+                and self.machine.switch_controller.is_active(self.machine.switches["s_trough_1_40"], ms=1000))
+
+    def _rearm_failed_release(self, release):
+        """With all three balls in the trough, nothing is left in the subway."""
+        if self.machine.game or release.guard.state != "failed" or not self._trough_full():
+            return
+        reason = release.guard.reason
+        release.rearm()
+        self.machine.events.post("subway_release_interlock_rearmed", reason=reason)
+
     def _reconcile_home_counts(self):
         """Discard phantom playfield balls only when all three are home."""
-        if self.machine.game:
+        if self.machine.game or not self._trough_full():
             return
         trough = self.machine.ball_devices["bd_trough"]
-        controller = self.machine.switch_controller
-        if (trough.balls != 3 or trough.available_balls != 3
-                or not controller.is_active(self.machine.switches["s_trough_1_40"], ms=1000)):
-            return
         for device in self.machine.ball_devices.values():
             if device.is_playfield() or device is trough:
                 continue
@@ -136,6 +145,7 @@ class SubwayStartupClear:
                 counter.reconcile_empty_after_recovery()
                 self._reconciled = True
             self._reconcile_home_counts()
+            self._rearm_failed_release(release)
             kicker_ejector = self.machine.ball_devices["bd_classic_subway_kicker"].ejector
             if release._allow_start() and kicker_ejector.state == "ready":
                 if not self.awaiting_return:

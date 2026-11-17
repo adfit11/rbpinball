@@ -39,6 +39,10 @@ class InterlockedSubwayEjector(PulseCoilEjector):
                 and trough.balls == 3
                 and self.machine.ball_controller.num_balls_known == 3)
 
+    def rearm(self):
+        self.guard.rearm()
+        self._reported_fault = False
+
     def _observe(self):
         now = self.machine.clock.get_time()
         active = self.machine.switch_controller.is_active(self.machine.switches["s_subway_kicker_0"])

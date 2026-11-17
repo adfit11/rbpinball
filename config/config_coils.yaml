@@ -15,6 +15,11 @@ digital_outputs:
     enable_events: classic_open_gate
     disable_events: classic_close_gate, ball_will_end, tilt, slam_tilt, game_will_end
 
+  # The skill shot motor relay runs only while lamp 12 is held on and L0 is on.
+  skill_motor:
+    number: 12
+    type: light
+
 coils:
   c_classic_ball_saver:
     number: 113
@@ -56,6 +61,3 @@ coils:
   c_hole_kicker_top:
     number: 116 # uses light bank
     default_pulse_ms: 55
-  c_skill_motor:
-    number: 112 # uses light bank
-    default_pulse_ms: 5000
