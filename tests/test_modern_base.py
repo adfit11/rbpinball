@@ -33,6 +33,7 @@ class TestModernStack(ModernTestCase):
         self.advance_time_and_run(.1)
         self.assertEqual(self.player.score - start, 1000)
         self.player.modern_song_multiplier = 3
+        self.player.modern_nickel = 1  # a held nickel pauses the hunt, so no nickel points
         start = self.player.score
         self.hit_and_release_switch("s_spot_target_36")
         self.advance_time_and_run(.1)
