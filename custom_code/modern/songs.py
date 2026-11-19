@@ -16,6 +16,7 @@ def drain_value(start, end, total_ms, elapsed_ms):
 
 
 class SongRule:
+    key = ""
     title = ""
     goal = ""
     ends_on_complete = False
@@ -62,6 +63,7 @@ class SongRule:
 
 
 class HurryUp(SongRule):
+    key = "hurry_up"
     title, goal, ends_on_complete = "HURRY-UP", "Shoot the flashing location before it drains!", True
 
     def start(self):
@@ -86,6 +88,7 @@ class HurryUp(SongRule):
 
 
 class Ladder(SongRule):
+    key = "ladder"
     title, goal = "LADDER", "Climb four rungs at the Kitchen"
 
     def start(self):
@@ -106,6 +109,7 @@ class Ladder(SongRule):
 
 
 class BuildAndCollect(SongRule):
+    key = "build_and_collect"
     title, goal = "BUILD AND COLLECT", "Spin the Bandstand to build the pot, collect at the Bar"
 
     def start(self):
@@ -129,6 +133,7 @@ class BuildAndCollect(SongRule):
 
 
 class RovingShot(SongRule):
+    key = "roving_shot"
     title, goal = "ROVING SHOT", "Chase the moving shot. Tap green once to freeze it"
 
     def start(self):
@@ -168,6 +173,7 @@ class RovingShot(SongRule):
 
 
 class JukeboxJackpot(SongRule):
+    key = "jukebox_jackpot"
     title, goal = "JUKEBOX JACKPOT", "Every crater is a jackpot!"
 
     def start(self):
@@ -186,6 +192,7 @@ class JukeboxJackpot(SongRule):
 
 
 class PartyTime(SongRule):
+    key = "party_time"
     title, goal = "PARTY TIME", "Double scoring and the Bouncer is ready. Survive the song!"
 
     def start(self):
@@ -208,6 +215,7 @@ class PartyTime(SongRule):
 
 
 class OrderUp(SongRule):
+    key = "order_up"
     title, goal, ends_on_complete = "ORDER UP", "Pick up at the Kitchen, deliver before it gets cold", False
 
     def start(self):
@@ -247,6 +255,7 @@ class OrderUp(SongRule):
 
 
 class RequestNight(SongRule):
+    key = "request_night"
     title, goal = "REQUEST NIGHT", "Take a request at every location"
 
     def start(self):
@@ -267,6 +276,7 @@ class RequestNight(SongRule):
 
 
 class DanceFloor(SongRule):
+    key = "dance_floor"
     title, goal = "DANCE FLOOR", "Bumpers score 5×. Pack the floor with 25 hits"
 
     def start(self):
@@ -288,6 +298,7 @@ class DanceFloor(SongRule):
 
 
 class HitMe(SongRule):
+    key = "hit_me"
     title, goal, ends_on_complete = "HIT ME!", "Tap green to stop the dial, then hit the lit location", True
 
     def start(self):
@@ -364,7 +375,7 @@ class ModernSongs(Mode):
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
         self.machine.events.post("modern_overlay", title=self.rule.title, subtitle=self.rule.goal, ms=2200,
                                  style="teal")
-        self.machine.events.post("modern_callout", pool="mc_song_start")
+        self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}")
         self._tick()
 
     def _tick(self):

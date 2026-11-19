@@ -136,3 +136,17 @@ class TestModernSongs(ModernTestCase):
         self.drain_one_ball()
         self.advance_time_and_run(8)
         self.assertEqual(self.player.modern_song_active, 0)
+
+    def test_each_mode_posts_its_callout_and_has_voice_lines(self):
+        from custom_code.modern.songs import SLOT_RULES
+        self.start_modern()
+        pools = self.machine.modes["modern_callouts"].pools
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.mock_event("modern_callout")
+        for slot, rule in SLOT_RULES.items():
+            self.assertIn(f"mc_mode_{rule.key}", pools)
+            jukebox._start_song(jukebox.slots[slot - 1][1][0])
+            self.advance_time_and_run(.2)
+            self.assertEqual(self._last_event_kwargs["modern_callout"]["pool"], f"mc_mode_{rule.key}")
+            jukebox.end_song()
+            self.advance_time_and_run(.1)
