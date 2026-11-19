@@ -121,6 +121,7 @@ class ModernJukebox(Mode):
         self.machine.events.post("modern_release_jukebox")
         if self.chosen:
             self.pending_song, self.chosen = self.chosen, None
+            self._count_song()
             self.delay.reset(ms=TRANSFER_FALLBACK_MS, name="transfer", callback=self._start_pending)
 
     def _start_pending(self, **kwargs):
@@ -128,19 +129,32 @@ class ModernJukebox(Mode):
         if self.pending_song:
             self.delay.remove("transfer")
             song, self.pending_song = self.pending_song, None
-            self._start_song(song)
+            self._start_song(song, counted=True)
 
     # Songs -----------------------------------------------------------------
-    def _start_song(self, song):
+    def _count_song(self, step=1):
+        """Song progression and multiplier; counted as the ball is released so new scores use it."""
         player = self.player
-        player.modern_songs_played += 1
-        player.modern_round_songs += 1
-        player.modern_bonus_songs += 1
-        player.modern_song_active = 1
+        player.modern_songs_played += step
+        player.modern_round_songs += step
+        player.modern_bonus_songs += step
         player.modern_song_multiplier = min(settings.MAX_SONG_MULTIPLIER,
                                             1 + player.modern_songs_played // settings.MULTIPLIER_EVERY)
+        self._show()
+
+    def _refund(self, song, counted):
+        """Give back an artist whose song never started (the ball drained first)."""
+        self.player.modern_artists_played &= ~(1 << (song.slot - 1))
+        if counted:
+            self._count_song(-1)
+
+    def _start_song(self, song, counted=False):
+        player = self.player
+        if not counted:
+            self._count_song()
         if player.modern_songs_played in settings.EXTRA_BALL_SONGS:
             self.machine.events.post("modern_light_extra_ball")
+        player.modern_song_active = 1
         length = catalogue.mp3_length_ms(os.path.join(catalogue.ROOT, song.path), settings.DEFAULT_SONG_MS)
         self.song = song
         self.song_remaining_ms = length
@@ -203,7 +217,11 @@ class ModernJukebox(Mode):
             self.machine.events.post("modern_selector_closed")
         if self.song:
             self.end_song(reason="drain")
-        self.chosen = None
+        if self.pending_song:
+            self._refund(self.pending_song, counted=True)
+        if self.chosen:
+            self._refund(self.chosen, counted=False)
+        self.chosen = self.pending_song = None
         self.player.modern_song_active = 0
         try:
             self.lamps.clear("songs")

@@ -157,6 +157,22 @@ class TestModernJukebox(ModernTestCase):
         self.assertIsNotNone(jukebox.song)
         self.assertIsNone(jukebox.pending_song)
 
+    def test_multiplier_applies_while_ball_returns_and_drain_refunds_artist(self):
+        self.start_modern()
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.player.modern_songs_played = settings.MULTIPLIER_EVERY - 1
+        jukebox.selector_open, jukebox.highlight = True, 3
+        jukebox._choose()
+        jukebox._release_ball()
+        self.advance_time_and_run(.1)
+        self.assertEqual(self.player.modern_song_multiplier, 2)
+        self.assertTrue(jukebox.played(3))
+        self.drain_one_ball()
+        self.advance_time_and_run(8)
+        self.assertFalse(jukebox.played(3))
+        self.assertEqual(self.player.modern_songs_played, settings.MULTIPLIER_EVERY - 1)
+        self.assertEqual(self.player.modern_song_multiplier, 1)
+
     def test_tap_moves_and_hold_selects(self):
         self.start_modern()
         self.give_nickel()
