@@ -1,12 +1,19 @@
 """The Bar (saucer) and Kitchen (fire pit): holds, extra balls and the special."""
 
 from mpf.core.mode import Mode
+from mpf.platforms.virtual import VirtualHardwarePlatform
 
 from custom_code.modern import settings
 from custom_code.modern.lamps import FLASH, STEADY, director
 from custom_code.modern.scoring import award
 
 HOLES = {"bar": "ball_hold_modern_saucer_held_ball", "kitchen": "ball_hold_modern_firepit_held_ball"}
+DEVICES = ("bd_classic_saucer", "bd_classic_firepit")
+
+
+def plain_virtual(machine):
+    """mpf -x: nothing moves the simulated ball out when a kicker fires (mpf -X does)."""
+    return type(machine.default_platform) is VirtualHardwarePlatform
 
 
 class ModernHoles(Mode):
@@ -15,6 +22,8 @@ class ModernHoles(Mode):
         self.hold_ms = {}
         for hole, event in HOLES.items():
             self.add_mode_event_handler(event, self._captured, hole=hole)
+        for device in DEVICES:
+            self.add_mode_event_handler(f"balldevice_{device}_ejecting_ball", self._ejecting, device=device)
         self.add_mode_event_handler("modern_light_extra_ball", self._light_extra_ball)
         self.add_mode_event_handler("modern_light_special", self._light_special)
         self._show()
@@ -57,6 +66,11 @@ class ModernHoles(Mode):
         """The nickel hunt already answers every location hit while it is hunting."""
         nickels = self.machine.modes["modern_nickels"]
         return nickels.active and nickels.hunting()
+
+    def _ejecting(self, device, **kwargs):
+        if plain_virtual(self.machine):
+            self.delay.add(ms=100, callback=self.machine.default_platform.virtual_remove_ball_from_device,
+                           ball_device=device)
 
     def _release(self, hole):
         self.machine.events.post("modern_ball_released", hole=hole)

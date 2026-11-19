@@ -2,7 +2,7 @@
 
 from mpf.core.mode import Mode
 
-from custom_code.modern import settings
+from custom_code.modern import guide, settings
 from custom_code.modern.lamps import LampDirector, STEADY
 from custom_code.modern.scoring import award
 
@@ -11,6 +11,11 @@ BASE_SWITCHES = {
     "s_rollunder_25": "rollunder", "s_return_left_16": "left_return",
     "s_outlane_left_6": "outlane", "s_outlane_right_5": "outlane",
 }
+TASK_EVENTS = (
+    "modern_nickel_directed", "modern_nickel_awarded", "modern_nickel_spent", "modern_selector_opened",
+    "modern_selector_closed", "modern_song_started", "modern_song_ended", "modern_lock_lit", "modern_ball_locked",
+    "multiball_modern_rent_party_started", "multiball_modern_rent_party_ended",
+)
 LOCATION_SWITCHES = {"s_spot_target_36": "coat_check", "s_kicking_target_26": "back_door"}
 
 BALL_VARS = (
@@ -49,6 +54,10 @@ class ModernCore(Mode):
         if select_switch != settings.TAP_SWITCH:
             self.add_mode_event_handler(select_switch + "_active", self._select_pressed)
         self.add_mode_event_handler("player_extra_balls", self._shoot_again_lamp)
+        self._task = None
+        for event in TASK_EVENTS:
+            self.add_mode_event_handler(event, self._task_changed)
+        self._task_changed()
         self._shoot_again_lamp()
 
     # Shared services -------------------------------------------------------
@@ -67,6 +76,15 @@ class ModernCore(Mode):
         self.player.modern_bonus_locations += 1
         award(self.machine, settings.SCORE_LOCATION, location)
         self.machine.events.post("modern_location_hit", location=location)
+
+    def _task_changed(self, **kwargs):
+        self.delay.reset(ms=50, name="task", callback=self._post_task)
+
+    def _post_task(self):
+        task = guide.current_task(self.machine)
+        if task != self._task:
+            self._task = task
+            self.machine.events.post("modern_task", title=task[0], detail=task[1])
 
     # Handlers --------------------------------------------------------------
     def _base_hit(self, kind, **kwargs):

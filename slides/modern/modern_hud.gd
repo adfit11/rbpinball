@@ -27,6 +27,9 @@ var song_title: Label
 var song_bar: ProgressBar
 var mode_banner: Label
 var caption: Label
+var task_panel: PanelContainer
+var task_title: Label
+var task_detail: Label
 var overlay_root: Control
 var selector: Control
 var selector_cells: Array = []
@@ -54,7 +57,7 @@ const EVENTS := [
 	"modern_select_progress", "modern_drop_the_needle", "modern_ball_saver_ready", "modern_ball_saved",
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
-	"modern_overlay", "modern_mode_status", "modern_floor_nickel", "game_ending", "ball_started",
+	"modern_overlay", "modern_mode_status", "modern_task", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_rent_party_started", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
@@ -164,6 +167,18 @@ func _build() -> void:
 	song_box.add_child(song_bar)
 	_place(song_panel, 330, 120, 620, 80)
 	song_panel.visible = false
+
+	task_panel = _panel(Color(BURGUNDY, 0.85))
+	var task_box := VBoxContainer.new()
+	task_panel.add_child(task_box)
+	task_title = _label("", 24, GOLD, title_font)
+	task_box.add_child(task_title)
+	task_detail = _label("", 21, CREAM)
+	task_detail.autowrap_mode = TextServer.AUTOWRAP_WORD
+	task_detail.custom_minimum_size = Vector2(780, 0)
+	task_box.add_child(task_detail)
+	_place(task_panel, 200, 420, 820, 110)
+	task_panel.visible = false
 
 	mode_banner = _place(_label("", 26, CREAM), 200, 540, 840, 40)
 	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -530,6 +545,10 @@ func _on_event(payload: Dictionary = {}) -> void:
 			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT COLLECTED!"
 		"modern_rent_party_ended":
 			mode_banner.text = ""
+		"modern_task":
+			task_title.text = str(payload.get("title", ""))
+			task_detail.text = str(payload.get("detail", ""))
+			task_panel.visible = true
 		"modern_mode_status":
 			mode_banner.text = str(payload.get("text", ""))
 		"game_ending":
