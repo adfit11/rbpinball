@@ -42,7 +42,7 @@ If a song's video is missing or cannot play, the screen SHALL use the artist's `
 - **THEN** the next available fallback plays, and the song and mode start on time
 
 ### Requirement: Provide placeholder videos
-Placeholder videos SHALL exist for every catalogue song and for the generic club fallback. Placeholders SHALL show generic, era-appropriate performer scenes for the act type: a singer at a microphone, a saxophone, a piano, or a small band. They SHALL NOT depict, imitate or name any real performer.
+Placeholder videos SHALL exist for every artist slot (its `video.ogv`, used by all of that slot's songs) and for the generic club fallback. Per-song `video_<n>.ogv` files are optional owner overrides. Placeholders SHALL show generic, era-appropriate performer scenes for the act type: a singer at a microphone, a saxophone, a piano, or a small band. They SHALL NOT depict, imitate or name any real performer.
 
 #### Scenario: A fresh checkout
 - **WHEN** the project is checked out without owner videos
