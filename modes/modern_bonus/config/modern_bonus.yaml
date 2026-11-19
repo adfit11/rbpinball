@@ -1,0 +1,7 @@
+#config_version=6
+
+mode:
+  code: custom_code.modern.bonus.ModernBonus
+  start_events: ball_ending{machine.session_game == "modern"}
+  priority: 500
+  use_wait_queue: true

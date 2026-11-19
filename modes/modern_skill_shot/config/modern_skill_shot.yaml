@@ -1,0 +1,8 @@
+#config_version=6
+
+# Drop the Needle reuses Classic's skill shot cam control unchanged.
+mode:
+  code: custom_code.classic_skill_shot.ClassicSkillShot
+  start_events: mode_modern_started
+  stop_events: ball_will_end
+  priority: 105

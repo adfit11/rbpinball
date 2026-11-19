@@ -23,7 +23,7 @@ class VolcanoSubwayCounter(EntranceSwitchCounter):
         return self._last_count
 
     def _entrance_switch_handler(self, switch_name):
-        if not self.machine.game or self.machine.variables.get_machine_var("session_game") == "classic":
+        if not self.machine.game or self.machine.variables.get_machine_var("session_game") in ("classic", "modern"):
             # During recovery switch 10 is an occupancy sensor. Contact
             # bounce and balls advancing over it must not enqueue MPF ejects.
             return
@@ -31,7 +31,7 @@ class VolcanoSubwayCounter(EntranceSwitchCounter):
 
     def crater_ball_arrived(self):
         """Record one inferred crater passage after its travel delay."""
-        if not self.machine.game or self.machine.variables.get_machine_var("session_game") != "classic":
+        if not self.machine.game or self.machine.variables.get_machine_var("session_game") not in ("classic", "modern"):
             return
         if self._last_count >= self.capacity:
             self.ball_device.log.warning("Ignored crater arrival: subway counter is full")

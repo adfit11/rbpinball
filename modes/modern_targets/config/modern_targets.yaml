@@ -1,0 +1,7 @@
+#config_version=6
+
+mode:
+  code: custom_code.modern.targets.ModernTargets
+  start_events: mode_modern_started
+  stop_events: ball_will_end
+  priority: 102

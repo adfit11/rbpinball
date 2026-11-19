@@ -25,11 +25,18 @@ modes:
   - classic_holes
   - classic_gate
   - classic_subway
-  - base
-  - bumpers
-  - outlanes
-  - hurryup
-  - right_drops
+  - modern
+  - modern_targets
+  - modern_skill_shot
+  - modern_nickels
+  - modern_jukebox
+  - modern_subway
+  - modern_holes
+  - modern_ball_saver
+  - modern_bonus
+  - modern_callouts
+  - modern_display
+  - modern_high_score
   - tilt
 
 game:

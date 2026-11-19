@@ -45,6 +45,7 @@ class TestGameRelay(MpfGameTestCase):
         self.assertEqual(self.machine.ball_devices['bd_trough'].balls, 3)
         self.hit_and_release_switch('s_start_47')
         self.start_game(start_switch='s_start_47')
+        self.hit_and_release_switch('s_start_47')  # skip the Modern rules splash
         for ball in range(1, 4):
             self.release_switch_and_run('s_trough_1_40', 2)
             self.hit_and_release_switch('s_return_left_16')
@@ -56,7 +57,7 @@ class TestGameRelay(MpfGameTestCase):
             self.hit_switch_and_run('s_trough_1_40', 1 if ball == 3 else .1)
             if ball != 3:
                 self.release_switch_and_run('s_trough_1_40', .1)
-            self.advance_time_and_run(3)
+            self.advance_time_and_run(8)
         self.assertGameIsNotRunning()
         self.assertEqual(relay.current_brightness, 0)
 
@@ -96,6 +97,8 @@ class TestGameRelay(MpfGameTestCase):
         self.mock_event('ball_drain')
         self.mock_event('balldevice_bd_trough_ejecting_ball')
         self.hit_and_release_switch('s_start_47')
+        self.advance_time_and_run(.5)
+        self.hit_and_release_switch('s_start_47')  # skip the Modern rules splash
         self.advance_time_and_run(.04)
 
         self.release_switch_and_run(entrance, .012)
@@ -112,7 +115,7 @@ class TestGameRelay(MpfGameTestCase):
         self.mock_event('balldevice_bd_outhole_ball_eject_success')
         self.hit_switch_and_run('s_trough_3_20', 1)
         self.release_switch_and_run('s_trough_3_20', .1)
-        self.hit_switch_and_run(entrance, 1)
+        self.hit_switch_and_run(entrance, 6)  # Modern counts its bonus first
         self.assertEventCalled('balldevice_bd_outhole_ball_eject_success', 1)
         self.assertBallNumber(2)
 
