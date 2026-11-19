@@ -1,0 +1,25 @@
+#config_version=6
+
+mode:
+  code: custom_code.modern.rent_party.ModernRentParty
+  start_events: mode_modern_jukebox_started
+  stop_events: ball_will_end
+  priority: 130
+
+multiball_locks:
+  modern_subway_lock:
+    balls_to_lock: 3
+    balls_to_replace: 2
+    lock_devices: bd_classic_subway_lock
+    locked_ball_counting_strategy: physical_only
+    enable_events: modern_lock_qualified
+    disable_events: multiball_lock_modern_subway_lock_locked_ball, classic_subway_arrival_unconfirmed, tilt, slam_tilt
+
+multiballs:
+  modern_rent_party:
+    ball_count: 3
+    ball_count_type: total
+    ball_locks: bd_classic_subway_lock
+    replace_balls_in_play: true
+    shoot_again: 0
+    start_events: multiball_lock_modern_subway_lock_full

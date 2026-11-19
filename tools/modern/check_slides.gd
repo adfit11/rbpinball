@@ -4,7 +4,7 @@ extends SceneTree
 func _initialize() -> void:
 	var failed := 0
 	for path in ["res://slides/modern/modern_hud.tscn", "res://slides/modern/modern_high_score.tscn",
-			"res://slides/modern/modern_high_score_award.tscn"]:
+			"res://slides/modern/modern_high_score_award.tscn", "res://slides/modern/modern_game_over.tscn", "res://slides/modern/modern_splash.tscn"]:
 		var scene: PackedScene = load(path)
 		if scene == null:
 			push_error("Cannot load %s" % path)
