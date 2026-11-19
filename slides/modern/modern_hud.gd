@@ -7,6 +7,9 @@ const CREAM := Color("#f6e7c8")
 const BURGUNDY := Color("#5a1020")
 const TEAL := Color("#0f4a4a")
 const DIM := Color("#8a7f70")
+const BRASS := Color("#7a5a12")
+const RED := Color("#8a1010")
+const OVERLAY_STYLES := {"teal": TEAL, "gold": BRASS, "red": RED}
 const DUCK_DB := -12.0
 const LOCATIONS := ["Bar", "Kitchen", "Bandstand", "Coat Check", "Back Door"]
 
@@ -48,6 +51,7 @@ const EVENTS := [
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_floor_nickel", "game_ending", "ball_started",
+	"modern_rent_party_started", "modern_jackpot", "modern_super_jackpot_lit", "modern_rent_party_ended",
 ]
 
 
@@ -457,7 +461,15 @@ func _on_event(payload: Dictionary = {}) -> void:
 			bonus_lines.clear()
 		"modern_overlay":
 			show_overlay(str(payload.get("title", "")), str(payload.get("subtitle", "")), int(payload.get("ms", 1800)),
-				TEAL if payload.get("style", "") == "teal" else BURGUNDY)
+				OVERLAY_STYLES.get(str(payload.get("style", "")), BURGUNDY))
+		"modern_rent_party_started":
+			mode_banner.text = "RENT PARTY  •  LIT CRATERS = JACKPOT %s" % MPF.util.comma_sep(int(payload.get("jackpot", 0)))
+		"modern_jackpot":
+			mode_banner.text = "RENT PARTY  •  JACKPOT %s  •  %d/3 TO SUPER" % [MPF.util.comma_sep(int(payload.get("next_value", 0))), int(payload.get("count", 0))]
+		"modern_super_jackpot_lit":
+			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT AT THE BAR!"
+		"modern_rent_party_ended":
+			mode_banner.text = ""
 		"modern_mode_status":
 			mode_banner.text = str(payload.get("text", ""))
 		"game_ending":
