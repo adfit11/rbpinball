@@ -14,6 +14,15 @@ class TestModernSongs(ModernTestCase):
         self.advance_time_and_run(.2)
         return self.machine.modes["modern_songs"].rule
 
+    def test_song_start_announces_the_real_artist_and_title(self):
+        self.mock_event("modern_voice")
+        self.start_slot(1)
+        song = self.machine.modes["modern_jukebox"].slots[0][1][0]
+        voice = self._last_event_kwargs["modern_voice"]
+        self.assertEqual(f"Here's Louis Jordan with {song.title}!", voice["text"])
+        self.assertTrue(voice["file"].endswith("01_louis_jordan/intro_1.mp3"))
+        self.assertNotIn("song", song.title.lower())
+
     def test_every_slot_starts_its_rule(self):
         self.start_modern()
         jukebox = self.machine.modes["modern_jukebox"]

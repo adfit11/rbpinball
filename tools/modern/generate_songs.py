@@ -3,7 +3,8 @@
 Each placeholder is a synthesized boogie-woogie loop with the title spoken over it.
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
-Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
+Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--intros] [--seconds 60]
+--intros regenerates only the MC song announcements, e.g. after editing catalogue titles.
 """
 
 import os
@@ -73,6 +74,22 @@ def write_wav(path, data):
         handle.writeframes((data * 32767).astype(np.int16).tobytes())
 
 
+def make_intros(force=False):
+    """MC "Here's <artist> with <title>!" announcements; rerun with --intros after editing catalogue titles."""
+    made = 0
+    for _, songs in catalogue.load():
+        for song in songs:
+            out = os.path.join(catalogue.ROOT, song.intro_path)
+            if os.path.exists(out) and not force:
+                continue
+            wav = tts.temp_wav()
+            tts.speak_wav(song.intro_text, MC, wav)
+            tts.to_mp3(wav, out, "64k")
+            os.remove(wav)
+            made += 1
+    print(f"generated {made} song intros")
+
+
 def main(force=False, seconds=60):
     made = 0
     for slot, (name, songs) in enumerate(catalogue.load(), 1):
@@ -97,6 +114,7 @@ def main(force=False, seconds=60):
             os.remove(wav)
             made += 1
     print(f"generated {made} song files")
+    make_intros(force or "--intros" in sys.argv[1:])
 
 
 if __name__ == "__main__":
