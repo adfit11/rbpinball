@@ -150,3 +150,36 @@ class TestModernSongs(ModernTestCase):
             self.assertEqual(self._last_event_kwargs["modern_callout"]["pool"], f"mc_mode_{rule.key}")
             jukebox.end_song()
             self.advance_time_and_run(.1)
+
+    def test_completing_ladder_ends_the_song(self):
+        self.start_slot(2)
+        for _ in range(4):
+            self.hit_location("kitchen")
+        self.assertIsNone(self.machine.modes["modern_jukebox"].song)
+
+    def test_cold_order_fails_and_ends_the_song(self):
+        rule = self.start_slot(7)
+        self.mock_event("modern_song_failed")
+        self.hit_location("kitchen")
+        self.assertIsNotNone(rule.destination)
+        self.advance_time_and_run(S.ORDER_MS / 1000 + 1)
+        self.assertEventCalled("modern_song_failed")
+        self.assertIsNone(self.machine.modes["modern_jukebox"].song)
+
+    def test_ball_hold_pauses_the_hurry_up(self):
+        rule = self.start_slot(1)
+        self.post_event("modern_song_paused", .1)
+        value = rule.value()
+        self.advance_time_and_run(S.HURRY_MS / 1000 + 2)
+        self.assertEqual(rule.value(), value)
+        self.assertFalse(rule.completed)
+        self.assertIsNotNone(self.machine.modes["modern_songs"].rule)
+        self.post_event("modern_song_resumed", .1)
+        self.advance_time_and_run(S.HURRY_MS / 1000 + 1)
+        self.assertIsNone(self.machine.modes["modern_songs"].rule)
+
+    def test_jukebox_jackpot_flashes_all_craters(self):
+        from custom_code.modern.lamps import FLASH, director
+        self.start_slot(5)
+        for light in S.CRATER_LAMPS:
+            self.assertEqual(director(self.machine).state(light), FLASH)

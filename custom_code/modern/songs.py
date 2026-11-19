@@ -30,7 +30,7 @@ class SongRule:
         return director(self.machine)
 
     def now_ms(self):
-        return self.machine.clock.get_time() * 1000
+        return self.songs.song_ms()
 
     def pay(self, value, source):
         return award(self.machine, value, source)
@@ -89,7 +89,7 @@ class HurryUp(SongRule):
 
 class Ladder(SongRule):
     key = "ladder"
-    title, goal = "LADDER", "Climb four rungs at the Kitchen"
+    title, goal, ends_on_complete = "LADDER", "Climb four rungs at the Kitchen", True
 
     def start(self):
         self.rung = 0
@@ -134,7 +134,7 @@ class BuildAndCollect(SongRule):
 
 class RovingShot(SongRule):
     key = "roving_shot"
-    title, goal = "ROVING SHOT", "Chase the moving shot. Tap green once to freeze it"
+    title, goal, ends_on_complete = "ROVING SHOT", "Chase the moving shot. Tap green once to freeze it", True
 
     def start(self):
         self.hits, self.frozen_until, self.freeze_used = 0, 0, False
@@ -178,6 +178,8 @@ class JukeboxJackpot(SongRule):
 
     def start(self):
         self.jackpots = 0
+        for light in S.CRATER_LAMPS:
+            self.lamps.set("song", light, FLASH)
 
     def on_crater(self, crater, lit):
         value = S.JACKPOT_VALUES[crater - 1] + S.JACKPOT_STEP * self.jackpots
@@ -216,7 +218,7 @@ class PartyTime(SongRule):
 
 class OrderUp(SongRule):
     key = "order_up"
-    title, goal, ends_on_complete = "ORDER UP", "Pick up at the Kitchen, deliver before it gets cold", False
+    title, goal, ends_on_complete = "ORDER UP", "Pick up at the Kitchen, deliver before it gets cold", True
 
     def start(self):
         self.destination, self.started = None, 0
@@ -237,7 +239,7 @@ class OrderUp(SongRule):
     def tick(self):
         if self.destination and self.now_ms() - self.started >= S.ORDER_MS:
             self.destination = None
-            self.flash(["kitchen"])
+            self.songs.failed(self, end_song=True)
 
     def on_location(self, location):
         if self.destination and location == self.destination:
@@ -256,7 +258,7 @@ class OrderUp(SongRule):
 
 class RequestNight(SongRule):
     key = "request_night"
-    title, goal = "REQUEST NIGHT", "Take a request at every location"
+    title, goal, ends_on_complete = "REQUEST NIGHT", "Take a request at every location", True
 
     def start(self):
         self.remaining = list(LOC)
@@ -368,6 +370,26 @@ class ModernSongs(Mode):
         self.add_mode_event_handler("modern_tap", self._tap)
         self.add_mode_event_handler("modern_ball_saved", self._forward, method="on_ball_saved")
         self.add_mode_event_handler("tilt", self._tilt)
+        self.add_mode_event_handler("modern_song_paused", self._paused)
+        self.add_mode_event_handler("modern_song_resumed", self._resumed)
+        self.paused_total, self.paused_at = 0, None
+
+    def _wall_ms(self):
+        return self.machine.clock.get_time() * 1000
+
+    def song_ms(self):
+        """Song-clock time: wall time minus time the ball spent held, so challenges pause with the song."""
+        held = self.paused_total + (self._wall_ms() - self.paused_at if self.paused_at is not None else 0)
+        return self._wall_ms() - held
+
+    def _paused(self, **kwargs):
+        if self.paused_at is None:
+            self.paused_at = self._wall_ms()
+
+    def _resumed(self, **kwargs):
+        if self.paused_at is not None:
+            self.paused_total += self._wall_ms() - self.paused_at
+            self.paused_at = None
 
     def _song_started(self, slot, **kwargs):
         self.rule = SLOT_RULES[slot](self)
@@ -381,7 +403,8 @@ class ModernSongs(Mode):
     def _tick(self):
         if not self.rule:
             return
-        self.rule.tick()
+        if self.paused_at is None:
+            self.rule.tick()
         if self.rule:
             self.machine.events.post("modern_mode_status", text=self.rule.status())
             self.delay.reset(ms=TICK_MS, name="tick", callback=self._tick)
