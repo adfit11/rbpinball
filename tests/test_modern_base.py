@@ -141,6 +141,24 @@ class TestModernJukebox(ModernTestCase):
         self.assertEqual(self.player.modern_songs_played, 1)
         self.assertEqual(self.player.modern_artists_played, 1)
         self.assertTrue(self.machine.modes["modern_jukebox"].song)
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.assertNotIn("subway_transfer", jukebox.pauses)  # the kicker has returned the ball
+
+    def test_song_clock_waits_for_the_subway_transfer(self):
+        self.start_modern()
+        jukebox = self.machine.modes["modern_jukebox"]
+        jukebox.chosen = jukebox.slots[0][1][0]
+        jukebox._release_ball()
+        self.advance_time_and_run(.1)
+        self.assertIn("subway_transfer", jukebox.pauses)
+        remaining = jukebox.song_remaining()
+        self.advance_time_and_run(3)
+        self.assertEqual(jukebox.song_remaining(), remaining)
+        jukebox._resume(hole="subway_transfer")  # the kicker ejecting the ball
+        self.advance_time_and_run(.1)
+        self.assertFalse(jukebox.pauses)
+        self.advance_time_and_run(2)
+        self.assertLess(jukebox.song_remaining(), remaining - 1500)
 
     def test_tap_moves_and_hold_selects(self):
         self.start_modern()

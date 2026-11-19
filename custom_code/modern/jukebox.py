@@ -9,6 +9,8 @@ from custom_code.modern import catalogue, settings
 from custom_code.modern.lamps import STEADY, director
 
 SONG_FALLBACK_MS = 6000
+TRANSFER = "subway_transfer"
+TRANSFER_FALLBACK_MS = 8_000
 
 
 class ModernJukebox(Mode):
@@ -29,6 +31,8 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("ball_hold_modern_jukebox_held_ball", self._ball_held)
         self.add_mode_event_handler("modern_ball_held", self._pause)
         self.add_mode_event_handler("modern_ball_released", self._resume)
+        self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ejecting_ball", self._resume,
+                                    hole=TRANSFER)
         self._show()
 
     # Craters ---------------------------------------------------------------
@@ -117,10 +121,11 @@ class ModernJukebox(Mode):
         self.machine.events.post("modern_release_jukebox")
         if self.chosen:
             song, self.chosen = self.chosen, None
-            self._start_song(song)
+            self._start_song(song, transfer=True)
 
     # Songs -----------------------------------------------------------------
-    def _start_song(self, song):
+    def _start_song(self, song, transfer=False):
+        """Start a song; with transfer, its clock waits until the subway kicker returns the ball."""
         player = self.player
         player.modern_songs_played += 1
         player.modern_round_songs += 1
@@ -137,7 +142,12 @@ class ModernJukebox(Mode):
         self._show()
         self.machine.events.post("modern_song_started", slot=song.slot, artist=song.artist, title=song.title,
                                  path=song.res_path, length_ms=length)
-        self._run_song_timer()
+        if transfer:
+            self.pauses.add(TRANSFER)
+            self.song_started_at = self.machine.clock.get_time()
+            self.delay.reset(ms=TRANSFER_FALLBACK_MS, name="transfer", callback=self._resume, hole=TRANSFER)
+        else:
+            self._run_song_timer()
 
     def _run_song_timer(self):
         self.song_started_at = self.machine.clock.get_time()
@@ -155,6 +165,8 @@ class ModernJukebox(Mode):
     def _resume(self, hole=None, **kwargs):
         if not self.song or hole not in self.pauses:
             return
+        if hole == TRANSFER:
+            self.delay.remove("transfer")
         self.pauses.discard(hole)
         if not self.pauses:
             self.machine.events.post("modern_song_resumed", remaining_ms=int(self.song_remaining_ms))
