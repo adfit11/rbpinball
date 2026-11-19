@@ -30,3 +30,4 @@ Everything below was verified only in simulation. Check each item on the real ma
 - [ ] Music volume suits the room, and voice callouts duck the music clearly.
 - [ ] Your MP3s go in `sounds/music/jukebox/<nn>_<artist>/song_<n>.mp3` and titles in `catalogue.yaml`. Run `godot --headless --path . --import` once, or open the project in the editor, then check that songs play their full length.
 - [ ] Modern screens fill the cabinet monitor, scaled and letterboxed.
+- [ ] Artist videos: replace placeholders by converting a clip with `ffmpeg -i clip.mp4 -vf scale=-2:720 -c:v libtheora -q:v 6 -an videos/modern/jukebox/<nn>_<artist>/video_<n>.ogv` (or `video.ogv` for the whole artist), reimport, and check it plays smoothly behind a song mode on the cabinet PC.

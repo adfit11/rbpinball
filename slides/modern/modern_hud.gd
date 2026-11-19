@@ -33,6 +33,7 @@ var selector_timer: Label
 var select_ring: ProgressBar
 var music: AudioStreamPlayer
 var voice: AudioStreamPlayer
+var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var house_band: AudioStream
 var song_length_ms := 0.0
@@ -118,6 +119,14 @@ func _build() -> void:
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.modulate = Color(0.55, 0.5, 0.5)
 	_place(bg, 0, 0, 1280, 720)
+
+	artist_video = VideoStreamPlayer.new()
+	artist_video.expand = true
+	artist_video.loop = true
+	artist_video.volume_db = -80.0
+	artist_video.modulate = Color(0.55, 0.55, 0.55)
+	artist_video.visible = false
+	_place(artist_video, 0, 0, 1280, 720)
 
 	scores = HBoxContainer.new()
 	scores.add_theme_constant_override("separation", 12)
@@ -349,6 +358,32 @@ func _play_house_band() -> void:
 		music.play()
 
 
+static func artist_video_paths(song_path: String) -> PackedStringArray:
+	## res://sounds/music/jukebox/<folder>/song_<n>.mp3 -> song video, artist video, club video.
+	var folder := song_path.get_base_dir().get_file()
+	var base := "res://videos/modern/jukebox/"
+	var name := song_path.get_file().get_basename().replace("song_", "video_")
+	return PackedStringArray([base + folder + "/" + name + ".ogv", base + folder + "/video.ogv", base + "club.ogv"])
+
+
+func _play_artist_video(song_path: String) -> void:
+	for path in artist_video_paths(song_path):
+		if ResourceLoader.exists(path):
+			var stream := load(path) as VideoStream
+			if stream:
+				artist_video.stream = stream
+				artist_video.paused = false
+				artist_video.visible = true
+				artist_video.play()
+				return
+	_stop_artist_video()
+
+
+func _stop_artist_video() -> void:
+	artist_video.stop()
+	artist_video.visible = false
+
+
 func _play_song(path: String) -> void:
 	var stream := _load_audio(path)
 	if stream:
@@ -424,16 +459,20 @@ func _on_event(payload: Dictionary = {}) -> void:
 			song_panel.visible = true
 			show_overlay("NOW PLAYING", song_title.text, 1800, TEAL)
 			_play_song(str(payload.get("path", "")))
+			_play_artist_video(str(payload.get("path", "")))
 		"modern_song_ended":
+			_stop_artist_video()
 			song_panel.visible = false
 			mode_banner.text = ""
 			_play_house_band()
 		"modern_song_paused":
 			song_paused = true
 			music.stream_paused = true
+			artist_video.paused = true
 		"modern_song_resumed":
 			song_paused = false
 			music.stream_paused = false
+			artist_video.paused = false
 		"modern_voice":
 			var line := "%s: \"%s\"" % [payload.get("speaker", ""), payload.get("text", "")]
 			if payload.get("queue", false) and voice.playing:
