@@ -141,24 +141,37 @@ class TestModernJukebox(ModernTestCase):
         self.assertEqual(self.player.modern_songs_played, 1)
         self.assertEqual(self.player.modern_artists_played, 1)
         self.assertTrue(self.machine.modes["modern_jukebox"].song)
-        jukebox = self.machine.modes["modern_jukebox"]
-        self.assertNotIn("subway_transfer", jukebox.pauses)  # the kicker has returned the ball
 
-    def test_song_clock_waits_for_the_subway_transfer(self):
+    def test_song_waits_for_the_subway_kicker(self):
         self.start_modern()
         jukebox = self.machine.modes["modern_jukebox"]
+        self.mock_event("modern_song_started")
         jukebox.chosen = jukebox.slots[0][1][0]
         jukebox._release_ball()
-        self.advance_time_and_run(.1)
-        self.assertIn("subway_transfer", jukebox.pauses)
-        remaining = jukebox.song_remaining()
         self.advance_time_and_run(3)
-        self.assertEqual(jukebox.song_remaining(), remaining)
-        jukebox._resume(hole="subway_transfer")  # the kicker ejecting the ball
+        self.assertEventNotCalled("modern_song_started")
+        self.assertIsNone(jukebox.song)
+        jukebox._start_pending()  # balldevice_bd_classic_subway_kicker_ball_eject_success
         self.advance_time_and_run(.1)
-        self.assertFalse(jukebox.pauses)
-        self.advance_time_and_run(2)
-        self.assertLess(jukebox.song_remaining(), remaining - 1500)
+        self.assertEventCalled("modern_song_started")
+        self.assertIsNotNone(jukebox.song)
+        self.assertIsNone(jukebox.pending_song)
+
+    def test_multiplier_applies_while_ball_returns_and_drain_refunds_artist(self):
+        self.start_modern()
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.player.modern_songs_played = settings.MULTIPLIER_EVERY - 1
+        jukebox.selector_open, jukebox.highlight = True, 3
+        jukebox._choose()
+        jukebox._release_ball()
+        self.advance_time_and_run(.1)
+        self.assertEqual(self.player.modern_song_multiplier, 2)
+        self.assertTrue(jukebox.played(3))
+        self.drain_one_ball()
+        self.advance_time_and_run(8)
+        self.assertFalse(jukebox.played(3))
+        self.assertEqual(self.player.modern_songs_played, settings.MULTIPLIER_EVERY - 1)
+        self.assertEqual(self.player.modern_song_multiplier, 1)
 
     def test_tap_moves_and_hold_selects(self):
         self.start_modern()
