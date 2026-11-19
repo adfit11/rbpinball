@@ -1,0 +1,24 @@
+#config_version=6
+
+mode:
+  code: custom_code.modern.holes.ModernHoles
+  start_events: mode_modern_started
+  stop_events: ball_will_end
+  priority: 104
+
+ball_holds:
+  modern_saucer:
+    balls_to_hold: 1
+    hold_devices: bd_classic_saucer
+    enable_events: mode_modern_holes_started
+    release_one_events: modern_release_bar
+  modern_firepit:
+    balls_to_hold: 1
+    hold_devices: bd_classic_firepit
+    enable_events: mode_modern_holes_started
+    release_one_events: modern_release_kitchen
+
+extra_balls:
+  modern_extra_ball:
+    award_events: modern_award_extra_ball
+    max_per_game: 2

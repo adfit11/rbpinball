@@ -1,0 +1,9 @@
+#config_version=6
+
+mode:
+  code: custom_code.modern.callouts.ModernCallouts
+  start_events: game_started{machine.session_game == "modern"}
+  stop_events: game_ended
+  stop_on_ball_end: false
+  game_mode: false
+  priority: 150

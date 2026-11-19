@@ -39,10 +39,13 @@ class ClassicSubway(Mode):
         if now - self._last_hits.get(switch, -100) < self.BOUNCE_SECONDS:
             return
         self._last_hits[switch] = now
+        self._crater_passed(crater)
+        self.delay.add(ms=self.TRAVEL_MS, callback=self._arrived, elapsed_ms=self.TRAVEL_MS)
+
+    def _crater_passed(self, crater):
         targets = self.machine.modes["classic_targets"]
         if targets.crater_index and crater >= targets.crater_index:
             self.machine.events.post("classic_lock_qualified")
-        self.delay.add(ms=self.TRAVEL_MS, callback=self._arrived, elapsed_ms=self.TRAVEL_MS)
 
     def _arrived(self, elapsed_ms):
         device = self.machine.ball_devices["bd_classic_subway_lock"]

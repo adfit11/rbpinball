@@ -1,0 +1,27 @@
+# Jukebox catalogue. Edit titles freely; files stay song_<n>.mp3 in each folder.
+artists:
+  - {folder: 01_louis_jordan, name: Louis Jordan, songs: [Caldonia, "Choo Choo Ch'Boogie", Saturday Night Fish Fry]}
+  - {folder: 02_ruth_brown, name: Ruth Brown, songs: ["(Mama) He Treats Your Daughter Mean", Teardrops from My Eyes, 5-10-15 Hours]}
+  - {folder: 03_big_joe_turner, name: Big Joe Turner, songs: ["Shake, Rattle and Roll", Honey Hush, "Flip, Flop and Fly"]}
+  - {folder: 04_lavern_baker, name: LaVern Baker, songs: [Tweedlee Dee, Jim Dandy, Bop-Ting-a-Ling]}
+  - {folder: 05_wynonie_harris, name: Wynonie Harris, songs: ["Good Rockin' Tonight", All She Wants to Do Is Rock, Bloodshot Eyes]}
+  - {folder: 06_big_mama_thornton, name: Big Mama Thornton, songs: [Hound Dog, They Call Me Big Mama, I Smell a Rat]}
+  - {folder: 07_etta_james, name: Etta James, songs: ["Roll with Me, Henry", "Good Rockin' Daddy", Tough Lover]}
+  - {folder: 08_ray_charles, name: Ray Charles, songs: [I Got a Woman, Mess Around, "What'd I Say"]}
+  - {folder: 09_joe_liggins, name: Joe Liggins, songs: [The Honeydripper, Pink Champagne, "I've Got a Right to Cry"]}
+hit_me:
+  folder: 10_hit_me
+  name: Hit me!
+  songs:
+    - {title: Rocket 88, artist: Jackie Brenston & His Delta Cats}
+    - {title: Sixty Minute Man, artist: Billy Ward and His Dominoes}
+    - {title: Chicken Shack Boogie, artist: Amos Milburn}
+    - {title: "Ain't Got No Home", artist: "Clarence \"Frogman\" Henry"}
+    - {title: Stagger Lee, artist: Lloyd Price}
+    - {title: Hey Hey Baby, artist: Helen Humes}
+    - {title: Snatch and Grab It, artist: Julia Lee}
+    - {title: Maybe, artist: The Chantels}
+    - {title: Mr. Lee, artist: The Bobbettes}
+    - {title: I Wanna Know, artist: The Du Droppers}
+    - {title: Do Unto Others, artist: Pee Wee Crayton}
+    - {title: Rock the Joint, artist: Jimmy Preston}
