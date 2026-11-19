@@ -5,7 +5,7 @@ import random
 
 from mpf.core.mode import Mode
 
-from custom_code.modern import catalogue, settings
+from custom_code.modern import callouts, catalogue, settings
 from custom_code.modern.lamps import STEADY, director
 
 SONG_FALLBACK_MS = 6000
@@ -174,6 +174,9 @@ class ModernJukebox(Mode):
         self.song_remaining_ms = length
         self.pauses.clear()
         self._show()
+        if os.path.exists(os.path.join(catalogue.ROOT, song.intro_path)):
+            self.machine.events.post("modern_voice", pool="mc_song_intro", speaker=_mc_name(), text=song.intro_text,
+                                     file="res://" + song.intro_path.replace(os.sep, "/"))
         self.machine.events.post("modern_song_started", slot=song.slot, artist=song.artist, title=song.title,
                                  path=song.res_path, length_ms=length)
         self._run_song_timer()
@@ -242,3 +245,14 @@ class ModernJukebox(Mode):
             self.lamps.clear("multiplier")
         except KeyError:
             pass
+
+
+_MC = []
+
+
+def _mc_name():
+    """Speaker name of the MC from the voice script, for the song-intro caption."""
+    if not _MC:
+        _, pools = callouts.load_script()
+        _MC.append(next((line["speaker"] for pool, lines in pools.items() if pool.startswith("mc_") for line in lines), "MC"))
+    return _MC[0]

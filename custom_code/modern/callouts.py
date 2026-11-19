@@ -36,7 +36,7 @@ class ModernCallouts(Mode):
         self.add_mode_event_handler("modern_callout", self._callout)
         self.delay.reset(ms=settings.QUIP_CHECK_MS, name="quip", callback=self._quip)
 
-    def _callout(self, pool=None, **kwargs):
+    def _callout(self, pool=None, queue=False, **kwargs):
         lines = self.pools.get(pool)
         if not lines:
             self.debug_log("No voice pool %s", pool)
@@ -46,7 +46,7 @@ class ModernCallouts(Mode):
         self.last[pool] = line
         self.last_spoken = self.machine.clock.get_time()
         self.machine.events.post("modern_voice", pool=pool, file="res://" + line["path"],
-                                 speaker=line["speaker"], text=line["text"])
+                                 speaker=line["speaker"], text=line["text"], queue=queue)
 
     def _quip(self):
         self.delay.reset(ms=settings.QUIP_CHECK_MS, name="quip", callback=self._quip)
