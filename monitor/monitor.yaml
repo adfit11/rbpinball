@@ -127,12 +127,12 @@ light:
     y: 0.0606
 switch:
   s_flipper_left:
-    shape: FLIPPER
+    shape: TRIANGLE
     size: 0.04
     x: 0.0121
     y: 0.9205
   s_flipper_right:
-    shape: FLIPPER
+    shape: TRIANGLE
     size: 0.04
     x: 0.9388
     y: 0.9333
@@ -140,102 +140,121 @@ switch:
     size: 0.04
     x: 0.93
     y: 0.97
+    shape: TRIANGLE
   s_test_switch_7:
     x: 0.6943
     y: 0.9537
+    shape: TRIANGLE
   s_start_47:
     size: 0.05
     x: 0.329
     y: 0.9731
+    shape: TRIANGLE
   s_trough_1_40:
     x: 0.6602
     y: 0.893
+    shape: TRIANGLE
   s_trough_2_30:
     x: 0.7784
     y: 0.856
+    shape: TRIANGLE
   s_trough_3_20:
     size: 0.04
     x: 0.4727
     y: 0.9181
+    shape: TRIANGLE
   s_subway_kicker_0:
     size: 0.04
     x: 0.13
     y: 0.264
+    shape: TRIANGLE
   s_subway_one_3:
     size: 0.04
     x: 0.19
     y: 0.25
+    shape: TRIANGLE
   s_subway_lock_10:
     size: 0.04
     x: 0.238
     y: 0.235
+    shape: TRIANGLE
   s_right_drop_1_1:
     size: 0.03
     x: 0.8002
     y: 0.3282
+    shape: TRIANGLE
   s_right_drop_2_11:
     size: 0.03
     x: 0.8122
     y: 0.3513
+    shape: TRIANGLE
   s_right_drop_3_21:
     size: 0.03
     x: 0.8193
     y: 0.3756
+    shape: TRIANGLE
   s_right_drop_4_31:
     size: 0.03
     x: 0.8408
     y: 0.4
+    shape: TRIANGLE
   s_right_drop_5_41:
     size: 0.03
     x: 0.8528
     y: 0.4244
+    shape: TRIANGLE
   s_top_drop_1_2:
     size: 0.03
     x: 0.1935
     y: 0.1731
+    shape: TRIANGLE
   s_top_drop_2_12:
     size: 0.03
     x: 0.2269
     y: 0.15
+    shape: TRIANGLE
   s_top_drop_3_22:
     size: 0.03
     x: 0.258
     y: 0.1333
+    shape: TRIANGLE
   s_top_drop_4_32:
     size: 0.03
     x: 0.2914
     y: 0.1128
+    shape: TRIANGLE
   s_top_drop_5_42:
     size: 0.03
     x: 0.3249
     y: 0.0949
+    shape: TRIANGLE
   s_ramp_1_34:
-    shape: SQUARE
+    shape: TRIANGLE
     size: 0.05
     x: 0.7548
     y: 0.2013
   s_ramp_2_24:
-    shape: SQUARE
+    shape: TRIANGLE
     size: 0.05
     x: 0.7525
     y: 0.1654
   s_ramp_3_14:
-    shape: SQUARE
+    shape: TRIANGLE
     size: 0.05
     x: 0.7548
     y: 0.1295
   s_ramp_4_4:
-    shape: SQUARE
+    shape: TRIANGLE
     size: 0.05
     x: 0.7548
     y: 0.0936
   s_outlane_right_5:
-    shape: RECTANGLE
+    shape: TRIANGLE
     size: 0.06
     x: 0.8529
     y: 0.6407
   s_outlane_left_6:
-    shape: RECTANGLE
+    shape: TRIANGLE
     size: 0.06
     x: 0.0502
     y: 0.7128
@@ -253,13 +272,14 @@ switch:
     size: 0.04
     x: 0.1629
     y: 0.2248
+    shape: TRIANGLE
   s_return_left_16:
-    shape: RECTANGLE
+    shape: TRIANGLE
     size: 0.06
     x: 0.1027
     y: 0.6769
   s_hole_kicker_top_23:
-    shape: CIRCLE
+    shape: TRIANGLE
     size: 0.04
     x: 0.5834
     y: 0.0681
@@ -267,22 +287,27 @@ switch:
     size: 0.04
     x: 0.262
     y: 0.2853
+    shape: TRIANGLE
   s_kicking_target_26:
     size: 0.04
     x: 0.1402
     y: 0.5381
+    shape: TRIANGLE
   s_spot_target_36:
     size: 0.04
     x: 0.633
     y: 0.2564
+    shape: TRIANGLE
   s_side_kicker_left_43:
     size: 0.04
     x: 0.0549
     y: 0.45
+    shape: TRIANGLE
   s_spinner_44:
     size: 0.04
     x: 0.1935
     y: 0.359
+    shape: TRIANGLE
   s_tilt_46:
     shape: TRIANGLE
     size: 0.05

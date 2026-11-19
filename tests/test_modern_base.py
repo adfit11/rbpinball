@@ -285,6 +285,24 @@ class TestModernBallFeatures(ModernTestCase):
         self.assertEqual(self.player.extra_balls, 1)
         self.assertEqual(self.player.modern_extra_balls_earned, 1)
 
+    def test_bar_and_kitchen_speak_when_the_nickel_hunt_is_quiet(self):
+        self.start_modern()
+        self.give_nickel()
+        self.mock_event("modern_voice")
+        for hole, staff in (("bar", "bartender"), ("kitchen", "cook")):
+            self.hit_location(hole)
+            self.assertEqual(self._last_event_kwargs["modern_voice"]["pool"], f"{staff}_held")
+
+    def test_holes_leave_the_nickel_hunt_line_alone(self):
+        self.start_modern()
+        pools = []
+        self.machine.events.add_handler("modern_voice", lambda pool, **kwargs: pools.append(pool))
+        hole = "kitchen" if self.player.modern_nickel_target == "bar" else "bar"
+        self.hit_location(hole)
+        staff = "bartender" if hole == "bar" else "cook"
+        self.assertIn(f"{staff}_refusal", pools)
+        self.assertNotIn(f"{staff}_held", pools)
+
     def test_one_warning_tilt_in_modern(self):
         self.start_modern()
         self.mock_event("tilt")
