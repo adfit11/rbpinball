@@ -100,7 +100,7 @@ Classic SHALL run the skill shot motor starting 1 s after it serves a ball to th
 
 #### Scenario: Modern is selected
 - **WHEN** a Modern game serves a ball to the shooter lane
-- **THEN** the skill shot motor stays off
+- **THEN** the skill shot motor runs for Drop the Needle under the same start and stop rules
 
 ### Requirement: Stop the skill shot cam
 Classic SHALL stop the skill shot motor at the first of these: the player presses the green button, the served ball hits any playfield switch, the safety timeout elapses, the machine tilts or slam tilts, or the ball ends. Once stopped, the motor SHALL stay off until the next shooter-lane serve.
