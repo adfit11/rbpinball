@@ -9,7 +9,7 @@ mode:
 ball_holds:
   modern_jukebox:
     balls_to_hold: 1
-    hold_devices: bd_classic_subway_kicker
+    hold_devices: bd_classic_subway_lock
     enable_events: modern_jukebox_hold_enable
     disable_events: modern_jukebox_hold_disable
     release_all_events: modern_release_jukebox
