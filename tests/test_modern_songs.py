@@ -15,13 +15,23 @@ class TestModernSongs(ModernTestCase):
         return self.machine.modes["modern_songs"].rule
 
     def test_song_start_announces_the_real_artist_and_title(self):
-        self.mock_event("modern_voice")
+        voices = []
+        self.machine.events.add_handler("modern_voice", lambda **kwargs: voices.append(kwargs))
         self.start_slot(1)
         song = self.machine.modes["modern_jukebox"].slots[0][1][0]
-        voice = self._last_event_kwargs["modern_voice"]
+        voice = next(v for v in voices if v["pool"] == "mc_song_intro")
         self.assertEqual(f"Here's Louis Jordan with {song.title}!", voice["text"])
         self.assertTrue(voice["file"].endswith("01_louis_jordan/intro_1.mp3"))
         self.assertNotIn("song", song.title.lower())
+
+    def test_mode_instructions_queue_behind_the_song_intro(self):
+        voices = []
+        self.machine.events.add_handler("modern_voice", lambda **kwargs: voices.append(kwargs))
+        self.start_slot(1)
+        voices = [v for v in voices if v["pool"] in ("mc_song_intro", "mc_mode_hurry_up")]
+        self.assertEqual("mc_song_intro", voices[0]["pool"])
+        self.assertEqual("mc_mode_hurry_up", voices[1]["pool"])
+        self.assertTrue(voices[1]["queue"])
 
     def test_every_slot_starts_its_rule(self):
         self.start_modern()

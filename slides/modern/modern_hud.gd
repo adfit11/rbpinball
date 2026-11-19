@@ -33,6 +33,7 @@ var selector_timer: Label
 var select_ring: ProgressBar
 var music: AudioStreamPlayer
 var voice: AudioStreamPlayer
+var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var house_band: AudioStream
 var song_length_ms := 0.0
 var song_elapsed_ms := 0.0
@@ -181,7 +182,7 @@ func _build() -> void:
 	add_child(music)
 	voice = AudioStreamPlayer.new()
 	voice.bus = "voice"
-	voice.finished.connect(func(): _set_duck(false))
+	voice.finished.connect(_voice_done)
 	add_child(voice)
 
 
@@ -369,6 +370,15 @@ func _say(path: String) -> void:
 	_set_duck(true)
 
 
+func _voice_done() -> void:
+	if voice_queue.is_empty():
+		_set_duck(false)
+		return
+	var next: Array = voice_queue.pop_front()
+	caption.text = next[0]
+	_say(next[1])
+
+
 func _set_duck(on: bool) -> void:
 	var bus := AudioServer.get_bus_index("music")
 	if bus >= 0:
@@ -425,8 +435,13 @@ func _on_event(payload: Dictionary = {}) -> void:
 			song_paused = false
 			music.stream_paused = false
 		"modern_voice":
-			caption.text = "%s: \"%s\"" % [payload.get("speaker", ""), payload.get("text", "")]
-			_say(str(payload.get("file", "")))
+			var line := "%s: \"%s\"" % [payload.get("speaker", ""), payload.get("text", "")]
+			if payload.get("queue", false) and voice.playing:
+				voice_queue.append([line, str(payload.get("file", ""))])
+			else:
+				voice_queue.clear()
+				caption.text = line
+				_say(str(payload.get("file", "")))
 		"modern_select_progress":
 			var p := float(payload.get("progress", 0))
 			select_ring.visible = p > 0.0 and p < 1.0

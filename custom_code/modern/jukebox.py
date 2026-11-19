@@ -174,11 +174,11 @@ class ModernJukebox(Mode):
         self.song_remaining_ms = length
         self.pauses.clear()
         self._show()
-        self.machine.events.post("modern_song_started", slot=song.slot, artist=song.artist, title=song.title,
-                                 path=song.res_path, length_ms=length)
         if os.path.exists(os.path.join(catalogue.ROOT, song.intro_path)):
             self.machine.events.post("modern_voice", pool="mc_song_intro", speaker=_mc_name(), text=song.intro_text,
                                      file="res://" + song.intro_path.replace(os.sep, "/"))
+        self.machine.events.post("modern_song_started", slot=song.slot, artist=song.artist, title=song.title,
+                                 path=song.res_path, length_ms=length)
         self._run_song_timer()
 
     def _run_song_timer(self):
