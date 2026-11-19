@@ -1,10 +1,11 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" uid="uid://gan0qfjhl6tq" path="res://addons/mpf-gmc/classes/mpf_slide.gd" id="1_adeqt"]
 [ext_resource type="Script" uid="uid://di84ngvg0fo4e" path="res://addons/mpf-gmc/classes/mpf_text_input.gd" id="2_6uslk"]
 
 [ext_resource type="Texture2D" path="res://images/modern/club_background.jpg" id="3_bg"]
 [ext_resource type="FontFile" path="res://fonts/modern/Limelight-Regular.ttf" id="4_font"]
+[ext_resource type="Script" path="res://slides/modern/fit_to_screen.gd" id="fit"]
 
 [node name="modern_high_score" type="Control"]
 layout_mode = 3
@@ -66,3 +67,6 @@ offset_right = 1040.0
 offset_bottom = 360.0
 theme_override_font_sizes/normal_font_size = 60
 bbcode_enabled = true
+
+[node name="FitToScreen" type="Node" parent="."]
+script = ExtResource("fit")
