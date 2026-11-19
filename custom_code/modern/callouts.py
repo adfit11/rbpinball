@@ -36,7 +36,7 @@ class ModernCallouts(Mode):
         self.add_mode_event_handler("modern_callout", self._callout)
         self.delay.reset(ms=settings.QUIP_CHECK_MS, name="quip", callback=self._quip)
 
-    def _callout(self, pool, **kwargs):
+    def _callout(self, pool=None, **kwargs):
         lines = self.pools.get(pool)
         if not lines:
             self.debug_log("No voice pool %s", pool)

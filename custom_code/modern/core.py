@@ -27,7 +27,6 @@ class ModernCore(Mode):
         player = self.player
         for name in BALL_VARS:
             setattr(player, name, 0)
-        player.modern_nickel_target = ""
         player.modern_score_factor = 1
         player.modern_bumper_factor = 1
         if not player.modern_song_multiplier:
@@ -124,17 +123,28 @@ class ModernCore(Mode):
                        STEADY if self.player.extra_balls > 0 else 0)
 
     def _set_tilt_warnings(self, count):
+        """Route the tilt-tagged bob to warnings for Modern; Classic keeps its immediate tilt."""
         try:
             tilt = self.machine.modes["tilt"]
-        except (KeyError, AttributeError):
+        except KeyError:
             return
         if getattr(tilt, "_warnings_to_tilt", None) is None:
             return
-        if not hasattr(self, "_saved_tilt"):
+        restore = hasattr(self, "_saved_tilt")
+        if not restore:
             self._saved_tilt = tilt._warnings_to_tilt
         tilt._warnings_to_tilt = count
+        controller = self.machine.switch_controller
+        for switch in self.machine.switches.items_tagged(tilt.tilt_config["tilt_switch_tag"]):
+            old, new = (tilt._tilt_warning_switch_handler, tilt.tilt) if restore else \
+                (tilt.tilt, tilt._tilt_warning_switch_handler)
+            controller.remove_switch_handler(switch_name=switch.name, callback=old)
+            controller.add_switch_handler_obj(switch=switch, callback=new)
+        if restore:
+            del self._saved_tilt
 
     def mode_stop(self, **kwargs):
         if hasattr(self, "_saved_tilt"):
             self._set_tilt_warnings(self._saved_tilt)
+            self.machine.events.post("modern_tilt_restored")
         self.lamps.stop()
