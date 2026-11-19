@@ -33,6 +33,7 @@ class TestModernStack(ModernTestCase):
         self.advance_time_and_run(.1)
         self.assertEqual(self.player.score - start, 1000)
         self.player.modern_song_multiplier = 3
+        self.player.modern_nickel = 1  # a held nickel pauses the hunt, so no nickel points
         start = self.player.score
         self.hit_and_release_switch("s_spot_target_36")
         self.advance_time_and_run(.1)
@@ -137,6 +138,9 @@ class TestModernJukebox(ModernTestCase):
         self.advance_time_and_run(settings.SELECTOR_TIMEOUT_MS / 1000)
         self.assertEventCalled("modern_song_started")
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 0)
+        self.assertEqual(self.player.modern_songs_played, 1)
+        self.assertEqual(self.player.modern_artists_played, 1)
+        self.assertTrue(self.machine.modes["modern_jukebox"].song)
         jukebox = self.machine.modes["modern_jukebox"]
         self.assertNotIn("subway_transfer", jukebox.pauses)  # the kicker has returned the ball
 
@@ -155,9 +159,6 @@ class TestModernJukebox(ModernTestCase):
         self.assertFalse(jukebox.pauses)
         self.advance_time_and_run(2)
         self.assertLess(jukebox.song_remaining(), remaining - 1500)
-        self.assertEqual(self.player.modern_songs_played, 1)
-        self.assertEqual(self.player.modern_artists_played, 1)
-        self.assertTrue(self.machine.modes["modern_jukebox"].song)
 
     def test_tap_moves_and_hold_selects(self):
         self.start_modern()
