@@ -114,7 +114,7 @@ class ModernJukebox(Mode):
         self.chosen = random.choice(songs)
         self.machine.events.post("modern_artist_chosen", slot=self.highlight + 1, slot_name=name,
                                  artist=self.chosen.artist, title=self.chosen.title)
-        if self.ball_waiting:
+        if self.ball_waiting or self.lock_entry:
             self._release_ball()
         else:
             self.delay.reset(ms=SONG_FALLBACK_MS, name="ball_fallback", callback=self._release_ball)
