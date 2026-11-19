@@ -87,3 +87,14 @@ ORDER_PICKUP, ORDER_START, ORDER_END, ORDER_MS = 75_000, 900_000, 100_000, 20_00
 REQUEST_VALUES, FINAL_REQUEST_AWARD = (50_000, 75_000, 100_000, 125_000, 150_000), 250_000
 DANCE_FACTOR, DANCE_HITS, PACKED_FLOOR_AWARD = 5, 25, 550_000
 DIAL_STEP_MS, DIAL_AUTO_STOP_MS, HIT_ME_VALUE, HIT_ME_HITS = 250, 5_000, 250_000, 3
+
+# Rent Party multiball (Gate Crasher)
+GUESTS = LOCATION_NAMES + ("top_bank", "right_bank")
+GUEST_NAMES = {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check",
+               "back_door": "Back Door", "top_bank": "Top Bank", "right_bank": "Right Bank"}
+GUESTS_TO_FILL = 5
+LOCKS_FOR_MULTIBALL = 3
+SCORE_LOCK_LIT = 25_000
+SCORE_BALL_LOCKED = 50_000
+JACKPOT_BASE, JACKPOT_INCREMENT, JACKPOTS_FOR_SUPER = 250_000, 50_000, 3
+SUPER_JACKPOT = 1_000_000

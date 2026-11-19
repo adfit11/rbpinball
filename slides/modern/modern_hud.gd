@@ -229,7 +229,10 @@ func _render() -> void:
 		int(active.get("modern_nickel_progress", 0)), int(active.get("modern_nickel_cost", 1))]
 	side_labels.target.text = "Shoot a lit crater!" if held else _target_name(str(active.get("modern_nickel_target", "")))
 	side_labels.locks.text = "LOCKS %d / 3" % int(active.get("modern_locked_balls", 0))
-	var guests := int(active.get("modern_guests", 0))
+	var guest_bits := int(active.get("modern_guests", 0))
+	var guests := 0
+	for i in 7:
+		guests += (guest_bits >> i) & 1
 	side_labels.guests.text = "GUEST LIST " + "●".repeat(guests) + "○".repeat(max(0, 5 - guests))
 	if int(active.get("modern_lock_lit", 0)):
 		side_labels.guests.text = "LOCK IS LIT"

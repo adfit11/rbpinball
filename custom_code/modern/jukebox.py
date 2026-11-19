@@ -22,6 +22,7 @@ class ModernJukebox(Mode):
         self.ball_waiting = False
         self.song = None
         self.pending_song = None
+        self.lock_entry = False
         self.song_remaining_ms = 0
         self.song_started_at = None
         self.pauses = set()
@@ -33,6 +34,8 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("modern_ball_released", self._resume)
         self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ball_eject_success",
                                     self._start_pending)
+        # A locked jukebox ball: the song starts as the replacement leaves the trough.
+        self.add_mode_event_handler("balldevice_bd_trough_ball_eject_success", self._start_pending)
         self._show()
 
     # Craters ---------------------------------------------------------------
@@ -50,13 +53,20 @@ class ModernJukebox(Mode):
         if self.machine.game.balls_in_play > 1:
             return
         if not player.modern_nickel:
+            rent_party = self.machine.modes["modern_rent_party"]
+            if rent_party.active and rent_party.qualify_lock(lit):
+                return
             self.machine.events.post("modern_jukebox_no_nickel")
             self.machine.events.post("modern_callout", pool="mc_needs_nickel")
             return
         if not lit:
             return
+        rent_party = self.machine.modes["modern_rent_party"]
+        locking = rent_party.active and rent_party.qualify_lock(lit)
         self.machine.events.post("modern_nickel_spent")
-        self.machine.events.post("modern_jukebox_hold_enable")
+        self.lock_entry = locking
+        if not locking:
+            self.machine.events.post("modern_jukebox_hold_enable")
         self._open_selector()
 
     # Selector --------------------------------------------------------------
@@ -119,7 +129,11 @@ class ModernJukebox(Mode):
         self.ball_waiting = False
         self.machine.events.post("modern_jukebox_hold_disable")
         self.machine.events.post("modern_release_jukebox")
-        if self.chosen:
+        if self.chosen and self.lock_entry:
+            # The ball stayed in the lock; its replacement is already being served.
+            song, self.chosen, self.lock_entry = self.chosen, None, False
+            self._start_song(song)
+        elif self.chosen:
             self.pending_song, self.chosen = self.chosen, None
             self._count_song()
             self.delay.reset(ms=TRANSFER_FALLBACK_MS, name="transfer", callback=self._start_pending)
