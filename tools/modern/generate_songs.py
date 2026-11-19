@@ -114,9 +114,12 @@ def main(force=False, seconds=60):
             os.remove(wav)
             made += 1
     print(f"generated {made} song files")
-    make_intros(force or "--intros" in sys.argv[1:])
+    make_intros(force)
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    if "--intros" in args:
+        make_intros(force=True)
+        sys.exit()
     main("--force" in args, int(args[args.index("--seconds") + 1]) if "--seconds" in args else 60)
