@@ -140,8 +140,6 @@ class ModernJukebox(Mode):
         player.modern_bonus_songs += step
         player.modern_song_multiplier = min(settings.MAX_SONG_MULTIPLIER,
                                             1 + player.modern_songs_played // settings.MULTIPLIER_EVERY)
-        if step > 0 and player.modern_songs_played in settings.EXTRA_BALL_SONGS:
-            self.machine.events.post("modern_light_extra_ball")
         self._show()
 
     def _refund(self, song, counted):
@@ -154,6 +152,8 @@ class ModernJukebox(Mode):
         player = self.player
         if not counted:
             self._count_song()
+        if player.modern_songs_played in settings.EXTRA_BALL_SONGS:
+            self.machine.events.post("modern_light_extra_ball")
         player.modern_song_active = 1
         length = catalogue.mp3_length_ms(os.path.join(catalogue.ROOT, song.path), settings.DEFAULT_SONG_MS)
         self.song = song
