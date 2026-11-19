@@ -392,6 +392,7 @@ class ModernSongs(Mode):
             self.paused_at = None
 
     def _song_started(self, slot, **kwargs):
+        self.paused_total, self.paused_at = 0, None  # a hold left over from the previous song
         self.rule = SLOT_RULES[slot](self)
         self.rule.start()
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)

@@ -183,3 +183,13 @@ class TestModernSongs(ModernTestCase):
         self.start_slot(5)
         for light in S.CRATER_LAMPS:
             self.assertEqual(director(self.machine).state(light), FLASH)
+
+    def test_next_song_is_not_frozen_by_a_hold_left_from_the_last(self):
+        self.start_slot(2)
+        self.post_event("modern_song_paused", .1)
+        self.machine.modes["modern_jukebox"].end_song(reason="completed")
+        self.advance_time_and_run(.1)
+        self.start_slot(1)
+        self.assertIsNone(self.machine.modes["modern_songs"].paused_at)
+        self.advance_time_and_run(S.HURRY_MS / 1000 + 2)
+        self.assertIsNone(self.machine.modes["modern_songs"].rule)
