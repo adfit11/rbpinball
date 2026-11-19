@@ -11,6 +11,7 @@ const BRASS := Color("#7a5a12")
 const RED := Color("#8a1010")
 const OVERLAY_STYLES := {"teal": TEAL, "gold": BRASS, "red": RED}
 const DUCK_DB := -12.0
+const VOICE_CUT_MS := 600  # lines posted together play one after another instead of cutting each other off
 const LOCATIONS := ["Bar", "Kitchen", "Bandstand", "Coat Check", "Back Door"]
 
 var title_font: Font = load("res://fonts/modern/Limelight-Regular.ttf")
@@ -35,6 +36,7 @@ var music: AudioStreamPlayer
 var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
+var voice_started_ms := -VOICE_CUT_MS
 var house_band: AudioStream
 var song_length_ms := 0.0
 var song_elapsed_ms := 0.0
@@ -402,6 +404,7 @@ func _say(path: String) -> void:
 		stream.loop = false
 	voice.stream = stream
 	voice.play()
+	voice_started_ms = Time.get_ticks_msec()
 	_set_duck(true)
 
 
@@ -475,7 +478,8 @@ func _on_event(payload: Dictionary = {}) -> void:
 			artist_video.paused = false
 		"modern_voice":
 			var line := "%s: \"%s\"" % [payload.get("speaker", ""), payload.get("text", "")]
-			if payload.get("queue", false) and voice.playing:
+			var just_started := Time.get_ticks_msec() - voice_started_ms < VOICE_CUT_MS
+			if voice.playing and (payload.get("queue", false) or just_started):
 				voice_queue.append([line, str(payload.get("file", ""))])
 			else:
 				voice_queue.clear()
