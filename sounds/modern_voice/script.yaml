@@ -9,6 +9,7 @@ characters:
       refusal: ["What are you doing here? Kitchen's calling you.", "Not now, sugar. Try somewhere else.", "Honey, I ain't got your nickel. Go ask around.", "You lost? Go see the doorman."]
       nickel: ["Here's your nickel, sugar. Go play us something.", "One shiny nickel. Don't spend it all in one place.", "That's a nickel, baby. Jukebox is waiting."]
       special: ["Drinks on the house! You won a free game!", "Lord have mercy, a special! Free game, sugar!"]
+      held: ["Sit a spell, sugar. What are you drinking?", "Pull up a stool, honey.", "Another round for my friend here!"]
   cook:
     name: Earl, the cook
     voice: {model: en_US-hfc_male-medium, length_scale: 1.15}
@@ -18,6 +19,7 @@ characters:
       nickel: ["Here's a nickel from the tip jar. Go on!", "Take this nickel and play something with some grease on it.", "Nickel for you. Now get out of my kitchen!"]
       extra_ball: ["Seconds! Extra ball coming up!", "Extra helping! Shoot again!"]
       order_up: ["Order up!", "Hot plate! Order up!"]
+      held: ["Mind the grease, now!", "Fresh off the skillet!", "Something good cooking back here!"]
   bandleader:
     name: Cornelius, the bandleader
     voice: {model: en_US-joe-medium, length_scale: 1.1}

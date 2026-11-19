@@ -32,21 +32,31 @@ class ModernHoles(Mode):
     def _captured(self, hole, **kwargs):
         self.hold_ms[hole] = settings.HOLE_HOLD_MS
         self.machine.events.post("modern_ball_held", hole=hole)
+        spoke = self._nickel_hunt_spoke()
         self.machine.modes["modern"].location_hit(hole)
         if hole == "kitchen" and self.player.modern_extra_ball_lit:
             self.player.modern_extra_ball_lit = 0
             self.player.modern_extra_balls_earned += 1
             self.machine.events.post("modern_award_extra_ball")
             self.machine.events.post("modern_callout", pool="cook_extra_ball")
+            spoke = True
         if hole == "bar" and self.player.modern_special_state == 1:
             self.player.modern_special_state = 2
             self.machine.coils["c_Replay_Knock"].pulse()
             points = award(self.machine, settings.SCORE_SPECIAL, "special")
             self.machine.events.post("modern_special_awarded", points=points)
             self.machine.events.post("modern_callout", pool="bartender_special")
+            spoke = True
+        if not spoke:
+            self.machine.events.post("modern_callout", pool=settings.LOCATIONS[hole][2] + "_held", queue=True)
         self.machine.events.post("modern_hole_held", hole=hole)
         self._show()
         self.delay.reset(ms=self.hold_ms[hole], name=hole, callback=self._release, hole=hole)
+
+    def _nickel_hunt_spoke(self):
+        """The nickel hunt already answers every location hit while it is hunting."""
+        nickels = self.machine.modes["modern_nickels"]
+        return nickels.active and nickels.hunting()
 
     def _release(self, hole):
         self.machine.events.post("modern_ball_released", hole=hole)
