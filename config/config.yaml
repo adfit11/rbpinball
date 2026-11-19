@@ -72,3 +72,11 @@ lisy:
   connection: serial
   port: /dev/cu.usbmodem1101
   baud: 115200
+
+# Modern game over: machine level, so it outlives the modern_display mode at game_ended.
+slide_player:
+  game_ending{machine.session_game == "modern"}:
+    modern_game_over:
+      action: play
+      expire: 5s
+      priority: 1000
