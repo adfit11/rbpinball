@@ -1,3 +1,4 @@
+from unittest.mock import patch
 """Modern juke joint base rules against the real machine config."""
 
 from custom_code.modern import catalogue, settings
@@ -302,6 +303,25 @@ class TestModernBallFeatures(ModernTestCase):
         staff = "bartender" if hole == "bar" else "cook"
         self.assertIn(f"{staff}_refusal", pools)
         self.assertNotIn(f"{staff}_held", pools)
+
+    def test_task_panel_guides_the_nickel_hunt_and_jukebox(self):
+        self.mock_event("modern_task")
+        self.start_modern()
+        task = self._last_event_kwargs["modern_task"]
+        self.assertEqual(task["title"], "GET A NICKEL")
+        self.assertIn(settings.LOCATIONS[self.player.modern_nickel_target][0].upper(), task["detail"])
+        self.give_nickel()
+        self.advance_time_and_run(.1)
+        self.assertEqual(self._last_event_kwargs["modern_task"]["title"], "PLAY THE JUKEBOX")
+
+    def test_plain_virtual_kicker_clears_the_hole_switch(self):
+        self.start_modern()
+        platform = self.machine.default_platform
+        with patch("custom_code.modern.holes.plain_virtual", return_value=True), \
+                patch.object(platform, "virtual_remove_ball_from_device") as remove:
+            self.hit_location("bar", wait_release=False)
+            self.advance_time_and_run(2)
+        remove.assert_any_call(ball_device="bd_classic_saucer")
 
     def test_one_warning_tilt_in_modern(self):
         self.start_modern()
