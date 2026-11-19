@@ -38,3 +38,15 @@ cd /Users/adrian/Library/CloudStorage/Dropbox/Dev/rbpinball
 
 **then hit this page**
 http://127.0.0.1:8765/
+
+### Modern: the Juke Joint
+
+Modern is a 1940s rhythm and blues club. Hit the club staff (Bar, Kitchen, Bandstand, Coat Check, Back Door) where the flashing lamp or screen directs you to earn a nickel, then shoot a lit crater to play the jukebox. Each artist runs a song mode; completed songs raise Standing Ovation, and every five songs raise the song multiplier.
+
+Everything Modern lives in `modes/modern_*`, `custom_code/modern/`, `slides/modern/`, `sounds/modern_*`, `sounds/music/jukebox/`, `images/modern/`, `fonts/modern/` and `tools/modern/`, so it can be removed without touching Classic. Tunable values are in `custom_code/modern/settings.py`.
+
+**Your own songs:** drop MP3s over the placeholders using the same names, for example `sounds/music/jukebox/03_big_joe_turner/song_1.mp3`, or `sounds/music/jukebox/10_hit_me/song_01.mp3` to `song_12.mp3`. Edit titles in `sounds/music/jukebox/catalogue.yaml`. Song length is read from each file. Open the project in Godot once (or run `godot --headless --path . --import`) so it picks up new files.
+
+**Voice lines:** the script is `sounds/modern_voice/script.yaml`. Replace any file in `sounds/modern_voice/<character>/` with a recording of the same name. To regenerate placeholders, install Piper (`python3 -m venv ~/tts && ~/tts/bin/pip install piper-tts ruamel.yaml numpy`, voices in `~/tts/voices`) and run `~/tts/bin/python tools/modern/generate_voices.py`; `tools/modern/generate_songs.py` makes song placeholders. Both keep existing files unless given `--force`.
+
+**Select action:** holding the right green button for 2 s is *select* (jukebox and initials). To move it to a wired left green button, set the machine variable `modern_select_switch` to that switch name.

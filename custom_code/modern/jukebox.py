@@ -98,7 +98,7 @@ class ModernJukebox(Mode):
         name, songs = self.slots[self.highlight]
         self.player.modern_artists_played |= 1 << self.highlight
         self.chosen = random.choice(songs)
-        self.machine.events.post("modern_artist_chosen", slot=self.highlight + 1, name=name,
+        self.machine.events.post("modern_artist_chosen", slot=self.highlight + 1, slot_name=name,
                                  artist=self.chosen.artist, title=self.chosen.title)
         if self.ball_waiting:
             self._release_ball()

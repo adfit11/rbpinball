@@ -12,3 +12,10 @@ slide_player:
   mode_modern_display_started:
     modern_hud:
       action: play
+  modern_splash_show:
+    modern_splash:
+      action: play
+      priority: 200
+  modern_splash_hide:
+    modern_splash:
+      action: remove

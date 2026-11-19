@@ -377,7 +377,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 				"Hit the club staff to earn a NICKEL. Shoot a lit crater to play the JUKEBOX. " +
 				"Every song is a mode. Fill the guest list to lock balls for RENT PARTY multiball.\nPress START to skip.", 5800, TEAL)
 		"modern_nickel_directed":
-			caption.text = "Shoot the %s  (%d / %d)" % [payload.get("name", ""), int(payload.get("progress", 0)), int(payload.get("cost", 1))]
+			caption.text = "Shoot the %s  (%d / %d)" % [payload.get("location_name", ""), int(payload.get("progress", 0)), int(payload.get("cost", 1))]
 		"modern_nickel_refused":
 			caption.text = "Not here! Try %s" % payload.get("target", "")
 		"modern_nickel_awarded":
