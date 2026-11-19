@@ -34,12 +34,12 @@ vertical_alignment = 1
 [node name="Rules" type="Label" parent="."]
 layout_mode = 0
 offset_left = 140.0
-offset_top = 190.0
+offset_top = 165.0
 offset_right = 1140.0
-offset_bottom = 640.0
+offset_bottom = 700.0
 theme_override_colors/font_color = Color(0.96, 0.9, 0.78, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "Hit the club staff where the flashing lamp sends you to earn a NICKEL.
 
 Shoot a lit crater with a nickel to play the JUKEBOX.

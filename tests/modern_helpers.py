@@ -50,11 +50,15 @@ class ModernTestCase(MpfGameTestCase):
         self.post_event("modern_floor_nickel", .1)
         self.assertEqual(self.player.modern_nickel, 1)
 
-    def hit_location(self, location):
-        if location == "bar":
-            self.hit_switch_and_run("s_hole_kicker_top_23", 2)
-        elif location == "kitchen":
-            self.hit_switch_and_run("s_side_kicker_left_43", 2)
+    def hit_location(self, location, wait_release=True):
+        if location in ("bar", "kitchen"):
+            device = self.machine.ball_devices["bd_classic_saucer" if location == "bar" else "bd_classic_firepit"]
+            self.machine.default_platform.add_ball_to_device(device)
+            self.advance_time_and_run(1.2)  # entrance confirmation, then the hold claims the ball
+            for _ in range(150):  # an eject to the playfield confirms after its 10 s timeout
+                if not wait_release or (not device.balls and device.state == "idle"):
+                    break
+                self.advance_time_and_run(.1)
         elif location == "bandstand":
             self.advance_time_and_run(1.1)
             self.hit_and_release_switch("s_spinner_44")

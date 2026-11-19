@@ -36,6 +36,8 @@ characters:
     name: Big Otis, the doorman
     voice: {model: en_US-ryan-high, length_scale: 1.15}
     pools:
+      guest: ["Come on in, you're on the list!", "Name's on the list. Step right in!", "Another guest for the party!"]
+      gate_crasher: ["Hey! Those weren't your guests! Gate crasher!", "Sneaking in the back? Gate crasher!"]
       direction: ["Back door, friend. Quick now.", "Psst! Back door!", "Round the back, quick!"]
       refusal: ["Hey! What you doing back here? Go on inside.", "Back door's for staff, friend. Try the bar.", "Move along now. Bandstand's that way."]
       nickel: ["Here's a nickel. Don't tell nobody.", "Slipped you a nickel. Go on in.", "Nickel for the jukebox. Keep it moving."]
@@ -59,6 +61,21 @@ characters:
       song_failed: ["Aw, the record skipped!", "Better luck next time!"]
       multiplier: ["Song multiplier is up!", "The joint is getting hotter!"]
       bonus: ["Take a bow!", "Standing ovation!"]
+      mode_hurry_up: ["Hurry up! That shot won't wait all night!", "Quick now, before it cools off!"]
+      mode_ladder: ["Climb that ladder, one rung at a time!", "Kitchen's cooking, keep it coming!"]
+      mode_build_and_collect: ["Spin the bandstand, build that pot!", "Fill the pot, then cash it at the bar!"]
+      mode_roving_shot: ["Chase that light around the room!", "Catch it if you can!"]
+      mode_jukebox_jackpot: ["Every crater's a jackpot!", "The jukebox is paying out!"]
+      mode_party_time: ["Party time! Everything pays double!", "The bouncer's watching your back. Party on!"]
+      mode_order_up: ["Order up! Grab it from the kitchen!", "Hot plate coming through!"]
+      mode_request_night: ["Request night! Take every request in the house!", "Everybody's got a request tonight!"]
+      mode_dance_floor: ["Pack that dance floor!", "Get those dancers moving!"]
+      mode_hit_me: ["Hit me! Stop that dial!", "Spin it and hit it!"]
+      lock_lit: ["Guest list is full! The back room is open!", "Lock is lit! Shoot a lit crater!"]
+      ball_locked: ["One more in the back room!", "Ball locked! Keep 'em coming!"]
+      rent_party: ["Rent party! Everybody in!", "It's a rent party, and the whole block is here!"]
+      jackpot: ["Jackpot!", "Pay the rent!"]
+      super_jackpot: ["Super jackpot! The rent is paid!", "Super jackpot! Landlord's smiling now!"]
   regulars:
     name: The regulars
     voice: {model: en_US-libritts_r-medium, speaker: 20, length_scale: 1.1}

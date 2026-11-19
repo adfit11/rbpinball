@@ -26,6 +26,8 @@ class ModernHoles(Mode):
     def extend(self, hole, ms):
         """Hold the captured ball longer; call from a modern_hole_held handler."""
         self.hold_ms[hole] = max(self.hold_ms.get(hole, 0), ms)
+        if self.delay.check(hole):
+            self.delay.reset(ms=self.hold_ms[hole], name=hole, callback=self._release, hole=hole)
 
     def _captured(self, hole, **kwargs):
         self.hold_ms[hole] = settings.HOLE_HOLD_MS
