@@ -23,12 +23,10 @@ class ModernDisplay(Mode):
         queue.wait()
         self.splash_queue = queue
         self.machine.events.post("modern_splash_show")
-        self.delay.reset(ms=settings.SPLASH_MS, name="splash", callback=self._end_splash)
 
     def _end_splash(self, **kwargs):
         if self.splash_queue is None:
             return
-        self.delay.remove("splash")
         queue, self.splash_queue = self.splash_queue, None
         self.machine.events.post("modern_splash_hide")
         queue.clear()
