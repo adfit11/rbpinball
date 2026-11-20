@@ -41,6 +41,8 @@ var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var voice_started_ms := -VOICE_CUT_MS
 var house_band: AudioStream
+var between_balls_song: AudioStream
+var between_balls := false  # a drained ball plays its own song until the next ball starts
 var song_length_ms := 0.0
 var song_elapsed_ms := 0.0
 var song_paused := false
@@ -57,7 +59,7 @@ const EVENTS := [
 	"modern_select_progress", "modern_drop_the_needle", "modern_ball_saver_ready", "modern_ball_saved",
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
-	"modern_overlay", "modern_mode_status", "modern_task", "modern_floor_nickel", "game_ending", "ball_started",
+	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_rent_party_started", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
@@ -375,6 +377,18 @@ func _play_house_band() -> void:
 		music.play()
 
 
+func _play_between_balls() -> void:
+	if between_balls_song == null:
+		between_balls_song = _load_audio("res://sounds/modern_music/between_balls.mp3")
+	if between_balls_song is AudioStreamMP3:
+		between_balls_song.loop = true
+	music.stop()
+	if between_balls_song:
+		music.stream = between_balls_song
+		music.volume_db = -6.0
+		music.play()
+
+
 static func artist_video_paths(song_path: String) -> PackedStringArray:
 	## res://sounds/music/jukebox/<folder>/song_<n>.mp3 -> song video, artist video, club video.
 	var folder := song_path.get_base_dir().get_file()
@@ -482,7 +496,8 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_stop_artist_video()
 			song_panel.visible = false
 			mode_banner.text = ""
-			_play_house_band()
+			if not between_balls:
+				_play_house_band()
 		"modern_song_paused":
 			song_paused = true
 			music.stream_paused = true
@@ -529,9 +544,17 @@ func _on_event(payload: Dictionary = {}) -> void:
 			show_overlay("EASY NOW!", "One more and you're out", 1500)
 		"tilt":
 			show_overlay("TILT", "The bouncer shows you the door", 3000)
+		"ball_will_end":
+			between_balls = true
+			_stop_artist_video()
+			song_panel.visible = false
+			_play_between_balls()
 		"ball_started":
 			mode_banner.text = ""
 			bonus_lines.clear()
+			if between_balls:
+				between_balls = false
+				_play_house_band()
 		"modern_overlay":
 			show_overlay(str(payload.get("title", "")), str(payload.get("subtitle", "")), int(payload.get("ms", 1800)),
 				OVERLAY_STYLES.get(str(payload.get("style", "")), BURGUNDY))
