@@ -60,8 +60,6 @@ class ModernNickels(Mode):
             self.machine.events.post("modern_nickel_directed", location=target,
                                      location_name=settings.LOCATIONS[target][0],
                                      progress=self.player.modern_nickel_progress, cost=self.cost())
-        targets = self.machine.modes["modern_targets"]
-        targets.set_crater_prompt(bool(self.player.modern_nickel) and self.machine.game.balls_in_play <= 1)
 
     def _callout(self, pool, location):
         self.machine.events.post("modern_callout", pool=f"{settings.LOCATIONS[location][2]}_{pool}")

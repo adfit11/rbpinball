@@ -1,14 +1,16 @@
 """Modern craters, drop banks and Drop the Needle.
 
-The cascade timings mirror Classic's ClassicTargets, but live here so Modern can be
-removed without touching Classic.
+The crater cascade timings mirror Classic's ClassicTargets, but live here so Modern can be
+removed without touching Classic. The drop lamps cascade only for the skill shot; after
+that each lamp shows its right-bank target is down.
 """
 
 from mpf.core.mode import Mode
 
 from custom_code.classic_targets import ClassicTargets
 from custom_code.modern import settings
-from custom_code.modern.lamps import FLASH, STEADY, director
+from custom_code.modern.holes import plain_virtual
+from custom_code.modern.lamps import STEADY, director
 from custom_code.modern.scoring import award
 
 SCAN_MS = 200
@@ -32,17 +34,20 @@ class ModernTargets(Mode):
         self.can_freeze = True
         self.frozen = False
         self.down_banks = set()
+        self.down_targets = set()
+        self.drops_cascading = True
         self.skill_window = False
-        self.crater_prompt = False
         for bank, switches in self.DROP_SWITCHES.items():
             for target, switch in enumerate(switches, 1):
                 self.add_mode_event_handler(switch + "_active", self._drop_hit, bank=bank, target=target)
             self.add_mode_event_handler(f"drop_target_bank_{bank}_down", self._bank_down, bank=bank)
+            self.add_mode_event_handler(f"drop_target_bank_{bank}_up", self._bank_up, bank=bank)
         self.add_mode_event_handler("modern_freeze", self._freeze)
         self.add_mode_event_handler("balldevice_bd_trough_ejecting_ball", self._serve)
         for switch in self.machine.switches.values():
             if switch.name not in SKILL_IGNORED and not switch.name.startswith(("s_top_drop", "s_right_drop")):
                 self.add_mode_event_handler(switch.name + "_active", self._playfield_hit)
+        self._clear_simulated_drops()
         self._schedule("drops", SCAN_MS, self._advance_drops)
         self._schedule("craters", SCAN_MS, self._advance_craters)
         self._show_lamps()
@@ -54,16 +59,12 @@ class ModernTargets(Mode):
     def crater_lit(self, crater):
         return bool(self.crater_index) and crater >= self.crater_index
 
-    def set_crater_prompt(self, prompt):
-        """Flash the lit craters while the player is directed to the jukebox or lock."""
-        self.crater_prompt = prompt
-        if self.active:
-            self._show_lamps()
-
     def _schedule(self, name, delay, callback):
         self.delay.reset(ms=delay, name=name, callback=callback)
 
     def _advance_drops(self):
+        if not self.drops_cascading:
+            return
         self.drop_index = self.drop_index % 5 + 1
         self._show_lamps()
         self._schedule("drops", SCAN_MS, self._advance_drops)
@@ -82,7 +83,7 @@ class ModernTargets(Mode):
         self.skill_window = False
         if not self.ball_active:
             self.ball_active = True
-            self._schedule("drops", RESUME_MS, self._advance_drops)
+            self._stop_drop_cascade()
             self._schedule("craters", RESUME_MS, self._advance_craters)
         self.can_freeze = True
 
@@ -94,7 +95,6 @@ class ModernTargets(Mode):
         self.delay.remove("craters")
         self.machine.events.post("modern_lamps_frozen")
         if self.ball_active:
-            self._schedule("drops", FREEZE_MS, self._advance_drops)
             self._schedule("craters", FREEZE_MS, self._advance_craters)
 
     def crater_entered(self, crater):
@@ -105,8 +105,14 @@ class ModernTargets(Mode):
         self._playfield_hit()
         return lit
 
+    def _stop_drop_cascade(self):
+        self.drops_cascading = False
+        self.delay.remove("drops")
+        self._show_lamps()
+
     def _drop_hit(self, bank, target, **kwargs):
-        lit = target == self.drop_index
+        lit = self.drops_cascading and target == self.drop_index
+        self.down_targets.add((bank, target))
         self.player.modern_bonus_drops += 1
         award(self.machine, settings.SCORE_DROP, "drop")
         if lit and self.skill_window:
@@ -117,8 +123,7 @@ class ModernTargets(Mode):
             self.machine.events.post("modern_ball_saver_qualified")
         self.skill_window = False
         self._playfield_hit()
-        if lit:
-            self._schedule("drops", RESUME_MS, self._advance_drops)
+        self._stop_drop_cascade()
         self.machine.events.post("modern_drop_hit", bank=bank, lit=lit)
 
     def _bank_down(self, bank, **kwargs):
@@ -133,21 +138,36 @@ class ModernTargets(Mode):
             self.delay.reset(ms=500, name="reset_banks", callback=self._reset_banks)
         self._show_lamps()
 
+    def _bank_up(self, bank, **kwargs):
+        self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
+        self._show_lamps()
+
     def _reset_banks(self):
         for bank in self.DROP_SWITCHES:
             self.machine.drop_target_banks[bank].reset()
+        self._clear_simulated_drops()
+
+    def _clear_simulated_drops(self):
+        """mpf -x: the reset coil can't raise simulated targets, so release their switches."""
+        if not plain_virtual(self.machine):
+            return
+        for switches in self.DROP_SWITCHES.values():
+            for switch in switches:
+                if self.machine.switches[switch].state:
+                    self.machine.default_platform.virtual_set_switch(switch, 0)
 
     def _show_lamps(self):
         if not hasattr(self, "drop_index"):
             return
         lamps = self.lamps
         for index, light in enumerate(settings.DROP_LAMPS, 1):
-            lamps.set("drops", light, STEADY if index == self.drop_index else 0)
+            if self.drops_cascading:
+                lit = index == self.drop_index
+            else:
+                lit = ("right_bank", index) in self.down_targets
+            lamps.set("drops", light, STEADY if lit else 0)
         for crater, light in enumerate(settings.CRATER_LAMPS, 1):
-            state = 0
-            if self.crater_lit(crater):
-                state = FLASH if self.crater_prompt else STEADY
-            lamps.set("craters", light, state)
+            lamps.set("craters", light, STEADY if self.crater_lit(crater) else 0)
         for bank, light in settings.BANK_LAMPS.items():
             lamps.set("banks", light, STEADY if bank in self.down_banks else 0)
 
