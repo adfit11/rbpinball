@@ -117,5 +117,5 @@ class TestModernRentParty(ModernTestCase):
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 0)
         self.assertTrue(jukebox.selector_open)
         jukebox._choose()
-        self.advance_time_and_run(.5)
+        self.advance_time_and_run(S.SONG_START_MS / 1000 + .5)
         self.assertEventCalled("modern_song_started")

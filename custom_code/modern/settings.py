@@ -31,7 +31,8 @@ NICKEL_COSTS = (1, 2, 3, 4, 5)
 SELECT_SWITCH = "s_green_button_right_56"
 TAP_SWITCH = "s_green_button_right_56"
 SELECT_HOLD_MS = 2000
-SONG_READ_MS = 8000  # the jukebox holds the ball while the song mode's instructions are read
+SONG_READ_MS = 8000  # the jukebox holds the ball (and the record crackles) while the instructions are read
+SONG_START_MS = 4000  # the artist's song starts this long after the pick, over the crackle
 SELECT_PROGRESS_MS = 100
 
 # Lamps
