@@ -52,8 +52,20 @@ class ModernNickels(Mode):
             choices = [l for l in settings.LOCATION_NAMES if l not in blocked]
             self.player.modern_nickel_target = random.choice(choices)
             if self.hunting():
-                self._callout("direction", self.player.modern_nickel_target)
+                self._announce_target()
         self._show()
+
+    def _announce_target(self):
+        """The target's staff call the player over, or the MC points the way."""
+        target = self.player.modern_nickel_target
+        staff = settings.LOCATIONS[target][2]
+        pool = random.choice([f"{staff}_direction", f"mc_target_{target}"])
+        self.machine.events.post("modern_callout", pool=pool)
+
+    def _remind(self):
+        if self.hunting() and self.player.modern_nickel_target:
+            self._announce_target()
+        self.delay.reset(ms=settings.TARGET_REMINDER_MS, name="remind", callback=self._remind)
 
     def _extra_ball_lit(self, **kwargs):
         if self.player.modern_nickel_target == "kitchen":
@@ -63,6 +75,7 @@ class ModernNickels(Mode):
         self.lamps.clear("nickel")
         target = self.player.modern_nickel_target
         if self.hunting() and target:
+            self.delay.reset(ms=settings.TARGET_REMINDER_MS, name="remind", callback=self._remind)
             self.lamps.set("nickel", settings.LOCATIONS[target][1], FLASH)
             self.machine.events.post("modern_nickel_directed", location=target,
                                      location_name=settings.LOCATIONS[target][0],

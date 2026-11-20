@@ -396,7 +396,7 @@ class ModernSongs(Mode):
         self.rule = SLOT_RULES[slot](self)
         self.rule.start()
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
-        self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)  # after the intro
+        self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)
         self._tick()
 
     def _tick(self):

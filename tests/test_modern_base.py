@@ -56,6 +56,22 @@ class TestModernStack(ModernTestCase):
 
 class TestModernNickels(ModernTestCase):
 
+    def test_target_is_announced_again_while_hunting(self):
+        voices = []
+        self.machine.events.add_handler("modern_callout", lambda pool, **kwargs: voices.append(pool))
+        self.start_modern()
+        target = self.player.modern_nickel_target
+        staff = settings.LOCATIONS[target][2]
+        expected = {f"{staff}_direction", f"mc_target_{target}"}
+        voices.clear()
+        self.advance_time_and_run(settings.TARGET_REMINDER_MS * 3 / 1000 + 1)
+        reminders = [p for p in voices if p in expected]
+        self.assertEqual(len(reminders), 3)
+        self.give_nickel()
+        voices.clear()
+        self.advance_time_and_run(settings.TARGET_REMINDER_MS * 2 / 1000)
+        self.assertFalse([p for p in voices if p.endswith("_direction") or p.startswith("mc_target_")])
+
     def test_kitchen_is_never_the_target_while_extra_ball_is_lit(self):
         with patch("custom_code.modern.nickels.random.choice", lambda c: "kitchen" if "kitchen" in c else c[0]):
             self.start_modern()
