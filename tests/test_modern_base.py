@@ -173,22 +173,27 @@ class TestModernJukebox(ModernTestCase):
         self.advance_time_and_run(4)
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)
         self.assertEventNotCalled("modern_song_started")
-        self.advance_time_and_run(settings.SELECTOR_TIMEOUT_MS / 1000 + 1)
-        self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)  # reading time
+        self.mock_event("modern_record_crackle_stop")
+        self.advance_time_and_run(settings.SELECTOR_TIMEOUT_MS / 1000 - 4 + .5)  # auto-picked .5 s ago
+        self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)
         self.assertEventNotCalled("modern_song_started")
-        self.advance_time_and_run(settings.SONG_READ_MS / 1000)
+        self.advance_time_and_run(4)  # 4.5 s: the song has started, the ball is still held
         self.assertEventCalled("modern_song_started")
+        self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)
+        self.assertEventNotCalled("modern_record_crackle_stop")
+        self.advance_time_and_run(4)  # 8.5 s: crackle stopped and ball released
+        self.assertEventCalled("modern_record_crackle_stop")
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 0)
         self.assertEqual(self.player.modern_songs_played, 1)
         self.assertEqual(self.player.modern_artists_played, 1)
         self.assertTrue(self.machine.modes["modern_jukebox"].song)
 
-    def test_song_starts_when_the_ball_is_released(self):
+    def test_chosen_song_starts(self):
         self.start_modern()
         jukebox = self.machine.modes["modern_jukebox"]
         self.mock_event("modern_song_started")
         jukebox.chosen = jukebox.slots[0][1][0]
-        jukebox._release_ball()
+        jukebox._start_chosen()
         self.advance_time_and_run(.1)
         self.assertEventCalled("modern_song_started")
         self.assertIsNotNone(jukebox.song)
@@ -200,8 +205,7 @@ class TestModernJukebox(ModernTestCase):
         self.player.modern_songs_played = settings.MULTIPLIER_EVERY - 1
         jukebox.selector_open, jukebox.highlight = True, 3
         jukebox._choose()
-        jukebox._release_ball()
-        self.advance_time_and_run(.1)
+        self.advance_time_and_run(settings.SONG_START_MS / 1000 + .1)
         self.assertEqual(self.player.modern_song_multiplier, 2)
         self.assertTrue(jukebox.played(3))
         self.drain_one_ball()

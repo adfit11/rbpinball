@@ -17,7 +17,7 @@ sound_player:
     record_crackle:
       bus: effects
       loops: -1
-  modern_release_jukebox:
+  modern_record_crackle_stop:
     record_crackle:
       action: stop
   ball_will_end:
