@@ -148,9 +148,10 @@ class ModernJukebox(Mode):
             song, self.chosen, self.lock_entry = self.chosen, None, False
             self._start_song(song)
         elif self.chosen:
-            self.pending_song, self.chosen = self.chosen, None
+            # The song starts as the reading time ends, while the ball rides the subway back.
+            song, self.chosen = self.chosen, None
             self._count_song()
-            self.delay.reset(ms=TRANSFER_FALLBACK_MS, name="transfer", callback=self._start_pending)
+            self._start_song(song, counted=True)
 
     def _start_pending(self, **kwargs):
         """Start the chosen song once the subway kicker has returned the ball to play."""

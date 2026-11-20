@@ -36,6 +36,7 @@ var selector_cells: Array = []
 var selector_timer: Label
 var select_ring: ProgressBar
 var music: AudioStreamPlayer
+var music_fade: Tween  # fades the house band out while the record crackles
 var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
@@ -360,7 +361,23 @@ func _load_audio(path: String) -> AudioStream:
 	return null
 
 
+func _fade_out_music() -> void:
+	_stop_music_fade()
+	if not music.playing:
+		return
+	music_fade = create_tween()
+	music_fade.tween_property(music, "volume_db", -60.0, 1.0)
+	music_fade.tween_callback(music.stop)
+
+
+func _stop_music_fade() -> void:
+	if music_fade:
+		music_fade.kill()
+		music_fade = null
+
+
 func _play_house_band() -> void:
+	_stop_music_fade()
 	if house_band == null:
 		house_band = _load_audio("res://sounds/modern_music/house_band.mp3")
 	if house_band:
@@ -426,6 +443,7 @@ func _stop_artist_video() -> void:
 
 
 func _play_song(path: String) -> void:
+	_stop_music_fade()
 	var stream := _load_audio(path)
 	if stream:
 		if stream is AudioStreamMP3:
@@ -488,6 +506,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_highlight(int(payload.get("highlight", 0)))
 		"modern_artist_chosen":
 			_highlight(int(payload.get("slot", 1)) - 1)
+			_fade_out_music()
 			var tw := create_tween()
 			tw.tween_interval(0.6)
 			tw.tween_callback(func(): selector.visible = false)
