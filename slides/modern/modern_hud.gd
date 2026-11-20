@@ -474,6 +474,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_selector_opened":
 			_show_selector(payload)
 		"modern_selector_highlight":
+			selector_deadline = Time.get_ticks_msec() / 1000.0 + float(payload.get("timeout_ms", 10000)) / 1000.0
 			_highlight(int(payload.get("highlight", 0)))
 		"modern_artist_chosen":
 			_highlight(int(payload.get("slot", 1)) - 1)

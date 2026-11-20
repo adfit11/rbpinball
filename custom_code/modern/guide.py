@@ -12,7 +12,8 @@ WHERE = {
 
 
 def place(location):
-    return f"{settings.LOCATIONS[location][0].upper()} ({WHERE[location]})"
+    name = settings.LOCATIONS[location][0].removeprefix("the ")
+    return f"{name.upper()} ({WHERE[location]})"
 
 
 def current_task(machine):

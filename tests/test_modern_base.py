@@ -310,7 +310,8 @@ class TestModernBallFeatures(ModernTestCase):
         self.start_modern()
         task = self._last_event_kwargs["modern_task"]
         self.assertEqual(task["title"], "GET A NICKEL")
-        self.assertIn(settings.LOCATIONS[self.player.modern_nickel_target][0].upper(), task["detail"])
+        name = settings.LOCATIONS[self.player.modern_nickel_target][0].removeprefix("the ")
+        self.assertIn(f"Visit the {name.upper()} (", task["detail"])
         self.give_nickel()
         self.advance_time_and_run(.1)
         self.assertEqual(self._last_event_kwargs["modern_task"]["title"], "PLAY THE JUKEBOX")
@@ -356,6 +357,14 @@ class TestModernBallFeatures(ModernTestCase):
         light.color("black", priority=1000, key="test")
         self.advance_time_and_run(.1)
         self.assertEqual(light.get_monitorable_state()["color"], [0, 0, 0])
+
+    def test_simulator_monitor_is_told_about_lamp_changes(self):
+        light = self.machine.lights["l_xxx_46"]
+        manager = type(self.machine.device_manager)
+        with patch.object(manager, "notify_device_changes", autospec=True) as notify:
+            light.color("white", priority=1000, key="test")
+            self.advance_time_and_run(.1)
+        self.assertIn((light, "color", [0, 0, 0], [255, 170, 0]), [c.args[1:] for c in notify.call_args_list])
 
     def test_one_warning_tilt_in_modern(self):
         self.start_modern()

@@ -81,6 +81,8 @@ class ModernCore(Mode):
         self.delay.reset(ms=50, name="task", callback=self._post_task)
 
     def _post_task(self):
+        if not self.active or not self.machine.game:
+            return
         task = guide.current_task(self.machine)
         if task != self._task:
             self._task = task

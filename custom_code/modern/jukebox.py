@@ -97,7 +97,9 @@ class ModernJukebox(Mode):
     def _tap(self, owner="", **kwargs):
         if self.selector_open and owner == "jukebox":
             self.highlight = self._next_selectable(self.highlight)
-            self.machine.events.post("modern_selector_highlight", highlight=self.highlight)
+            self.delay.reset(ms=settings.SELECTOR_TIMEOUT_MS, name="selector_timeout", callback=self._choose)
+            self.machine.events.post("modern_selector_highlight", highlight=self.highlight,
+                                     timeout_ms=settings.SELECTOR_TIMEOUT_MS)
 
     def _select(self, owner="", **kwargs):
         if self.selector_open and owner == "jukebox":
