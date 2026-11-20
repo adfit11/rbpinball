@@ -3,6 +3,7 @@
 Each placeholder is a synthesized boogie-woogie loop with the title spoken over it.
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
+Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain.
 Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--intros] [--seconds 60]
 --intros regenerates only the MC song announcements, e.g. after editing catalogue titles.
 """
@@ -90,6 +91,25 @@ def make_intros(force=False):
     print(f"generated {made} song intros")
 
 
+BETWEEN_BALLS = os.path.join(catalogue.ROOT, "sounds", "modern_music", "between_balls.mp3")
+
+
+def make_between_balls(force=False, seconds=40):
+    """A slow, quiet blues loop for between balls; an owner's MP3 is never overwritten."""
+    out = os.path.normpath(BETWEEN_BALLS)
+    if os.path.exists(out) and not force:
+        return
+    music = backing(seconds, 82, 96, 7) * 0.6
+    fade = int(RATE * 0.5)
+    music[:fade] *= np.linspace(0, 1, fade)
+    music[-fade:] *= np.linspace(1, 0, fade)
+    wav = tts.temp_wav()
+    write_wav(wav, music)
+    tts.to_mp3(wav, out, "48k")
+    os.remove(wav)
+    print("generated", out)
+
+
 def main(force=False, seconds=60):
     made = 0
     for slot, (name, songs) in enumerate(catalogue.load(), 1):
@@ -114,6 +134,7 @@ def main(force=False, seconds=60):
             os.remove(wav)
             made += 1
     print(f"generated {made} song files")
+    make_between_balls(force)
     make_intros(force)
 
 
