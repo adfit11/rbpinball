@@ -31,7 +31,7 @@ def current_task(machine):
     if rule:
         return f"SONG MODE: {rule.title}", f"{rule.goal} Finish before the record ends."
     if player.modern_lock_lit:
-        return "LOCK IS LIT", "Shoot a lit crater to lock a ball for Rent Party multiball."
+        return "LOCK IS LIT", "Shoot any crater to lock a ball for Rent Party multiball."
     if player.modern_nickel:
         return "PLAY THE JUKEBOX", "You've got a nickel! Shoot a lit crater to pick a song."
     target = player.modern_nickel_target

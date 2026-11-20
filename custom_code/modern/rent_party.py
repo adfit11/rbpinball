@@ -82,14 +82,14 @@ class ModernRentParty(Mode):
             player.modern_lock_lit = 1
             award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
             self.machine.events.post("modern_lock_lit")
-            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot a lit crater!",
+            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
                                      ms=2200)
             self.machine.events.post("modern_callout", pool="mc_lock_lit")
 
     # Locks -----------------------------------------------------------------
-    def qualify_lock(self, lit):
-        """Called by the jukebox on a crater entry; returns whether this ball will be locked."""
-        if (lit and self.player.modern_lock_lit and not self.multiball
+    def qualify_lock(self):
+        """Called by the jukebox on any crater entry; returns whether this ball will be locked."""
+        if (self.player.modern_lock_lit and not self.multiball
                 and self.machine.game.balls_in_play == 1 and self.locked_balls < S.LOCKS_FOR_MULTIBALL):
             self.machine.events.post("modern_lock_qualified")
             return True
