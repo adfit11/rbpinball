@@ -25,7 +25,10 @@ class TestModernStack(ModernTestCase):
         self.mock_event("balldevice_bd_trough_ejecting_ball")
         self.start_modern(skip_splash=False)
         self.assertEventNotCalled("balldevice_bd_trough_ejecting_ball")
-        self.advance_time_and_run(settings.SPLASH_MS / 1000 + 1)
+        self.advance_time_and_run(30)
+        self.assertEventNotCalled("balldevice_bd_trough_ejecting_ball")
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(1)
         self.assertEventCalled("balldevice_bd_trough_ejecting_ball")
 
     def test_scores_apply_song_multiplier(self):

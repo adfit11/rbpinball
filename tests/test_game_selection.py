@@ -159,8 +159,11 @@ class TestGameSelection(MpfGameTestCase):
                     self.choose_game_and_count(game, count)
                     previous_starts = self._events.get("ball_started", 0)
                     self.hit_and_release_switch("s_start_47")
-                    # Modern holds the first ball behind its rules splash.
-                    self.advance_time_and_run(1 if game == "classic" else 7)
+                    # Modern holds the first ball behind its rules splash until Start is pressed again.
+                    self.advance_time_and_run(1)
+                    if game == "modern":
+                        self.hit_and_release_switch("s_start_47")
+                        self.advance_time_and_run(1)
                     self.assertGameIsRunning()
                     self.assertPlayerCount(count)
                     self.assertPlayerNumber(1)

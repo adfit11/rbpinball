@@ -74,7 +74,6 @@ QUIP_CHANCE = 0.35
 QUIP_CHECK_MS = 5_000
 
 # Splash
-SPLASH_MS = 6_000
 
 # Song modes (before the song multiplier)
 SONG_COMPLETION_AWARD = 250_000
