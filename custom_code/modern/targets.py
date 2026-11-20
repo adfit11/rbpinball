@@ -127,26 +127,28 @@ class ModernTargets(Mode):
         self.down_banks.add(bank)
         award(self.machine, settings.SCORE_BANK, "bank")
         self.machine.events.post("modern_bank_completed", bank=bank)
+        # The completed bank pops straight back up; its bank lamp stays lit until both are completed.
+        self.delay.reset(ms=500, name=f"reset_{bank}", callback=self._reset_bank, bank=bank)
         if len(self.down_banks) == 2:
             self.machine.events.post("modern_floor_nickel")
             self.down_banks.clear()
-            self.delay.reset(ms=500, name="reset_banks", callback=self._reset_banks)
         self._show_lamps()
 
     def _bank_up(self, bank, **kwargs):
         self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
         self._show_lamps()
 
-    def _reset_banks(self):
-        for bank in self.DROP_SWITCHES:
-            self.machine.drop_target_banks[bank].reset()
-        self._clear_simulated_drops()
+    def _reset_bank(self, bank):
+        self.machine.drop_target_banks[bank].reset()
+        self._clear_simulated_drops(bank)
 
-    def _clear_simulated_drops(self):
+    def _clear_simulated_drops(self, bank=None):
         """mpf -x: the reset coil can't raise simulated targets, so release their switches."""
         if not plain_virtual(self.machine):
             return
-        for switches in self.DROP_SWITCHES.values():
+        for name, switches in self.DROP_SWITCHES.items():
+            if bank and name != bank:
+                continue
             for switch in switches:
                 if self.machine.switches[switch].state:
                     self.machine.default_platform.virtual_set_switch(switch, 0)

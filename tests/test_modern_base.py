@@ -124,6 +124,19 @@ class TestModernNickels(ModernTestCase):
         self.assertEqual(self.player.modern_nickel, 1)
         self.assertEqual(self.machine.modes["modern_nickels"].cost(), cost)
 
+    def test_completed_bank_pops_back_up_on_its_own(self):
+        self.start_modern()
+        targets = self.machine.modes["modern_targets"]
+        top = self.machine.drop_target_banks["top_bank"]
+        right = self.machine.drop_target_banks["right_bank"]
+        with patch.object(top, "reset") as top_reset, patch.object(right, "reset") as right_reset:
+            self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][0], .05)
+            for switch in targets.DROP_SWITCHES["top_bank"]:
+                self.hit_switch_and_run(switch, .05)
+            self.advance_time_and_run(.6)
+            top_reset.assert_called_once()
+            right_reset.assert_not_called()
+
     def test_nickel_resets_at_drain(self):
         self.start_modern()
         self.give_nickel()
