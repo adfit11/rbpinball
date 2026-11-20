@@ -1,6 +1,12 @@
 """Layered lamp requests for Modern: flashing directs a shot, steady shows a lit feature."""
 
+import logging
+
 from custom_code.modern import settings
+
+LOG = logging.getLogger("modern.lamps")
+WATCHED = {light for (_, light, _) in settings.LOCATIONS.values() if light}
+NAMES = {0: "OFF", 1: "STEADY", 2: "FLASH"}
 
 OFF, STEADY, FLASH = 0, 1, 2
 
@@ -21,16 +27,26 @@ class LampDirector:
     def set(self, key, light, state=STEADY):
         if light is None:
             return
+        before = self.state(light)
         if state == OFF:
             self.requests.pop((key, light), None)
         else:
             self.requests[(key, light)] = state
+        self._log(light, before, key)
         self.refresh()
 
     def clear(self, key):
         for request in [r for r in self.requests if r[0] == key]:
+            before = self.state(request[1])
             del self.requests[request]
+            self._log(request[1], before, key)
         self.refresh()
+
+    def _log(self, light, before, key):
+        """Log location-lamp intent changes so a cabinet log shows what each lamp should be doing."""
+        after = self.state(light)
+        if light in WATCHED and after != before:
+            LOG.info("Lamp %s %s -> %s (%s)", light, NAMES[before], NAMES[after], key)
 
     def state(self, light):
         return max((s for (_, l), s in self.requests.items() if l == light), default=OFF)

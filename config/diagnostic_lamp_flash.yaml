@@ -1,0 +1,18 @@
+#config_version=6
+
+# Lamp flash check outside gameplay: L43-L47 flash together, 250 ms on / 250 ms off,
+# the same rate Modern uses for the nickel target. Stop MPF and Godot first, then run:
+# /Users/adrian/mpf/bin/mpf -c diagnostic_lamp_flash.yaml -b -t
+config:
+  - diagnostic_switches.yaml
+  - config_lights.yaml
+
+shows:
+  lamp_flash_check:
+    - duration: 250ms
+      lights: {l_xxx_43: on, l_xxx_44: on, l_xxx_45: on, l_xxx_46: on, l_xxx_47: on}
+    - duration: 250ms
+      lights: {l_xxx_43: off, l_xxx_44: off, l_xxx_45: off, l_xxx_46: off, l_xxx_47: off}
+
+show_player:
+  init_done: lamp_flash_check
