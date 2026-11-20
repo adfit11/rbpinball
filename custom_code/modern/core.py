@@ -28,6 +28,11 @@ BALL_VARS = (
 class ModernCore(Mode):
     """Owns Modern's shared services; feature modes ask it for lamps and green ownership."""
 
+    def mode_will_start(self, **kwargs):
+        # Child modes start inside mode_modern_started, before mode_start runs, and set lamps at once.
+        self.lamps = LampDirector(self)
+        self.lamps.start()
+
     def mode_start(self, **kwargs):
         player = self.player
         for name in BALL_VARS:
@@ -36,8 +41,6 @@ class ModernCore(Mode):
         player.modern_bumper_factor = 1
         if not player.modern_song_multiplier:
             player.modern_song_multiplier = 1
-        self.lamps = LampDirector(self)
-        self.lamps.start()
         self.green_owner = None
         self._green_down_at = None
         self._last_spin = -100

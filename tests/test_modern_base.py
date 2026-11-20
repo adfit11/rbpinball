@@ -53,6 +53,16 @@ class TestModernStack(ModernTestCase):
 
 class TestModernNickels(ModernTestCase):
 
+    def test_first_nickel_target_flashes_from_ball_start(self):
+        with patch("custom_code.modern.nickels.random.choice", lambda c: "bar" if "bar" in c else c[0]):
+            self.start_modern()
+        light = self.machine.lights["l_xxx_47"]
+        seen = set()
+        for _ in range(8):
+            self.advance_time_and_run(.125)
+            seen.add(light.get_color().rgb[0] > 0)
+        self.assertEqual(seen, {True, False})
+
     def test_directed_location_awards_nickel_and_cost_climbs(self):
         self.start_modern()
         nickels = self.machine.modes["modern_nickels"]
