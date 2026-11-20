@@ -325,20 +325,17 @@ class TestModernBallFeatures(ModernTestCase):
             self.advance_time_and_run(2)
         remove.assert_any_call(ball_device="bd_classic_saucer")
 
-    def test_drop_lamps_cascade_for_the_skill_shot_then_show_down_targets(self):
+    def test_drop_lamps_keep_cascading_and_dropped_targets_stay_lit(self):
         self.start_modern()
         targets = self.machine.modes["modern_targets"]
-        self.assertFalse(targets.drops_cascading)
-        index = targets.drop_index
-        self.advance_time_and_run(2)
-        self.assertEqual(targets.drop_index, index)
         lamps = director(self.machine)
-        self.assertTrue(all(lamps.state(light) == 0 for light in settings.DROP_LAMPS))
         self.hit_switch_and_run("s_right_drop_2_11", .5)
-        self.assertEqual(lamps.state("l_xxx_20"), STEADY)
-        self.advance_time_and_run(3)
-        self.assertEqual(lamps.state("l_xxx_20"), STEADY)
-        self.assertEqual([lamps.state(l) for l in settings.DROP_LAMPS].count(STEADY), 1)
+        seen = set()
+        for _ in range(20):
+            self.advance_time_and_run(.25)
+            seen.add(targets.drop_index)
+            self.assertEqual(lamps.state("l_xxx_20"), STEADY)
+        self.assertGreater(len(seen), 2)
 
     def test_lit_craters_stay_steady_while_holding_a_nickel(self):
         self.start_modern()
