@@ -23,6 +23,7 @@ class ModernJukebox(Mode):
         self.song = None
         self.pending_song = None
         self.lock_entry = False
+        self.read_until = 0
         self.song_remaining_ms = 0
         self.song_started_at = None
         self.pauses = set()
@@ -114,18 +115,31 @@ class ModernJukebox(Mode):
         self.chosen = random.choice(songs)
         self.machine.events.post("modern_artist_chosen", slot=self.highlight + 1, slot_name=name,
                                  artist=self.chosen.artist, title=self.chosen.title)
-        if self.ball_waiting or self.lock_entry:
+        from custom_code.modern.songs import SLOT_RULES
+        rule = SLOT_RULES[self.highlight + 1]
+        self.machine.events.post("modern_overlay", title=rule.title, subtitle=rule.goal,
+                                 ms=settings.SONG_READ_MS, style="teal")
+        self.read_until = self.machine.clock.get_time() + settings.SONG_READ_MS / 1000
+        if self.lock_entry:
             self._release_ball()
+        elif self.ball_waiting:
+            self.delay.reset(ms=settings.SONG_READ_MS, name="read", callback=self._release_ball)
         else:
-            self.delay.reset(ms=SONG_FALLBACK_MS, name="ball_fallback", callback=self._release_ball)
+            self.delay.reset(ms=max(SONG_FALLBACK_MS, settings.SONG_READ_MS), name="ball_fallback",
+                             callback=self._release_ball)
 
     def _ball_held(self, **kwargs):
         self.ball_waiting = True
         if self.chosen and not self.selector_open:
-            self._release_ball()
+            left = self.read_until - self.machine.clock.get_time()
+            if left > 0:
+                self.delay.reset(ms=left * 1000, name="read", callback=self._release_ball)
+            else:
+                self._release_ball()
 
     def _release_ball(self):
         self.delay.remove("ball_fallback")
+        self.delay.remove("read")
         self.ball_waiting = False
         self.machine.events.post("modern_jukebox_hold_disable")
         self.machine.events.post("modern_release_jukebox")

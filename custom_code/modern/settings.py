@@ -31,6 +31,7 @@ NICKEL_COSTS = (1, 2, 3, 4, 5)
 SELECT_SWITCH = "s_green_button_right_56"
 TAP_SWITCH = "s_green_button_right_56"
 SELECT_HOLD_MS = 2000
+SONG_READ_MS = 8000  # the jukebox holds the ball while the song mode's instructions are read
 SELECT_PROGRESS_MS = 100
 
 # Lamps
