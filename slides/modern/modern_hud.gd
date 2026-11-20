@@ -127,13 +127,7 @@ func _build() -> void:
 	bg.modulate = Color(0.55, 0.5, 0.5)
 	_place(bg, 0, 0, 1280, 720)
 
-	artist_video = VideoStreamPlayer.new()
-	artist_video.expand = true
-	artist_video.loop = true
-	artist_video.volume_db = -80.0
-	artist_video.modulate = Color(0.55, 0.55, 0.55)
-	artist_video.visible = false
-	_place(artist_video, 0, 0, 1280, 720)
+	_new_artist_video(bg)
 
 	scores = HBoxContainer.new()
 	scores.add_theme_constant_override("separation", 12)
@@ -397,22 +391,38 @@ static func artist_video_paths(song_path: String) -> PackedStringArray:
 	return PackedStringArray([base + folder + "/" + name + ".ogv", base + folder + "/video.ogv", base + "club.ogv"])
 
 
+func _new_artist_video(below: Control) -> void:
+	## A fresh player per song: reusing one VideoStreamPlayer for a new Theora stream can hang Godot.
+	artist_video = VideoStreamPlayer.new()
+	artist_video.expand = true
+	artist_video.loop = true
+	artist_video.volume_db = -80.0
+	artist_video.modulate = Color(0.55, 0.55, 0.55)
+	artist_video.visible = false
+	_place(artist_video, 0, 0, 1280, 720)
+	move_child(artist_video, below.get_index() + 1)
+
+
 func _play_artist_video(song_path: String) -> void:
+	_stop_artist_video()
 	for path in artist_video_paths(song_path):
 		if ResourceLoader.exists(path):
 			var stream := load(path) as VideoStream
 			if stream:
 				artist_video.stream = stream
-				artist_video.paused = false
 				artist_video.visible = true
 				artist_video.play()
 				return
-	_stop_artist_video()
 
 
 func _stop_artist_video() -> void:
-	artist_video.stop()
-	artist_video.visible = false
+	if artist_video.stream == null:
+		return
+	var old := artist_video
+	_new_artist_video(old)
+	old.stop()
+	old.stream = null
+	old.queue_free()
 
 
 func _play_song(path: String) -> void:
