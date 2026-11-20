@@ -53,6 +53,16 @@ class TestModernStack(ModernTestCase):
 
 class TestModernNickels(ModernTestCase):
 
+    def test_kitchen_is_never_the_target_while_extra_ball_is_lit(self):
+        with patch("custom_code.modern.nickels.random.choice", lambda c: "kitchen" if "kitchen" in c else c[0]):
+            self.start_modern()
+            self.assertEqual(self.player.modern_nickel_target, "kitchen")
+            self.machine.modes["modern_holes"]._light_extra_ball()
+            self.advance_time_and_run(.1)
+            self.assertNotEqual(self.player.modern_nickel_target, "kitchen")
+            self.machine.modes["modern_nickels"]._direct()
+            self.assertNotEqual(self.player.modern_nickel_target, "kitchen")
+
     def test_first_nickel_target_flashes_from_ball_start(self):
         with patch("custom_code.modern.nickels.random.choice", lambda c: "bar" if "bar" in c else c[0]):
             self.start_modern()

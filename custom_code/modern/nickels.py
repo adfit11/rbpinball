@@ -18,6 +18,7 @@ class ModernNickels(Mode):
         self.add_mode_event_handler("modern_location_hit", self._location_hit)
         self.add_mode_event_handler("modern_floor_nickel", self._floor_nickel)
         self.add_mode_event_handler("modern_nickel_spent", self._spent)
+        self.add_mode_event_handler("modern_extra_ball_lit", self._extra_ball_lit)
         for event in ("modern_song_started", "multiball_modern_rent_party_started"):
             self.add_mode_event_handler(event, self._suspend)
         for event in ("modern_song_ended", "modern_rent_party_ended"):
@@ -46,11 +47,17 @@ class ModernNickels(Mode):
         if self.player.modern_nickel:
             self.player.modern_nickel_target = ""
         else:
-            choices = [l for l in settings.LOCATION_NAMES if l != exclude] or list(settings.LOCATION_NAMES)
+            # The Kitchen shares L45 with Extra Ball, so it is never the target while extra ball is lit.
+            blocked = {exclude, "kitchen" if self.player.modern_extra_ball_lit else ""}
+            choices = [l for l in settings.LOCATION_NAMES if l not in blocked]
             self.player.modern_nickel_target = random.choice(choices)
             if self.hunting():
                 self._callout("direction", self.player.modern_nickel_target)
         self._show()
+
+    def _extra_ball_lit(self, **kwargs):
+        if self.player.modern_nickel_target == "kitchen":
+            self._direct(exclude="kitchen")
 
     def _show(self):
         self.lamps.clear("nickel")
