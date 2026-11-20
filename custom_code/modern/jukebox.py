@@ -52,17 +52,15 @@ class ModernJukebox(Mode):
             return
         if self.machine.game.balls_in_play > 1:
             return
-        if not player.modern_nickel:
-            rent_party = self.machine.modes["modern_rent_party"]
-            if rent_party.active and rent_party.qualify_lock(lit):
-                return
-            self.machine.events.post("modern_jukebox_no_nickel")
-            self.machine.events.post("modern_callout", pool="mc_needs_nickel")
-            return
-        if not lit:
-            return
         rent_party = self.machine.modes["modern_rent_party"]
-        locking = rent_party.active and rent_party.qualify_lock(lit)
+        if not player.modern_nickel or not lit:
+            if rent_party.active and rent_party.qualify_lock():
+                return
+            if not player.modern_nickel:
+                self.machine.events.post("modern_jukebox_no_nickel")
+                self.machine.events.post("modern_callout", pool="mc_needs_nickel")
+            return
+        locking = rent_party.active and rent_party.qualify_lock()
         self.machine.events.post("modern_nickel_spent")
         self.lock_entry = locking
         if not locking:

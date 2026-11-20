@@ -44,7 +44,7 @@ class TestModernRentParty(ModernTestCase):
         self.assertEqual(self.player.modern_guests, 0)
         self.assertEqual(self.player.modern_lock_lit, 0)
 
-    def test_lit_crater_locks_and_unlit_passes(self):
+    def test_unlit_crater_locks_while_lock_is_lit(self):
         self.start_modern()
         self.fill_guest_list()
         self.mock_event("modern_ball_locked")
@@ -52,11 +52,7 @@ class TestModernRentParty(ModernTestCase):
         switch = targets.CRATER_SWITCHES[0]
         targets.crater_index = 4  # only crater 4 is lit
         self.hit_and_release_switch(switch)
-        self.hit_and_release_switch("s_subway_lock_10")
-        self.advance_time_and_run(5)
-        self.assertEventNotCalled("modern_ball_locked")
-        self.assertEqual(self.lock.balls, 0)
-        self.lock_ball()
+        self.hit_switch_and_run("s_subway_lock_10", 5)
         self.assertEventCalled("modern_ball_locked")
         self.assertEqual(self.lock.balls, 1)
         self.assertEqual(self.player.modern_locked_balls, 1)
