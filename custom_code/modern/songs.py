@@ -396,8 +396,6 @@ class ModernSongs(Mode):
         self.rule = SLOT_RULES[slot](self)
         self.rule.start()
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
-        self.machine.events.post("modern_overlay", title=self.rule.title, subtitle=self.rule.goal, ms=2200,
-                                 style="teal")
         self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)  # after the intro
         self._tick()
 

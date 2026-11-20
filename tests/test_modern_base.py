@@ -170,7 +170,10 @@ class TestModernJukebox(ModernTestCase):
         self.advance_time_and_run(4)
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)
         self.assertEventNotCalled("modern_song_started")
-        self.advance_time_and_run(settings.SELECTOR_TIMEOUT_MS / 1000)
+        self.advance_time_and_run(settings.SELECTOR_TIMEOUT_MS / 1000 + 1)
+        self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 1)  # reading time
+        self.assertEventNotCalled("modern_song_started")
+        self.advance_time_and_run(settings.SONG_READ_MS / 1000)
         self.assertEventCalled("modern_song_started")
         self.assertEqual(self.machine.ball_holds["modern_jukebox"].balls_held, 0)
         self.assertEqual(self.player.modern_songs_played, 1)

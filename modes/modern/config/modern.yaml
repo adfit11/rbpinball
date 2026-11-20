@@ -13,3 +13,13 @@ sound_player:
   modern_drop_hit:
     right_drops_effect:
       bus: effects
+  modern_artist_chosen:
+    record_crackle:
+      bus: effects
+      loops: -1
+  modern_release_jukebox:
+    record_crackle:
+      action: stop
+  ball_will_end:
+    record_crackle:
+      action: stop
