@@ -9,6 +9,10 @@ const INACTIVE_COLOR := Color("#b0bac6")
 @onready var multiplier: Label = %Multiplier
 @onready var locks: Label = %Locks
 
+const Playlist := preload("res://slides/playlist.gd")
+var house_band := Playlist.new(Playlist.HOUSE_BAND_PREFIX, Playlist.HOUSE_BAND_COUNT)
+var music: AudioStreamPlayer
+
 
 func _ready() -> void:
 	for player: Dictionary in MPF.game.players:
@@ -19,6 +23,20 @@ func _ready() -> void:
 		scores.add_child(label)
 	MPF.game.player_update.connect(_on_player_update)
 	_render_scoreboard()
+	# This slide is shown afresh each ball, so every ball starts a new random house-band track.
+	music = AudioStreamPlayer.new()
+	music.bus = "music"
+	music.volume_db = -8.0
+	add_child(music)
+	music.finished.connect(_play_house_band)
+	_play_house_band()
+
+
+func _play_house_band() -> void:
+	var stream := house_band.next_stream()
+	if stream:
+		music.stream = stream
+		music.play()
 
 
 func _exit_tree() -> void:

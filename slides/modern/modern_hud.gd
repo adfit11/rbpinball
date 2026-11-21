@@ -42,7 +42,7 @@ var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var voice_started_ms := -VOICE_CUT_MS
 const Playlist := preload("res://slides/playlist.gd")
-var house_band := Playlist.new("res://sounds/modern_music/house_band", 10)
+var house_band := Playlist.new(Playlist.HOUSE_BAND_PREFIX, Playlist.HOUSE_BAND_COUNT)
 var playing_house_band := false
 var between_balls_song: AudioStream
 var between_balls := false  # a drained ball plays its own song until the next ball starts
