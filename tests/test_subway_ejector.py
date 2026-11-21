@@ -199,6 +199,30 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
             request()
             self.assertEqual(pulse.call_count, 2)
 
+    def test_missed_release_is_retried_mid_game_until_the_ball_arrives(self):
+        ejector = self.machine.ball_devices["bd_classic_subway_lock"].ejector
+        coil = self.machine.coils["c_subway_lock"]
+        lock = self.machine.switches["s_subway_lock_10"]
+        controller = self.machine.switch_controller
+        original = type(controller).is_active
+        def is_active(switch, *args, **kwargs):
+            return True if switch is lock else original(controller, switch, *args, **kwargs)
+
+        with patch.object(type(controller), "is_active", side_effect=is_active), \
+                patch.object(self.machine, "game", Mock()), \
+                patch.object(coil, "pulse", wraps=coil.pulse) as pulse:
+            self.advance_time_and_run(.6)
+            self.machine.clock.loop.create_task(ejector.eject_one_ball(False, 1, 1))
+            self.advance_time_and_run(.01)
+            self.assertEqual(pulse.call_count, 1)
+            self.advance_time_and_run(4.5)  # missed the kicker, retried after a second
+            self.assertEqual(pulse.call_count, 2)
+            self.advance_time_and_run(4.5)
+            self.assertEqual(pulse.call_count, 3)
+            self.hit_switch_and_run("s_subway_kicker_0", .01)  # the ball finally arrives
+            self.advance_time_and_run(6)
+            self.assertEqual(pulse.call_count, 3)
+
     def test_start_is_blocked_with_a_ball_or_pending_handoff(self):
         ejector = self.machine.ball_devices["bd_classic_subway_lock"].ejector
         self.assertTrue(ejector._allow_start())

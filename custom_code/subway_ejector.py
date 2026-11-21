@@ -4,6 +4,9 @@ from mpf.devices.ball_device.pulse_coil_ejector import PulseCoilEjector
 
 from custom_code.subway_recovery import SubwayReleaseInterlock
 
+MISSED_KICKER = "Released ball did not reach the kicker"
+RETRY_DELAY_S = 1.0
+
 
 class InterlockedSubwayEjector(PulseCoilEjector):
     """Route MPF ejects through an arrival-and-clear interlock.
@@ -11,13 +14,14 @@ class InterlockedSubwayEjector(PulseCoilEjector):
     Startup recovery and MPF eject requests share this interlock.
     """
 
-    __slots__ = ["guard", "_timer", "_reported_fault"]
+    __slots__ = ["guard", "_timer", "_reported_fault", "_retry_timer"]
 
     def __init__(self, config, ball_device, machine):
         super().__init__(config, ball_device, machine)
         self.guard = SubwayReleaseInterlock()
         self._timer = None
         self._reported_fault = False
+        self._retry_timer = None
         for state in (0, 1):
             machine.switch_controller.add_switch_handler(
                 "s_subway_kicker_0", self._observe, state=state)
@@ -51,6 +55,8 @@ class InterlockedSubwayEjector(PulseCoilEjector):
             self._reported_fault = True
             self.ball_device.log.error("Subway release interlock: %s", self.guard.reason)
             self.machine.events.post("subway_release_interlock_failed", reason=self.guard.reason)
+            if self.guard.reason == MISSED_KICKER and self.machine.game and self._retry_timer is None:
+                self._retry_timer = self.machine.clock.loop.call_later(RETRY_DELAY_S, self._retry_release)
         if self._timer is not None:
             self._timer.cancel()
             self._timer = None
@@ -81,6 +87,17 @@ class InterlockedSubwayEjector(PulseCoilEjector):
             return False
         self._observe()
         return True
+
+    def _retry_release(self):
+        """A release that never reached the kicker left the ball in the lock mid-game: pulse again."""
+        self._retry_timer = None
+        kicker = self.machine.switch_controller.is_active(self.machine.switches["s_subway_kicker_0"])
+        if self.guard.state != "failed" or self.guard.reason != MISSED_KICKER or not self.machine.game or kicker:
+            return
+        self.ball_device.log.warning("Subway release missed the kicker; retrying the lock release")
+        self.machine.events.post("subway_release_retry")
+        self.rearm()
+        self.request_recovery_release()
 
     def request_recovery_release(self):
         """Request one guarded release without relying on MPF's lock count."""
