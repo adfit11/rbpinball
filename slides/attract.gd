@@ -10,10 +10,28 @@ const UNSELECTED_COLOR := Color("#b0bac6")
 @onready var selected_game: Label = %SelectedGame
 @onready var player_count: Label = %PlayerCount
 
+const Playlist := preload("res://slides/playlist.gd")
+var playlist := Playlist.new("res://sounds/modern_music/attract", 5)
+var music: AudioStreamPlayer
+
 
 func _ready() -> void:
 	MPF.game.machine_update.connect(_on_machine_update)
 	_render_selection()
+	music = AudioStreamPlayer.new()
+	music.bus = "music"
+	music.volume_db = -6.0
+	add_child(music)
+	music.finished.connect(_play_next_track)
+	_play_next_track()
+
+
+func _play_next_track() -> void:
+	## One of five attract tracks at random; another random one follows when it ends.
+	var stream := playlist.next_stream()
+	if stream:
+		music.stream = stream
+		music.play()
 
 
 func _exit_tree() -> void:

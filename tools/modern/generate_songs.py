@@ -3,7 +3,8 @@
 Each placeholder is a synthesized boogie-woogie loop with the title spoken over it.
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
-Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain.
+Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain, and the
+house_band_1-5.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random.
 Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
 """
 
@@ -93,6 +94,24 @@ def make_between_balls(force=False, seconds=40):
     print("generated", out)
 
 
+def make_playlists(force=False):
+    """Five house-band tracks for general play and five attract tracks; an owner's MP3 is never overwritten."""
+    for prefix, seconds, base_tempo, seed in (("house_band", 90, 140, 500), ("attract", 60, 112, 600)):
+        for n in range(1, 6):
+            out = os.path.join(catalogue.ROOT, "sounds", "modern_music", f"{prefix}_{n}.mp3")
+            if os.path.exists(out) and not force:
+                continue
+            music = backing(seconds, 82 + n * 9, base_tempo + n * 8, seed + n) * 0.8
+            fade = int(RATE * 2)
+            music[:fade // 4] *= np.linspace(0, 1, fade // 4)
+            music[-fade:] *= np.linspace(1, 0, fade)
+            wav = tts.temp_wav()
+            write_wav(wav, music)
+            tts.to_mp3(wav, out, "48k")
+            os.remove(wav)
+            print("generated", out)
+
+
 def main(force=False, seconds=60):
     made = 0
     for slot, (name, songs) in enumerate(catalogue.load(), 1):
@@ -118,6 +137,7 @@ def main(force=False, seconds=60):
             made += 1
     print(f"generated {made} song files")
     make_between_balls(force)
+    make_playlists(force)
 
 
 if __name__ == "__main__":
