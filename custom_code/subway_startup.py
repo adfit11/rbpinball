@@ -12,6 +12,7 @@ class SubwayStartupClear:
 
     INTERVAL = .05
     RETURN_TIMEOUT = 60.0
+    RELEASE_RETRIES = 5  # extra release pulses per stuck ball before giving up
 
     def __init__(self, machine):
         self.machine = machine
@@ -33,7 +34,7 @@ class SubwayStartupClear:
             self.status = "failed"
             self.reason = "Guarded subway ejectors are not installed"
             return False
-        self.runner = SubwayRecoveryRunner(self)
+        self.runner = SubwayRecoveryRunner(self, retries=self.RELEASE_RETRIES)
         self._reconciled = False
         self.awaiting_return = False
         self._return_deadline = None
@@ -163,6 +164,13 @@ class SubwayStartupClear:
         if action == "failed":
             self._finish("failed", self.runner.sequence.reason)
             return
+        if action == "missed":
+            # The ball is still in the lock: clear the failed handoff so the next release can pulse.
+            if not kicker and release.guard.state in ("failed", "waiting_for_arrival"):
+                release.rearm()
+            self.awaiting_return = False
+            self._return_deadline = None
+            self.machine.events.post("subway_startup_release_retry", misses=self.runner.sequence.misses)
         if action == "done":
             self.status = "reconciling"
             self.machine.events.post("subway_startup_cleared_waiting_for_balls")
