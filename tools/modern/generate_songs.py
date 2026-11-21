@@ -4,8 +4,7 @@ Each placeholder is a synthesized boogie-woogie loop with the title spoken over 
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
 Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain.
-Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--intros] [--seconds 60]
---intros regenerates only the MC song announcements, e.g. after editing catalogue titles.
+Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
 """
 
 import os
@@ -20,8 +19,8 @@ import tts  # noqa: E402
 from custom_code.modern import catalogue  # noqa: E402
 
 RATE = 22050
-MC = {"model": "en_US-john-medium", "length_scale": 1.0}
 BASS = [0, 4, 7, 9, 10, 9, 7, 4]
+MC = {"model": "en_US-john-medium", "length_scale": 1.0}
 BARS = [0, 0, 0, 0, 5, 5, 0, 0, 7, 5, 0, 7]
 
 
@@ -75,22 +74,6 @@ def write_wav(path, data):
         handle.writeframes((data * 32767).astype(np.int16).tobytes())
 
 
-def make_intros(force=False):
-    """MC "Here's <artist> with <title>!" announcements; rerun with --intros after editing catalogue titles."""
-    made = 0
-    for _, songs in catalogue.load():
-        for song in songs:
-            out = os.path.join(catalogue.ROOT, song.intro_path)
-            if os.path.exists(out) and not force:
-                continue
-            wav = tts.temp_wav()
-            tts.speak_wav(song.intro_text, MC, wav)
-            tts.to_mp3(wav, out, "64k")
-            os.remove(wav)
-            made += 1
-    print(f"generated {made} song intros")
-
-
 BETWEEN_BALLS = os.path.join(catalogue.ROOT, "sounds", "modern_music", "between_balls.mp3")
 
 
@@ -135,12 +118,8 @@ def main(force=False, seconds=60):
             made += 1
     print(f"generated {made} song files")
     make_between_balls(force)
-    make_intros(force)
 
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if "--intros" in args:
-        make_intros(force=True)
-        sys.exit()
     main("--force" in args, int(args[args.index("--seconds") + 1]) if "--seconds" in args else 60)
