@@ -41,7 +41,9 @@ var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var voice_started_ms := -VOICE_CUT_MS
-var house_band: AudioStream
+const Playlist := preload("res://slides/playlist.gd")
+var house_band := Playlist.new("res://sounds/modern_music/house_band", 5)
+var playing_house_band := false
 var between_balls_song: AudioStream
 var between_balls := false  # a drained ball plays its own song until the next ball starts
 var song_length_ms := 0.0
@@ -203,6 +205,7 @@ func _build() -> void:
 	music = AudioStreamPlayer.new()
 	music.bus = "music"
 	add_child(music)
+	music.finished.connect(_on_music_finished)
 	voice = AudioStreamPlayer.new()
 	voice.bus = "voice"
 	voice.finished.connect(_voice_done)
@@ -377,18 +380,23 @@ func _stop_music_fade() -> void:
 
 
 func _play_house_band() -> void:
+	## One of five house-band tracks at random; the next random one follows when it ends.
 	_stop_music_fade()
-	if house_band == null:
-		house_band = _load_audio("res://sounds/modern_music/house_band.mp3")
-	if house_band:
-		if house_band is AudioStreamMP3:
-			house_band.loop = true
-		music.stream = house_band
+	var stream := house_band.next_stream()
+	playing_house_band = stream != null
+	if stream:
+		music.stream = stream
 		music.volume_db = -8.0
 		music.play()
 
 
+func _on_music_finished() -> void:
+	if playing_house_band:
+		_play_house_band()
+
+
 func _play_between_balls() -> void:
+	playing_house_band = false
 	if between_balls_song == null:
 		between_balls_song = _load_audio("res://sounds/modern_music/between_balls.mp3")
 	if between_balls_song is AudioStreamMP3:
@@ -444,6 +452,7 @@ func _stop_artist_video() -> void:
 
 func _play_song(path: String) -> void:
 	_stop_music_fade()
+	playing_house_band = false
 	var stream := _load_audio(path)
 	if stream:
 		if stream is AudioStreamMP3:

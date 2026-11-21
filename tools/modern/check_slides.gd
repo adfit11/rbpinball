@@ -13,7 +13,16 @@ func _initialize() -> void:
 		var node := scene.instantiate()
 		root.add_child(node)
 		print("OK ", path)
-	for path in ["res://sounds/modern_music/house_band.mp3", "res://sounds/modern_music/between_balls.mp3", "res://sounds/music/jukebox/10_hit_me/song_12.mp3",
+	for n in range(1, 6):
+		for prefix in ["house_band", "attract"]:
+			if load("res://sounds/modern_music/%s_%d.mp3" % [prefix, n]) == null:
+				push_error("Cannot load %s_%d.mp3" % [prefix, n])
+				failed += 1
+	var attract: PackedScene = load("res://slides/attract.tscn")
+	if attract == null or attract.instantiate() == null:
+		push_error("Cannot instance the attract slide")
+		failed += 1
+	for path in ["res://sounds/modern_music/between_balls.mp3", "res://sounds/music/jukebox/10_hit_me/song_12.mp3",
 			"res://sounds/modern_voice/mc/mc_game_start_01.mp3"]:
 		if load(path) == null:
 			push_error("Cannot load %s" % path)
