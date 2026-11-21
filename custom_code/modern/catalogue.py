@@ -20,16 +20,6 @@ class Song:
     def res_path(self):
         return "res://" + self.path.replace(os.sep, "/")
 
-    @property
-    def intro_path(self):
-        """MC announcement spoken as the song starts; sits beside the song file."""
-        folder, name = os.path.split(self.path)
-        return os.path.join(folder, name.replace("song_", "intro_", 1))
-
-    @property
-    def intro_text(self):
-        return f"Here's {self.artist} with {self.title}!"
-
 
 def load(root=ROOT):
     with open(os.path.join(root, JUKEBOX_DIR, "catalogue.yaml"), encoding="utf-8") as handle:
