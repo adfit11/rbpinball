@@ -56,6 +56,19 @@ class TestModernStack(ModernTestCase):
 
 class TestModernNickels(ModernTestCase):
 
+    def test_skill_shot_is_called_and_hunt_waits_for_first_switch(self):
+        voices = []
+        self.machine.events.add_handler("modern_callout", lambda pool, **kwargs: voices.append(pool))
+        self.start_modern(skip_splash=False)
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(2)
+        self.assertIn("mc_skill_shot", voices)
+        self.assertEqual(self.player.modern_nickel_target, "")
+        self.assertFalse([p for p in voices if p.endswith("_direction") or p.startswith("mc_target_")])
+        self.hit_and_release_switch("s_10_points_15")
+        self.advance_time_and_run(.1)
+        self.assertIn(self.player.modern_nickel_target, settings.LOCATION_NAMES)
+
     def test_target_is_announced_again_while_hunting(self):
         voices = []
         self.machine.events.add_handler("modern_callout", lambda pool, **kwargs: voices.append(pool))

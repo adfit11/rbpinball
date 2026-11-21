@@ -23,7 +23,14 @@ class ModernNickels(Mode):
             self.add_mode_event_handler(event, self._suspend)
         for event in ("modern_song_ended", "modern_rent_party_ended"):
             self.add_mode_event_handler(event, self._resume)
-        self._direct()
+        # The skill shot comes first: the nickel hunt starts on the ball's first playfield switch.
+        self.player.modern_nickel_target = ""
+        self.add_mode_event_handler("modern_ball_in_play", self._ball_in_play)
+        self._show()
+
+    def _ball_in_play(self, **kwargs):
+        if not self.player.modern_nickel_target:
+            self._direct()
 
     @property
     def lamps(self):
