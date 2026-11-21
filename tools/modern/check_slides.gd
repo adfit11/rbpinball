@@ -28,6 +28,9 @@ func _initialize() -> void:
 			push_error("Base music did not pick a new house-band track")
 			failed += 1
 			break
+	if load("res://slides/classic.tscn") == null or load("res://slides/classic.gd") == null:
+		push_error("Cannot load the classic slide")
+		failed += 1
 	var attract: PackedScene = load("res://slides/attract.tscn")
 	if attract == null or attract.instantiate() == null:
 		push_error("Cannot instance the attract slide")

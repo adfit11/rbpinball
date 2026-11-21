@@ -1,6 +1,10 @@
 extends RefCounted
 ## A numbered set of tracks (<prefix>_1.mp3 ... <prefix>_N.mp3) played in random order, never the same twice running.
 
+## Base-play music, shared by Classic and Modern.
+const HOUSE_BAND_PREFIX := "res://sounds/modern_music/house_band"
+const HOUSE_BAND_COUNT := 10
+
 var paths: PackedStringArray = []
 var last := -1
 
