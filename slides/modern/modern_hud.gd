@@ -42,7 +42,7 @@ var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var voice_started_ms := -VOICE_CUT_MS
 const Playlist := preload("res://slides/playlist.gd")
-var house_band := Playlist.new("res://sounds/modern_music/house_band", 5)
+var house_band := Playlist.new("res://sounds/modern_music/house_band", 10)
 var playing_house_band := false
 var between_balls_song: AudioStream
 var between_balls := false  # a drained ball plays its own song until the next ball starts
@@ -380,7 +380,7 @@ func _stop_music_fade() -> void:
 
 
 func _play_house_band() -> void:
-	## One of five house-band tracks at random; the next random one follows when it ends.
+	## A fresh random pick of ten house-band tracks each time base music starts (new ball, after a song, or when one ends).
 	_stop_music_fade()
 	var stream := house_band.next_stream()
 	playing_house_band = stream != null

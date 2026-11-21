@@ -4,7 +4,7 @@ Each placeholder is a synthesized boogie-woogie loop with the title spoken over 
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
 Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain, and the
-house_band_1-5.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random.
+house_band_1-10.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random.
 Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
 """
 
@@ -95,9 +95,9 @@ def make_between_balls(force=False, seconds=40):
 
 
 def make_playlists(force=False):
-    """Five house-band tracks for general play and five attract tracks; an owner's MP3 is never overwritten."""
-    for prefix, seconds, base_tempo, seed in (("house_band", 90, 140, 500), ("attract", 60, 112, 600)):
-        for n in range(1, 6):
+    """Ten house-band tracks for general play and five attract tracks; an owner's MP3 is never overwritten."""
+    for prefix, count, seconds, base_tempo, seed in (("house_band", 10, 90, 132, 500), ("attract", 5, 60, 112, 600)):
+        for n in range(1, count + 1):
             out = os.path.join(catalogue.ROOT, "sounds", "modern_music", f"{prefix}_{n}.mp3")
             if os.path.exists(out) and not force:
                 continue
