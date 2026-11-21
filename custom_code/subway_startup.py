@@ -1,5 +1,6 @@
 """Startup clearing adapter for the cabinet subway."""
 
+from custom_code.subway_ejector import MISSED_KICKER
 from custom_code.subway_recovery import SubwayRecoveryRunner
 
 
@@ -24,6 +25,7 @@ class SubwayStartupClear:
         self.awaiting_return = False
         self._return_deadline = None
         self._return_handler = None
+        self._missed_handoffs = 0
 
     def start(self):
         if self.status in ("running", "reconciling"):
@@ -35,6 +37,7 @@ class SubwayStartupClear:
             self.reason = "Guarded subway ejectors are not installed"
             return False
         self.runner = SubwayRecoveryRunner(self, retries=self.RELEASE_RETRIES)
+        self._missed_handoffs = 0
         self._reconciled = False
         self.awaiting_return = False
         self._return_deadline = None
@@ -132,6 +135,17 @@ class SubwayStartupClear:
         kicker = controller.is_active(switches["s_subway_kicker_0"])
         release = self.machine.ball_devices["bd_classic_subway_lock"].ejector
         outhole = controller.is_active(switches["s_trough_3_20"])
+        if (self.status == "running" and lock and not kicker and release.guard.state == "failed"
+                and release.guard.reason == MISSED_KICKER):
+            # A release (often MPF's own boot eject) left the ball on the lock switch: rearm and release again.
+            self._missed_handoffs += 1
+            if self._missed_handoffs > self.RELEASE_RETRIES:
+                self._finish("failed", MISSED_KICKER)
+                return
+            release.rearm()
+            self.awaiting_return = False
+            self._return_deadline = None
+            self.machine.events.post("subway_startup_release_retry", misses=self._missed_handoffs)
         if kicker or outhole or release.guard.state == "waiting_for_arrival":
             self._wait_for_return()
         if self.awaiting_return and self.machine.clock.get_time() >= self._return_deadline:

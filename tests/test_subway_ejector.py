@@ -436,6 +436,37 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
             self.assertEqual(kick.call_count, 2)
             self.assertEqual(startup.status, "done")
 
+    def test_startup_retries_when_mpf_boot_release_misses_the_kicker(self):
+        self.machine.modes["attract"].subway_startup.stop()  # this test drives its own startup clear
+        controller = self.machine.switch_controller
+        lock = self.machine.switches["s_subway_lock_10"]
+        kicker = self.machine.switches["s_subway_kicker_0"]
+        original = type(controller).is_active
+
+        def is_active(switch, *args, **kwargs):
+            if switch is lock:
+                return True
+            if switch is kicker:
+                return False
+            return original(controller, switch, *args, **kwargs)
+
+        ejector = self.machine.ball_devices["bd_classic_subway_lock"].ejector
+        coil = self.machine.coils["c_subway_lock"]
+        startup = SubwayStartupClear(self.machine)
+        self.mock_event("subway_startup_release_retry")
+        with patch.object(type(controller), "is_active", side_effect=is_active), \
+                patch.object(coil, "pulse", wraps=coil.pulse) as release:
+            self.advance_time_and_run(.6)
+            startup.start()
+            # MPF's own collecting_balls eject at boot, which doesn't move the ball.
+            self.machine.clock.loop.create_task(ejector.eject_one_ball(False, 1, 1))
+            self.advance_time_and_run(.1)
+            self.assertEqual(release.call_count, 1)
+            self.advance_time_and_run(8)
+            self.assertGreaterEqual(release.call_count, 2)
+            self.assertEventCalled("subway_startup_release_retry")
+            self.assertEqual(startup.status, "running")
+
     def test_startup_stops_if_ball_never_reaches_trough(self):
         controller = self.machine.switch_controller
         lock = self.machine.switches["s_subway_lock_10"]
