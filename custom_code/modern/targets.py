@@ -75,11 +75,13 @@ class ModernTargets(Mode):
         if target is self.machine.playfield:
             self.skill_window = True
             self.machine.events.post("modern_skill_shot_ready")
+            self.machine.events.post("modern_callout", pool="mc_skill_shot")
 
     def _playfield_hit(self, **kwargs):
         self.skill_window = False
         if not self.ball_active:
             self.ball_active = True
+            self.machine.events.post("modern_ball_in_play")
             self._schedule("drops", RESUME_MS, self._advance_drops)
             self._schedule("craters", RESUME_MS, self._advance_craters)
         self.can_freeze = True

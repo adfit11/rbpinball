@@ -55,6 +55,7 @@ characters:
       target_bandstand: ["Spin the bandstand!", "Head to the bandstand!", "Give that spinner a whirl!", "The bandstand's got your nickel!"]
       target_coat_check: ["Shoot the coat check!", "Head to the coat check!", "Hit the coat check target!", "The coat check's holding your nickel!"]
       target_back_door: ["Hit the back door!", "Round to the back door!", "Kick the back door!", "The back door's got your nickel!"]
+      skill_shot: ["Drop the needle! Hit the lit drop target!", "Skill shot! Drop the needle on the lit target!", "Needle's up! Shoot that lit drop target!"]
       floor_nickel: ["Hey! A nickel on the floor!", "Look at that, a nickel on the floor!"]
       needs_nickel: ["Jukebox needs a nickel, friend.", "No nickel, no music!", "That jukebox don't play for free."]
       jukebox_open: ["Pick a record!", "What'll it be?", "Drop that nickel and pick a tune!"]
