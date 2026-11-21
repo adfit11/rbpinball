@@ -7,7 +7,7 @@ artists:
   - {folder: 05_wynonie_harris, name: Wynonie Harris, songs: ["Good Rockin' Tonight", "Lovin' Machine", Mr. Blues Is Coming to Town]}
   - {folder: 06_big_mama_thornton, name: Big Mama Thornton, songs: [Hound Dog, They Call Me Big Mama, I Smell a Rat]}
   - {folder: 07_etta_james, name: Etta James, songs: ["Roll with Me, Henry", "Good Rockin' Daddy", Tough Lover]}
-  - {folder: 08_ray_charles, name: Ray Charles, songs: [I Got a Woman, Mess Around, "What'd I Say"]}
+  - {folder: 08_ray_charles, name: Ray Charles, songs: [I Got a Woman, Mess Around, Night Time Is the Right Time]}
   - {folder: 09_joe_liggins, name: Joe Liggins, songs: [The Honeydripper, Pink Champagne, "I've Got a Right to Cry"]}
 hit_me:
   folder: 10_hit_me
