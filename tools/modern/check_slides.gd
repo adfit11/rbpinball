@@ -13,11 +13,21 @@ func _initialize() -> void:
 		var node := scene.instantiate()
 		root.add_child(node)
 		print("OK ", path)
-	for n in range(1, 6):
+	for n in range(1, 11):
 		for prefix in ["house_band", "attract"]:
+			if prefix == "attract" and n > 5:
+				continue
 			if load("res://sounds/modern_music/%s_%d.mp3" % [prefix, n]) == null:
 				push_error("Cannot load %s_%d.mp3" % [prefix, n])
 				failed += 1
+	var hud: Node = load("res://slides/modern/modern_hud.tscn").instantiate()
+	for i in 20:
+		var before: int = hud.house_band.last
+		hud.house_band.next_stream()
+		if hud.house_band.last == before or hud.house_band.paths.size() != 10:
+			push_error("Base music did not pick a new house-band track")
+			failed += 1
+			break
 	var attract: PackedScene = load("res://slides/attract.tscn")
 	if attract == null or attract.instantiate() == null:
 		push_error("Cannot instance the attract slide")

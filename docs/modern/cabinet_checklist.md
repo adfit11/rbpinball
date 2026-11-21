@@ -29,7 +29,7 @@ Everything below was verified only in simulation. Check each item on the real ma
 ## Audio and screens
 - [ ] Music volume suits the room, and voice callouts duck the music clearly.
 - [ ] Your MP3s go in `sounds/music/jukebox/<nn>_<artist>/song_<n>.mp3` and titles in `catalogue.yaml`. Run `godot --headless --path . --import` once, or open the project in the editor, then check that songs play their full length.
-- [ ] Replace the general-play music placeholders `sounds/modern_music/house_band_1.mp3` to `house_band_5.mp3` and the attract-mode placeholders `sounds/modern_music/attract_1.mp3` to `attract_5.mp3` with your own MP3s (same names). Each set plays in random order, a new track when one ends.
+- [ ] Replace the general-play music placeholders `sounds/modern_music/house_band_1.mp3` to `house_band_10.mp3` and the attract-mode placeholders `sounds/modern_music/attract_1.mp3` to `attract_5.mp3` with your own MP3s (same names). Each set plays in random order; base music picks a new track at every new ball, after every artist song, and when a track ends.
 - [ ] Replace the between-balls placeholder at `sounds/modern_music/between_balls.mp3` with your own MP3 (same name; it loops after each drain until the next ball starts).
 - [ ] Modern screens fill the cabinet monitor, scaled and letterboxed.
 - [ ] Artist videos: replace placeholders by converting a clip with `ffmpeg -i clip.mp4 -vf scale=-2:720 -c:v libtheora -q:v 6 -an videos/modern/jukebox/<nn>_<artist>/video_<n>.ogv` (or `video.ogv` for the whole artist), reimport, and check it plays smoothly behind a song mode on the cabinet PC.
