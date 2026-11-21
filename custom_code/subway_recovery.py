@@ -8,10 +8,12 @@ ejects and ball accounting have a single coordinated owner.
 class SubwayRecovery:
     """Decide one action at a time from stable physical switch observations."""
 
-    def __init__(self, timeout=3.0, settle=1.0, limit=3):
+    def __init__(self, timeout=3.0, settle=1.0, limit=3, retries=0):
         self.timeout = timeout
         self.settle = settle
         self.limit = limit
+        self.retries = retries
+        self.misses = 0
         self.state = "settling"
         self.deadline = None
         self.stable_since = None
@@ -25,7 +27,7 @@ class SubwayRecovery:
         return "failed"
 
     def update(self, now, lock, kicker):
-        """Return release, kick, done, failed, or None for one observation."""
+        """Return release, kick, missed, done, failed, or None for one observation."""
         if self.state in ("done", "failed"):
             return None
         switches = (bool(lock), bool(kicker))
@@ -38,7 +40,13 @@ class SubwayRecovery:
                 self.state = "settling"
                 self.stable_since = now
             elif now >= self.deadline:
-                return self._fail("Released ball did not reach the kicker")
+                # The release coil can fail to move the ball; settle and release it again.
+                self.misses += 1
+                if self.misses > self.retries:
+                    return self._fail("Released ball did not reach the kicker")
+                self.state = "settling"
+                self.stable_since = now
+                return "missed"
             return None
         if self.state == "wait_kicker_clear":
             if not kicker:

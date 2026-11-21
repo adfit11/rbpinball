@@ -370,6 +370,7 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
             self.assertEqual(kick.call_count, 3)
 
     def test_startup_stops_when_release_does_not_reach_kicker(self):
+        self.machine.modes["attract"].subway_startup.stop()  # this test drives its own startup clear
         controller = self.machine.switch_controller
         lock = self.machine.switches["s_subway_lock_10"]
         kicker = self.machine.switches["s_subway_kicker_0"]
@@ -387,10 +388,53 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
         with patch.object(type(controller), "is_active", side_effect=is_active), \
                 patch.object(coil, "pulse", wraps=coil.pulse) as release:
             startup.start()
-            self.advance_time_and_run(5)
+            self.advance_time_and_run(6)
+            self.assertEqual(startup.status, "running")
+            self.assertEqual(release.call_count, 2)  # first release missed; tried again
+            self.advance_time_and_run(40)
             self.assertEqual(startup.status, "failed")
-            self.assertEqual(release.call_count, 1)
+            self.assertEqual(release.call_count, 1 + SubwayStartupClear.RELEASE_RETRIES)
             self.assertEqual(startup.reason, "Released ball did not reach the kicker")
+
+    def test_startup_retries_a_missed_release_with_two_balls_queued(self):
+        self.machine.modes["attract"].subway_startup.stop()  # this test drives its own startup clear
+        controller = self.machine.switch_controller
+        lock = self.machine.switches["s_subway_lock_10"]
+        kicker = self.machine.switches["s_subway_kicker_0"]
+        original = type(controller).is_active
+        state = {"lock": True, "kicker": False}
+
+        def is_active(switch, *args, **kwargs):
+            if switch is lock:
+                return state["lock"]
+            if switch is kicker:
+                return state["kicker"]
+            return original(controller, switch, *args, **kwargs)
+
+        release_coil = self.machine.coils["c_subway_lock"]
+        kicker_coil = self.machine.coils["c_subway_kicker"]
+        startup = SubwayStartupClear(self.machine)
+        with patch.object(type(controller), "is_active", side_effect=is_active), \
+                patch.object(release_coil, "pulse", wraps=release_coil.pulse) as release, \
+                patch.object(kicker_coil, "pulse", wraps=kicker_coil.pulse) as kick:
+            self.assertTrue(startup.start())
+            self.advance_time_and_run(1.2)
+            self.assertEqual(release.call_count, 1)
+            self.advance_time_and_run(4.5)  # the first pulse didn't move the ball
+            self.assertEqual(release.call_count, 2)
+            for count in (1, 2):
+                state["kicker"] = True
+                self.advance_time_and_run(1.2)
+                self.assertEqual(kick.call_count, count)
+                state["kicker"] = False
+                state["lock"] = count < 2  # the second ball rolls onto the lock switch
+                self.advance_time_and_run(3)
+                self.assertEqual(release.call_count, 2 + count - 1)  # waits for the trough
+                self.post_event("balldevice_bd_outhole_ball_eject_success")
+                self.advance_time_and_run(1.5)
+            self.assertEqual(release.call_count, 3)
+            self.assertEqual(kick.call_count, 2)
+            self.assertEqual(startup.status, "done")
 
     def test_startup_stops_if_ball_never_reaches_trough(self):
         controller = self.machine.switch_controller

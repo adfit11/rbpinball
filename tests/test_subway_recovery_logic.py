@@ -25,6 +25,15 @@ class TestSubwayRecovery(unittest.TestCase):
         self.assertEqual(recovery.update(1.12, True, False), "failed")
         self.assertIsNone(recovery.update(5, True, False))
 
+    def test_missed_release_is_retried_then_fails(self):
+        recovery = SubwayRecovery(settle=.1, timeout=1, retries=1)
+        recovery.update(0, True, False)
+        self.assertEqual(recovery.update(.11, True, False), "release")
+        self.assertEqual(recovery.update(1.12, True, False), "missed")
+        self.assertIsNone(recovery.update(1.2, True, False))
+        self.assertEqual(recovery.update(1.25, True, False), "release")
+        self.assertEqual(recovery.update(2.26, True, False), "failed")
+
     def test_blocked_kicker_stops_without_release(self):
         recovery = SubwayRecovery(settle=.1, timeout=1)
         recovery.update(0, True, True)
