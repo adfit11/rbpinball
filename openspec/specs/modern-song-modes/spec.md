@@ -95,7 +95,7 @@ Each spin SHALL add to a pot. The per-spin amount SHALL start at 5,000 and grow 
 - **THEN** the pot is lost
 
 ### Requirement: Mode 4 Roving shot
-One location SHALL light and move to a different random location every 3 s. Hitting it SHALL pay 250,000. Three hits SHALL complete and end the mode. A green tap SHALL freeze the roving shot once per mode. Unlit locations SHALL score normally.
+One location SHALL light and move to a different random location every 6 s. Hitting it SHALL pay 250,000. Three hits SHALL complete and end the mode. A green tap SHALL freeze the roving shot once per mode for 6 s. Unlit locations SHALL score normally.
 
 #### Scenario: The player freezes the roving shot
 - **WHEN** the player taps green during Roving shot for the first time
