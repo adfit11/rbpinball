@@ -3,7 +3,6 @@
 from mpf.core.mode import Mode
 
 from custom_code.modern import settings as S
-from custom_code.modern.jukebox import song_mode_running
 from custom_code.modern.lamps import FLASH, director
 from custom_code.modern.scoring import award
 
@@ -62,9 +61,9 @@ class ModernRentParty(Mode):
             self.machine.events.post("modern_callout", pool="mc_super_jackpot")
 
     def _bank(self, bank, **kwargs):
-        """Completing the top bank lights the lock for one ball; not during a song or multiball."""
+        """Completing the top bank lights the lock for one ball, at any time; the ball can lock once a crater may lock again."""
         player = self.player
-        if bank != S.LOCK_BANK or player.modern_lock_lit or self.multiball or song_mode_running(self.machine):
+        if bank != S.LOCK_BANK or player.modern_lock_lit:
             return
         if self.locked_balls >= S.LOCKS_FOR_MULTIBALL:
             return

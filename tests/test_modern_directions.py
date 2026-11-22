@@ -99,7 +99,7 @@ class TestModernDirections(ModernTestCase):
         self.start_song()
         party = self.machine.modes["modern_rent_party"]
         party._bank("top_bank")
-        self.assertEqual(self.player.modern_lock_lit, 0)
+        self.assertEqual(self.player.modern_lock_lit, 1)  # the top bank lights the lock even during a song
         targets = self.machine.modes["modern_targets"]
         ovation, start = self.player.modern_ovation, self.player.score
         for bank in ("top_bank", "right_bank"):

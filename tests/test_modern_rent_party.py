@@ -38,6 +38,29 @@ class TestModernRentParty(ModernTestCase):
         self.assertEventCalled("modern_lock_lit")
         self.assertEqual(self.player.modern_lock_lit, 1)
 
+    def test_top_bank_during_a_song_lights_the_lock_for_after_it(self):
+        self.start_modern()
+        self.player.modern_nickel = 1
+        self.shoot_crater(2)
+        self.advance_time_and_run(1)
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.assertTrue(jukebox.selector_open)
+        self.light_lock()
+        self.assertEqual(self.player.modern_lock_lit, 1)
+
+    def test_top_bank_during_rent_party_lights_the_lock(self):
+        self.start_modern()
+        for _ in range(3):
+            self.light_lock()
+            self.lock_ball()
+        self.advance_time_and_run(S.RENT_PARTY_BUILD_UP_MS / 1000 + 1)
+        self.assertTrue(self.party.multiball)
+        self.light_lock()
+        self.assertEqual(self.player.modern_lock_lit, 1)
+        self.mock_event("modern_lock_qualified")
+        self.shoot_crater(2)
+        self.assertEventNotCalled("modern_lock_qualified")  # no lock during the multiball
+
     def test_lit_lock_goes_out_at_drain(self):
         self.start_modern()
         self.light_lock()
