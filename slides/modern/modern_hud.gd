@@ -63,7 +63,7 @@ const EVENTS := [
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
-	"modern_rent_party_started", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
+	"modern_rent_party_started", "modern_song_jackpot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
 
@@ -290,6 +290,21 @@ func _process(delta: float) -> void:
 
 
 # Overlays ---------------------------------------------------------------
+func flash_screen(color: Color = GOLD, pulses: int = 3) -> void:
+	## Jackpot celebration: the whole screen pulses in colour behind the overlay card.
+	var flash := ColorRect.new()
+	flash.color = color
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_place(flash, 0, 0, 1280, 720)
+	move_child(flash, overlay_root.get_index())
+	flash.modulate.a = 0.0
+	var tw := create_tween()
+	for i in pulses:
+		tw.tween_property(flash, "modulate:a", 0.55, 0.08)
+		tw.tween_property(flash, "modulate:a", 0.0, 0.22)
+	tw.tween_callback(flash.queue_free)
+
+
 func show_overlay(title: String, subtitle: String = "", ms: int = 2000, color: Color = BURGUNDY) -> void:
 	overlay_queue.append([title, subtitle, ms, color])
 	if not overlay_busy:
@@ -599,7 +614,10 @@ func _on_event(payload: Dictionary = {}) -> void:
 				OVERLAY_STYLES.get(str(payload.get("style", "")), BURGUNDY))
 		"modern_rent_party_started":
 			mode_banner.text = "RENT PARTY  •  LIT CRATERS = JACKPOT %s" % MPF.util.comma_sep(int(payload.get("jackpot", 0)))
+		"modern_song_jackpot":
+			flash_screen(GOLD)
 		"modern_jackpot":
+			flash_screen(GOLD, 2)
 			mode_banner.text = "RENT PARTY  •  JACKPOT %s  •  %d/3 TO SUPER" % [MPF.util.comma_sep(int(payload.get("next_value", 0))), int(payload.get("count", 0))]
 		"modern_super_jackpot_lit":
 			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT AT THE BAR!"

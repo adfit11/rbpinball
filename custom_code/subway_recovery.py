@@ -83,8 +83,9 @@ class SubwayReleaseInterlock:
     connected to MPF or the cabinet.
     """
 
-    def __init__(self, timeout=3.0, clear_settle=0.5):
+    def __init__(self, timeout=3.0, clear_settle=0.5, arrival_timeout=None):
         self.timeout = timeout
+        self.arrival_timeout = timeout if arrival_timeout is None else arrival_timeout
         self.clear_settle = clear_settle
         self.state = "ready"
         self.deadline = None
@@ -96,7 +97,7 @@ class SubwayReleaseInterlock:
         if self.state != "ready" or kicker_active:
             return False
         self.state = "waiting_for_arrival"
-        self.deadline = now + self.timeout
+        self.deadline = now + self.arrival_timeout
         return True
 
     def observe(self, now, kicker_active):

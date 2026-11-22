@@ -13,6 +13,15 @@ sound_player:
   modern_drop_hit:
     right_drops_effect:
       bus: effects
+  modern_song_jackpot:
+    jackpot:
+      bus: effects
+  modern_jackpot:
+    jackpot:
+      bus: effects
+  modern_super_jackpot:
+    jackpot:
+      bus: effects
   modern_artist_chosen:
     record_crackle:
       bus: effects
