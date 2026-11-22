@@ -97,10 +97,7 @@ DANCE_FACTOR, DANCE_HITS, PACKED_FLOOR_AWARD = 5, 25, 550_000
 DIAL_STEP_MS, DIAL_AUTO_STOP_MS, HIT_ME_VALUE, HIT_ME_HITS = 250, 5_000, 250_000, 3
 
 # Rent Party multiball (Gate Crasher)
-GUESTS = LOCATION_NAMES + ("top_bank", "right_bank")
-GUEST_NAMES = {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check",
-               "booths": "Booths", "top_bank": "Top Bank", "right_bank": "Right Bank"}
-GUESTS_TO_FILL = 3
+LOCK_BANK = "top_bank"  # completing it lights the lock for one ball
 LOCKS_FOR_MULTIBALL = 3
 RENT_PARTY_BUILD_UP_MS = 8_000  # the riser and announcement before the locked balls are released
 SCORE_LOCK_LIT = 25_000

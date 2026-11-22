@@ -1,106 +1,307 @@
 #show_version=6
 
-# Song-mode shot: lamps 1-10 burst upward, then flash twice.
+# Song-mode shot: every playfield lamp bursts from the bottom of the table to the top, then flashes twice.
+# Rows follow the lamp positions in monitor/monitor.yaml. L8, L15 and L16 drive coils, so they are left out.
 # Played over the Modern lamps; they return when the show ends.
 - duration: 40ms
   lights:
+    l_xxx_03: off
     l_xxx_33: off
     l_xxx_34: off
     l_xxx_35: off
     l_xxx_36: off
     l_xxx_37: off
+    l_xxx_17: off
     l_xxx_38: off
+    l_xxx_18: off
     l_xxx_39: off
+    l_xxx_04: off
+    l_xxx_05: off
     l_xxx_40: off
     l_xxx_41: off
     l_xxx_42: off
-- duration: 40ms
+    l_xxx_06: off
+    l_xxx_07: off
+    l_xxx_45: off
+    l_xxx_29: off
+    l_xxx_46: off
+    l_xxx_30: off
+    l_xxx_31: off
+    l_xxx_32: off
+    l_xxx_43: off
+    l_xxx_19: off
+    l_xxx_28: off
+    l_xxx_20: off
+    l_xxx_27: off
+    l_xxx_21: off
+    l_xxx_22: off
+    l_xxx_26: off
+    l_xxx_23: off
+    l_xxx_25: off
+    l_xxx_24: off
+    l_xxx_47: off
+    l_xxx_44: off
+- duration: 35ms
+  lights:
+    l_xxx_03: on
+- duration: 35ms
   lights:
     l_xxx_33: on
-- duration: 40ms
+- duration: 35ms
   lights:
     l_xxx_34: on
-- duration: 40ms
+- duration: 35ms
   lights:
     l_xxx_35: on
-- duration: 40ms
+- duration: 35ms
   lights:
     l_xxx_36: on
-- duration: 40ms
+- duration: 35ms
   lights:
     l_xxx_37: on
-- duration: 40ms
+    l_xxx_17: on
+- duration: 35ms
   lights:
     l_xxx_38: on
-- duration: 40ms
+    l_xxx_18: on
+- duration: 35ms
   lights:
     l_xxx_39: on
-- duration: 40ms
+    l_xxx_04: on
+    l_xxx_05: on
+- duration: 35ms
   lights:
     l_xxx_40: on
-- duration: 40ms
-  lights:
     l_xxx_41: on
-- duration: 40ms
+- duration: 35ms
   lights:
     l_xxx_42: on
+    l_xxx_06: on
+    l_xxx_07: on
+- duration: 35ms
+  lights:
+    l_xxx_45: on
+    l_xxx_29: on
+    l_xxx_46: on
+- duration: 35ms
+  lights:
+    l_xxx_30: on
+- duration: 35ms
+  lights:
+    l_xxx_31: on
+- duration: 35ms
+  lights:
+    l_xxx_32: on
+- duration: 35ms
+  lights:
+    l_xxx_43: on
+- duration: 35ms
+  lights:
+    l_xxx_19: on
+    l_xxx_28: on
+    l_xxx_20: on
+    l_xxx_27: on
+- duration: 35ms
+  lights:
+    l_xxx_21: on
+    l_xxx_22: on
+    l_xxx_26: on
+- duration: 35ms
+  lights:
+    l_xxx_23: on
+    l_xxx_25: on
+- duration: 35ms
+  lights:
+    l_xxx_24: on
+    l_xxx_47: on
+    l_xxx_44: on
 - duration: 80ms
   lights:
+    l_xxx_03: off
     l_xxx_33: off
     l_xxx_34: off
     l_xxx_35: off
     l_xxx_36: off
     l_xxx_37: off
+    l_xxx_17: off
     l_xxx_38: off
+    l_xxx_18: off
     l_xxx_39: off
+    l_xxx_04: off
+    l_xxx_05: off
     l_xxx_40: off
     l_xxx_41: off
     l_xxx_42: off
+    l_xxx_06: off
+    l_xxx_07: off
+    l_xxx_45: off
+    l_xxx_29: off
+    l_xxx_46: off
+    l_xxx_30: off
+    l_xxx_31: off
+    l_xxx_32: off
+    l_xxx_43: off
+    l_xxx_19: off
+    l_xxx_28: off
+    l_xxx_20: off
+    l_xxx_27: off
+    l_xxx_21: off
+    l_xxx_22: off
+    l_xxx_26: off
+    l_xxx_23: off
+    l_xxx_25: off
+    l_xxx_24: off
+    l_xxx_47: off
+    l_xxx_44: off
 - duration: 120ms
   lights:
+    l_xxx_03: on
     l_xxx_33: on
     l_xxx_34: on
     l_xxx_35: on
     l_xxx_36: on
     l_xxx_37: on
+    l_xxx_17: on
     l_xxx_38: on
+    l_xxx_18: on
     l_xxx_39: on
+    l_xxx_04: on
+    l_xxx_05: on
     l_xxx_40: on
     l_xxx_41: on
     l_xxx_42: on
+    l_xxx_06: on
+    l_xxx_07: on
+    l_xxx_45: on
+    l_xxx_29: on
+    l_xxx_46: on
+    l_xxx_30: on
+    l_xxx_31: on
+    l_xxx_32: on
+    l_xxx_43: on
+    l_xxx_19: on
+    l_xxx_28: on
+    l_xxx_20: on
+    l_xxx_27: on
+    l_xxx_21: on
+    l_xxx_22: on
+    l_xxx_26: on
+    l_xxx_23: on
+    l_xxx_25: on
+    l_xxx_24: on
+    l_xxx_47: on
+    l_xxx_44: on
 - duration: 80ms
   lights:
+    l_xxx_03: off
     l_xxx_33: off
     l_xxx_34: off
     l_xxx_35: off
     l_xxx_36: off
     l_xxx_37: off
+    l_xxx_17: off
     l_xxx_38: off
+    l_xxx_18: off
     l_xxx_39: off
+    l_xxx_04: off
+    l_xxx_05: off
     l_xxx_40: off
     l_xxx_41: off
     l_xxx_42: off
+    l_xxx_06: off
+    l_xxx_07: off
+    l_xxx_45: off
+    l_xxx_29: off
+    l_xxx_46: off
+    l_xxx_30: off
+    l_xxx_31: off
+    l_xxx_32: off
+    l_xxx_43: off
+    l_xxx_19: off
+    l_xxx_28: off
+    l_xxx_20: off
+    l_xxx_27: off
+    l_xxx_21: off
+    l_xxx_22: off
+    l_xxx_26: off
+    l_xxx_23: off
+    l_xxx_25: off
+    l_xxx_24: off
+    l_xxx_47: off
+    l_xxx_44: off
 - duration: 160ms
   lights:
+    l_xxx_03: on
     l_xxx_33: on
     l_xxx_34: on
     l_xxx_35: on
     l_xxx_36: on
     l_xxx_37: on
+    l_xxx_17: on
     l_xxx_38: on
+    l_xxx_18: on
     l_xxx_39: on
+    l_xxx_04: on
+    l_xxx_05: on
     l_xxx_40: on
     l_xxx_41: on
     l_xxx_42: on
+    l_xxx_06: on
+    l_xxx_07: on
+    l_xxx_45: on
+    l_xxx_29: on
+    l_xxx_46: on
+    l_xxx_30: on
+    l_xxx_31: on
+    l_xxx_32: on
+    l_xxx_43: on
+    l_xxx_19: on
+    l_xxx_28: on
+    l_xxx_20: on
+    l_xxx_27: on
+    l_xxx_21: on
+    l_xxx_22: on
+    l_xxx_26: on
+    l_xxx_23: on
+    l_xxx_25: on
+    l_xxx_24: on
+    l_xxx_47: on
+    l_xxx_44: on
 - duration: 60ms
   lights:
+    l_xxx_03: off
     l_xxx_33: off
     l_xxx_34: off
     l_xxx_35: off
     l_xxx_36: off
     l_xxx_37: off
+    l_xxx_17: off
     l_xxx_38: off
+    l_xxx_18: off
     l_xxx_39: off
+    l_xxx_04: off
+    l_xxx_05: off
     l_xxx_40: off
     l_xxx_41: off
     l_xxx_42: off
+    l_xxx_06: off
+    l_xxx_07: off
+    l_xxx_45: off
+    l_xxx_29: off
+    l_xxx_46: off
+    l_xxx_30: off
+    l_xxx_31: off
+    l_xxx_32: off
+    l_xxx_43: off
+    l_xxx_19: off
+    l_xxx_28: off
+    l_xxx_20: off
+    l_xxx_27: off
+    l_xxx_21: off
+    l_xxx_22: off
+    l_xxx_26: off
+    l_xxx_23: off
+    l_xxx_25: off
+    l_xxx_24: off
+    l_xxx_47: off
+    l_xxx_44: off

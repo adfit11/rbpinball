@@ -38,7 +38,6 @@ characters:
     name: Big Otis, the doorman
     voice: {model: en_US-ryan-high, length_scale: 1.15}
     pools:
-      guest: ["Come on in, you're on the list!", "Name's on the list. Step right in!", "Another guest for the party!"]
       gate_crasher: ["Hey! Those weren't your guests! Gate crasher!", "Sneaking in the back? Gate crasher!"]
       ball_saved: ["I got you, friend! Back in you go!", "Not tonight! Back on the floor!"]
   hostess:
@@ -86,9 +85,9 @@ characters:
       mode_request_night: ["Request night! Take every request in the house!", "Everybody's got a request tonight!"]
       mode_dance_floor: ["Pack that dance floor!", "Get those dancers moving!"]
       mode_hit_me: ["Hit me! Stop that dial!", "Spin it and hit it!"]
-      lock_lit: ["Guest list is full! The back room is open!", "Lock is lit! Shoot a lit crater!"]
+      lock_lit: ["Top bank is down! The back room is open!", "Lock is lit! Shoot a lit crater!"]
       ball_locked: ["One more in the back room!", "Ball locked! Keep 'em coming!"]
-      rent_party_build_up: ["Ladies and gentlemen, the back room is full! The whole block is coming! Get ready, get ready... it's a rent party!", "Hold on to your hats! The guest list is full, the band is warming up, and here it comes... rent party!"]
+      rent_party_build_up: ["Ladies and gentlemen, the back room is full! The whole block is coming! Get ready, get ready... it's a rent party!", "Hold on to your hats! The back room is packed, the band is warming up, and here it comes... rent party!"]
       rent_party: ["Rent party! Everybody in!", "It's a rent party, and the whole block is here!"]
       jackpot: ["Jackpot!", "Pay the rent!"]
       super_jackpot: ["Super jackpot! The rent is paid!", "Super jackpot! Landlord's smiling now!"]

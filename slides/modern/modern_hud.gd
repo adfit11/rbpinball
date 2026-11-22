@@ -276,13 +276,7 @@ func _render() -> void:
 		int(active.get("modern_nickel_progress", 0)), int(active.get("modern_nickel_cost", 1))]
 	side_labels.target.text = "Shoot a lit crater!" if held else _target_name(str(active.get("modern_nickel_target", "")))
 	side_labels.locks.text = "LOCKS %d / 3" % int(active.get("modern_locked_balls", 0))
-	var guest_bits := int(active.get("modern_guests", 0))
-	var guests := 0
-	for i in 7:
-		guests += (guest_bits >> i) & 1
-	side_labels.guests.text = "GUEST LIST " + "●".repeat(guests) + "○".repeat(max(0, 3 - guests))
-	if int(active.get("modern_lock_lit", 0)):
-		side_labels.guests.text = "LOCK IS LIT"
+	side_labels.guests.text = "LOCK IS LIT" if int(active.get("modern_lock_lit", 0)) else "LOCK: TOP BANK"
 	side_labels.ovation.text = "OVATION ×%d" % min(4, 1 + int(active.get("modern_ovation", 0)) + int(active.get("modern_songs_completed_ball", 0)))
 	side_labels.saver.text = "BOUNCER READY" if int(active.get("modern_ball_saver_ready", 0)) else ""
 	var lit := int(active.get("modern_round_songs", 0))
@@ -630,7 +624,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_splash_show":
 			show_overlay("WELCOME TO THE JUKE JOINT",
 				"Hit the club staff to earn a NICKEL. Shoot a lit crater to play the JUKEBOX. " +
-				"Every song is a mode. Fill the guest list to lock balls for RENT PARTY multiball.\nPress START to skip.", 5800, TEAL)
+				"Every song is a mode. Complete the top drop bank to light a lock for RENT PARTY multiball.\nPress START to skip.", 5800, TEAL)
 		"modern_nickel_directed":
 			caption.text = "Shoot the %s  (%d / %d)" % [payload.get("location_name", ""), int(payload.get("progress", 0)), int(payload.get("cost", 1))]
 		"modern_nickel_refused":

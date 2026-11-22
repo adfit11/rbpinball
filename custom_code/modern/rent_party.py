@@ -1,4 +1,4 @@
-"""Guest list, physical subway locks (stealable: Gate Crasher), and Rent Party multiball."""
+"""Top-bank lock qualification, physical subway locks (stealable: Gate Crasher), and Rent Party multiball."""
 
 from mpf.core.mode import Mode
 
@@ -22,9 +22,7 @@ class ModernRentParty(Mode):
         return self._owners
 
     def mode_start(self, **kwargs):
-        player = self.player
-        player.modern_guests = 0
-        player.modern_lock_lit = 0
+        self.player.modern_lock_lit = 0
         self.multiball = False
         self.jackpots = 0
         self.super_lit = False
@@ -52,12 +50,8 @@ class ModernRentParty(Mode):
         if self.machine.game and self.machine.game.player:
             self.machine.game.player.modern_locked_balls = self.locked_balls
 
-    # Guest list ------------------------------------------------------------
-    def guests(self):
-        return [g for i, g in enumerate(S.GUESTS) if self.player.modern_guests & (1 << i)]
-
+    # Lock qualification ----------------------------------------------------
     def _location(self, location, **kwargs):
-        self._guest(location)
         if self.multiball and self.super_lit and location == "bar":
             self.super_lit = False
             self.lamps.clear("rent_party")
@@ -68,26 +62,18 @@ class ModernRentParty(Mode):
             self.machine.events.post("modern_callout", pool="mc_super_jackpot")
 
     def _bank(self, bank, **kwargs):
-        self._guest(bank)
-
-    def _guest(self, guest):
+        """Completing the top bank lights the lock for one ball; not during a song or multiball."""
         player = self.player
-        if guest not in S.GUESTS or player.modern_lock_lit or self.multiball or song_mode_running(self.machine):
+        if bank != S.LOCK_BANK or player.modern_lock_lit or self.multiball or song_mode_running(self.machine):
             return
-        bit = 1 << S.GUESTS.index(guest)
-        if player.modern_guests & bit:
+        if self.locked_balls >= S.LOCKS_FOR_MULTIBALL:
             return
-        player.modern_guests |= bit
-        count = len(self.guests())
-        self.machine.events.post("modern_guest_arrived", guest=guest, guest_name=S.GUEST_NAMES[guest], count=count)
-        self.machine.events.post("modern_callout", pool="doorman_guest")
-        if count >= S.GUESTS_TO_FILL:
-            player.modern_lock_lit = 1
-            award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
-            self.machine.events.post("modern_lock_lit")
-            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot a lit crater!",
-                                     ms=2200)
-            self.machine.events.post("modern_callout", pool="mc_lock_lit")
+        player.modern_lock_lit = 1
+        award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
+        self.machine.events.post("modern_lock_lit")
+        self.machine.events.post("modern_overlay", title="THE BACK ROOM IS OPEN", subtitle="LOCK IS LIT. Shoot a lit crater!",
+                                 ms=2200)
+        self.machine.events.post("modern_callout", pool="mc_lock_lit")
 
     # Locks -----------------------------------------------------------------
     def qualify_lock(self, lit):
@@ -101,9 +87,8 @@ class ModernRentParty(Mode):
     def _locked(self, total_balls_locked=0, **kwargs):
         self.lock_owners.append(self.player.number)
         self._update_locks()
-        # One lock per full guest list: the next lock needs a new list.
+        # One lock per completed top bank: the next lock needs the bank again.
         self.player.modern_lock_lit = 0
-        self.player.modern_guests = 0
         award(self.machine, S.SCORE_BALL_LOCKED, "ball_locked")
         count = self.locked_balls
         self.machine.events.post("modern_ball_locked", count=count)
@@ -130,7 +115,6 @@ class ModernRentParty(Mode):
         self.building = False
         self.multiball, self.jackpots, self.super_lit, self.total = True, 0, False, 0
         self.player.modern_lock_lit = 0
-        self.player.modern_guests = 0
         if crasher:
             self.machine.events.post("modern_gate_crasher", player=self.player.number)
             self.machine.events.post("modern_overlay", title="GATE CRASHER!",

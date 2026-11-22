@@ -43,7 +43,7 @@ class SongRule:
         self.machine.events.post("modern_song_targets", locations=",".join(locations))
 
     def shot(self, title=None, subtitle="", pool=None):
-        """A mode shot: lamps 1-10 burst upward, the screen flashes, and an optional overlay and callout."""
+        """A mode shot: every playfield lamp bursts bottom to top, the screen flashes, and an optional overlay and callout."""
         self.machine.events.post("modern_song_shot", mode=self.key)
         if title:
             self.machine.events.post("modern_overlay", title=title, subtitle=subtitle, ms=1500, style="gold")
