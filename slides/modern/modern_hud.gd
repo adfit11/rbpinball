@@ -874,7 +874,9 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_play_artist_video(str(payload.get("path", "")))
 		"modern_song_ended":
 			_stop_artist_video()
-			hurry_live = false
+			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
+				hurry_live = false
+				hurry_root.visible = false
 			song_panel.visible = false
 			mode_banner.text = ""
 			if not between_balls:
