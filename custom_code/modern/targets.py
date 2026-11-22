@@ -76,11 +76,8 @@ class ModernTargets(Mode):
         self._schedule("drops", SCAN_MS, self._advance_drops)
 
     def _show_booths(self):
-        """The Booths lamp is the right bank's lamp plus the lamp of every target still standing."""
-        bank = settings.BOOTHS_BANK
-        standing = [settings.DROP_LAMPS[t - 1] for t, switch in enumerate(self.DROP_SWITCHES[bank], 1)
-                    if (bank, t) not in self.down_targets and not self.machine.switches[switch].state]
-        self.lamps.alias(settings.BOOTHS_LAMP, [settings.BANK_LAMPS[bank], *standing])
+        """The Booths lamp is the right bank's lamp. L19-L23 sit beside the top bank, so they stay with the skill shot."""
+        self.lamps.alias(settings.BOOTHS_LAMP, [settings.BANK_LAMPS[settings.BOOTHS_BANK]])
 
     def _advance_craters(self):
         self.crater_index = (self.crater_index - 1) % 5
@@ -129,7 +126,7 @@ class ModernTargets(Mode):
         return lit
 
     def _drop_hit(self, bank, target, **kwargs):
-        lit = self.cascading and target == self.drop_index
+        lit = self.cascading and bank == settings.SKILL_BANK and target == self.drop_index
         self.down_targets.add((bank, target))
         self.player.modern_bonus_drops += 1
         award(self.machine, settings.SCORE_DROP, "drop")
