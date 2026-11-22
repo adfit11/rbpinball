@@ -27,15 +27,13 @@ class TestCoilPanel(MpfTestCase):
         self.panel.results_path = Path(self.temp.name) / "results.json"
 
     def test_pulse_bounds_and_cooldown(self):
-        coil = self.machine.coils["c_trough_release"].hw_driver
-        with patch.object(type(coil), "enable", autospec=True) as enable, \
-                patch.object(type(coil), "disable", autospec=True) as disable:
-            self.panel.command({"action": "pulse", "name": "c_trough_release", "ms": 270})
-            self.assertIs(coil, enable.call_args.args[0])
-            self.advance_time_and_run(.26)
-            disable.assert_not_called()
-            self.advance_time_and_run(.02)
-            self.assertIs(coil, disable.call_args.args[0])
+        coil = self.machine.coils["c_trough_release"]
+        for name in ("c_trough_release", "c_subway_lock"):
+            with self.assertRaises(ValueError):  # past LISY's 255 ms the pulse would depend on MPF
+                self.panel.command({"action": "pulse", "name": name, "ms": 256})
+        with patch.object(coil, "pulse") as pulse:
+            self.panel.command({"action": "pulse", "name": "c_trough_release", "ms": 255})
+            pulse.assert_called_once_with(pulse_ms=255)
             with self.assertRaises(ValueError):
                 self.panel.command({"action": "pulse", "name": "c_outhole", "ms": 65})
         for name, duration in [("c_outhole", 5000), ("c_GGG", 30), ("c_outhole", True), ("c_outhole", -1)]:

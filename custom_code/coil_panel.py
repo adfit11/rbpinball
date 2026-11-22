@@ -11,15 +11,16 @@ import time
 from mpf.core.custom_code import CustomCode
 
 
+# Release coils stop at 255 ms, the longest pulse the LISY80 times and ends itself.
 OUTPUTS = (
-    ("c_subway_lock", "Subway release", 400),
+    ("c_subway_lock", "Subway release", 255),
     ("c_top_drops", "Top drop reset", 400),
     ("c_subway_kicker", "Subway kicker", 100),
     ("c_right_drops", "Right drop reset", 400),
     ("c_outhole", "Bottom outhole", 100),
     ("c_side_kicker_left", "Left / fire-pit kicker", 100),
     ("c_hole_kicker_top", "Top hole kicker", 100),
-    ("c_trough_release", "Trough release", 400),
+    ("c_trough_release", "Trough release", 255),
     ("c_Replay_Knock", "Knocker", 100),
 )
 ALLOWED_HOSTS = {"127.0.0.1:8765", "localhost:8765"}
