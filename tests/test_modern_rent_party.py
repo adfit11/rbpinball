@@ -61,8 +61,11 @@ class TestModernRentParty(ModernTestCase):
         self.start_modern()
         self.light_lock()
         self.mock_event("modern_ball_locked")
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.lock_ball()
         self.assertEventCalled("modern_ball_locked")
+        self.assertIn("mc_ball_locked", pools)
         self.assertEqual(self.lock.balls, 1)
         self.assertEqual(self.player.modern_locked_balls, 1)
         self.assertEqual(self.machine.game.balls_in_play, 1)

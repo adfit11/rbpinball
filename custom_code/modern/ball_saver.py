@@ -17,6 +17,7 @@ class ModernBallSaver(Mode):
             self.player.modern_ball_saver_ready = 1
             self.machine.coils["c_classic_ball_saver"].pulse()
             self.machine.events.post("modern_ball_saver_ready")
+            self.machine.events.post("modern_callout", pool="mc_ball_saver_lit", queue=True)
 
     def _used(self, **kwargs):
         if self.player.modern_ball_saver_ready:

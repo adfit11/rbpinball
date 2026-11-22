@@ -93,8 +93,8 @@ class ModernRentParty(Mode):
         count = self.locked_balls
         self.machine.events.post("modern_ball_locked", count=count)
         if count < S.LOCKS_FOR_MULTIBALL:
-            self.machine.events.post("modern_overlay", title=f"BALL {count} LOCKED",
-                                     subtitle=f"{count} in the back room", ms=2000)
+            self.machine.events.post("modern_overlay", title=f"BALL {count} LOCKED!",
+                                     subtitle=f"{count} in the back room", ms=2500, style="gold")
             self.machine.events.post("modern_callout", pool="mc_ball_locked")
 
     # Rent Party --------------------------------------------------------------

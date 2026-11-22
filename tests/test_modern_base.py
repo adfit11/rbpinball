@@ -325,7 +325,10 @@ class TestModernBallFeatures(ModernTestCase):
         switch = targets.DROP_SWITCHES["top_bank"][targets.drop_index - 1]
         start = self.player.score
         self.mock_event("modern_drop_the_needle")
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.hit_switch_and_run(switch, .1)
+        self.assertIn("mc_ball_saver_lit", pools)
         self.assertEventCalled("modern_drop_the_needle")
         self.assertEqual(self.player.score - start, settings.SCORE_DROP + settings.SCORE_DROP_THE_NEEDLE)
         self.assertEqual(self.player.modern_ovation, 1)

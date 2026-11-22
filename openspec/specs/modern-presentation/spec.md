@@ -19,6 +19,27 @@ Modern SHALL play a callout from a matching pool at key game events, such as gam
 - **WHEN** the player earns a nickel
 - **THEN** a random line from the nickel pool plays, and it differs from the last nickel line
 
+### Requirement: Celebrate a locked ball
+Every ball locked before the third SHALL play an excited MC announcement, the jackpot sound, the lamp burst, a gold screen flash and a "BALL n LOCKED!" card. The third lock SHALL use the Rent Party build-up instead.
+
+#### Scenario: First lock
+- **WHEN** a ball locks with none already locked
+- **THEN** the MC announces the lock and "BALL 1 LOCKED!" shows
+
+### Requirement: Celebrate a lit ball saver
+Whenever the Bouncer ball saver becomes ready, the MC SHALL excitedly announce it after any line already playing, and a "BALL SAVER LIT!" card SHALL show.
+
+#### Scenario: Drop the needle lights the ball saver
+- **WHEN** Drop the Needle readies the Bouncer
+- **THEN** the MC announces the ball saver is lit and "BALL SAVER LIT!" shows
+
+### Requirement: Celebrate an earned extra ball
+Every extra ball earned SHALL play an excited MC announcement, the jackpot sound, the lamp burst, a gold screen flash, and an "EXTRA BALL!" card for 3 s.
+
+#### Scenario: Collecting a lit extra ball
+- **WHEN** the ball enters the Kitchen with an extra ball lit
+- **THEN** the MC announces the extra ball and the "EXTRA BALL!" card shows
+
 ### Requirement: Play random encouragement and quips
 During play with no other callout pending, Modern SHALL occasionally play a random encouragement or a witty quip suited to a 1940s rhythm-and-blues juke joint. Each SHALL follow a minimum quiet gap (draft 20 s) and a random chance, and SHALL never interrupt an event callout.
 

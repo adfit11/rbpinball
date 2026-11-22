@@ -126,6 +126,16 @@ class TestModernDirections(ModernTestCase):
         self.assertEqual(self.player.modern_extra_ball_lit, 0)
         self.assertEqual(self.player.modern_extra_balls_earned, 1)
 
+    def test_extra_ball_is_announced(self):
+        self.start_modern()
+        self.player.modern_extra_ball_lit = 1
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
+        self.mock_event("modern_award_extra_ball")
+        self.hit_location("kitchen")
+        self.assertEventCalled("modern_award_extra_ball")
+        self.assertIn("mc_extra_ball", pools)
+
     def test_outhole_retries_harder(self):
         ejector = self.machine.ball_devices["bd_outhole"].ejector
         self.assertEqual(ejector.config["retries_before_increasing_pulse"], 1)

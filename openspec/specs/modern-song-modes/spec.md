@@ -84,7 +84,7 @@ The round SHALL last 60 s. The Kitchen SHALL light for four rungs worth 75,000, 
 - **THEN** 150,000 scores, a "RUNG 2!" screen shows the next rung's value of 225,000, and the MC calls the climb
 
 ### Requirement: Mode 3 Build and collect
-Each spin SHALL add to a pot. The per-spin amount SHALL start at 5,000 and grow by 1,250 each spin. A Bar hit SHALL pay the pot plus 50,000, then reset the pot and the per-spin amount. Collecting can repeat until the song ends. Three collects SHALL complete the mode. An uncollected pot SHALL be lost.
+Each spin SHALL add to a pot. The per-spin amount SHALL start at 5,000 and grow by 1,250 each spin. A Bar hit SHALL pay the pot plus 50,000, then reset the pot and the per-spin amount. Collecting can repeat until the song ends. Three collects SHALL complete the mode. An uncollected pot SHALL be lost. Each spin SHALL show a spinning record on screen with the pot and the amount just added; it SHALL disappear 1.5 s after the last spin.
 
 #### Scenario: The pot is collected
 - **WHEN** the player has spun three times and then hits the Bar
@@ -113,7 +113,7 @@ The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry 
 - **THEN** the mode is completed and ends, and the song fades out
 
 ### Requirement: Mode 6 Party time
-All scoring SHALL be doubled for the song, on top of the song multiplier. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
+All scoring SHALL be doubled for the song, on top of the song multiplier. A looping table-wide light show SHALL run for the song, inviting the player to play anywhere; the shoot-again lamp SHALL be left out so it still shows the Bouncer. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
 
 #### Scenario: The Bouncer saves during Party time
 - **WHEN** the ball enters the left outlane and the Bouncer saves it
