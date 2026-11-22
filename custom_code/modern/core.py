@@ -13,7 +13,7 @@ BASE_SWITCHES = {
 }
 TASK_EVENTS = (
     "modern_nickel_directed", "modern_nickel_awarded", "modern_nickel_spent", "modern_selector_opened",
-    "modern_selector_closed", "modern_song_started", "modern_song_ended", "modern_lock_lit", "modern_ball_locked",
+    "modern_selector_closed", "modern_artist_chosen", "modern_song_started", "modern_song_ended", "modern_lock_lit", "modern_ball_locked",
     "multiball_modern_rent_party_started", "multiball_modern_rent_party_ended",
 )
 LOCATION_SWITCHES = {"s_spot_target_36": "coat_check"}

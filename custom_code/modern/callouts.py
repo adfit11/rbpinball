@@ -2,6 +2,7 @@
 
 import os
 import random
+import re
 
 from ruamel.yaml import YAML
 from mpf.core.mode import Mode
@@ -10,6 +11,19 @@ from custom_code.modern import settings
 from custom_code.modern.catalogue import ROOT
 
 SCRIPT = os.path.join("sounds", "modern_voice", "script.yaml")
+MENTIONS = {
+    "bar": r"\bbar\b|\bbartender",
+    "kitchen": r"\bkitchen|\bcook\b",
+    "bandstand": r"\bbandstand|\bband\b",
+    "coat_check": r"\bcoat check",
+    "booths": r"\bbooths?\b|\bhostess",
+}
+
+
+def names_only(text, allow):
+    """Whether a line names no club location outside `allow`."""
+    return not any(re.search(pattern, text, re.IGNORECASE)
+                   for location, pattern in MENTIONS.items() if location not in allow)
 
 
 def load_script(root=ROOT):
@@ -36,8 +50,12 @@ class ModernCallouts(Mode):
         self.add_mode_event_handler("modern_callout", self._callout)
         self.delay.reset(ms=settings.QUIP_CHECK_MS, name="quip", callback=self._quip)
 
-    def _callout(self, pool=None, queue=False, **kwargs):
+    def _callout(self, pool=None, queue=False, allow=None, fallback=None, **kwargs):
         lines = self.pools.get(pool)
+        if lines and allow is not None:
+            lines = [l for l in lines if names_only(l["text"], allow)]
+            if not lines and fallback:
+                return self._callout(fallback, queue)
         if not lines:
             self.debug_log("No voice pool %s", pool)
             return

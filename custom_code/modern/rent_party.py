@@ -28,6 +28,8 @@ class ModernRentParty(Mode):
         self.jackpots = 0
         self.super_lit = False
         self.total = 0
+        self.lock_news = False
+        self.add_mode_event_handler("modern_song_ended", self._song_ended)
         self.add_mode_event_handler("modern_location_hit", self._location)
         self.add_mode_event_handler("modern_bank_completed", self._bank)
         self.add_mode_event_handler("modern_crater_entered", self._crater)
@@ -82,9 +84,22 @@ class ModernRentParty(Mode):
             player.modern_lock_lit = 1
             award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
             self.machine.events.post("modern_lock_lit")
-            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
-                                     ms=2200)
-            self.machine.events.post("modern_callout", pool="mc_lock_lit")
+            jukebox = self.machine.modes["modern_jukebox"]
+            if jukebox.active and jukebox.busy:
+                self.lock_news = True  # craters can't lock during a song; say so once it ends
+            else:
+                self._announce_lock()
+
+    def _announce_lock(self):
+        self.lock_news = False
+        self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
+                                 ms=2200)
+        self.machine.events.post("modern_callout", pool="mc_lock_lit")
+
+    def _song_ended(self, reason=None, **kwargs):
+        if self.lock_news and self.player.modern_lock_lit and reason not in ("drain", "tilt"):
+            self._announce_lock()
+        self.lock_news = False
 
     # Locks -----------------------------------------------------------------
     def qualify_lock(self):
