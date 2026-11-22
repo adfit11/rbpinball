@@ -88,21 +88,50 @@ class TestModernDirections(ModernTestCase):
         self.assertFalse(names_only("You lost? Go see the hostess.", ("bar", "kitchen")))
         self.assertTrue(names_only("Not now, sugar. Try somewhere else.", ("bar",)))
 
-    def test_lock_lit_waits_for_the_song_to_end(self):
-        self.start_modern()
+    def start_song(self, slot=2):
         jukebox = self.machine.modes["modern_jukebox"]
-        jukebox._start_song(jukebox.slots[1][1][0])
+        jukebox._start_song(jukebox.slots[slot - 1][1][0])
         self.advance_time_and_run(.2)
-        pools = self.collect_pools()
+        return jukebox
+
+    def test_only_the_mode_advances_during_a_song(self):
+        self.start_modern()
+        self.start_song()
         party = self.machine.modes["modern_rent_party"]
-        for guest in S.GUESTS[:S.GUESTS_TO_FILL]:
+        for guest in S.GUESTS:
             party._guest(guest)
-        self.advance_time_and_run(.1)
-        self.assertEqual(self.player.modern_lock_lit, 1)
-        self.assertNotIn("mc_lock_lit", pools)
+        self.assertEqual(self.player.modern_guests, 0)
+        self.assertEqual(self.player.modern_lock_lit, 0)
+        targets = self.machine.modes["modern_targets"]
+        ovation, start = self.player.modern_ovation, self.player.score
+        for bank in ("top_bank", "right_bank"):
+            targets._bank_down(bank)
+        self.advance_time_and_run(1)
+        self.assertEqual(self.player.modern_ovation, ovation)
+        self.assertEqual(self.player.modern_nickel, 0)
+        self.assertFalse(targets.down_banks)
+        self.assertGreater(self.player.score, start)  # targets still score
+
+    def test_extra_ball_and_special_wait_for_the_song(self):
+        self.start_modern()
+        self.player.modern_extra_ball_lit = 1
+        self.player.modern_special_state = 1
+        jukebox = self.start_song()
+        self.player.modern_nickel = 1
+        self.hit_location("kitchen")
+        self.hit_location("bar")
+        self.assertEqual(self.player.modern_extra_ball_lit, 1)
+        self.assertEqual(self.player.modern_special_state, 1)
         jukebox.end_song()
         self.advance_time_and_run(.1)
-        self.assertIn("mc_lock_lit", pools)
+        self.hit_location("kitchen")
+        self.assertEqual(self.player.modern_extra_ball_lit, 0)
+        self.assertEqual(self.player.modern_extra_balls_earned, 1)
+
+    def test_outhole_retries_harder(self):
+        ejector = self.machine.ball_devices["bd_outhole"].ejector
+        self.assertEqual(ejector.config["retries_before_increasing_pulse"], 1)
+        self.assertEqual(ejector.config["eject_coil_retry_pulse"], [120])
 
 
 class TestKitchenReturns(ModernTestCase):

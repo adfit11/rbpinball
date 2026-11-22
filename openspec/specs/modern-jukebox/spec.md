@@ -38,6 +38,17 @@ When the player hits a club location that is not the flashing one, Modern SHALL 
 - **WHEN** the Coat Check is flashing and the player hits the Bar
 - **THEN** the refusal does not send the player to the Kitchen, the Bandstand, or the Booths
 
+### Requirement: Only the song mode advances during a song
+From the moment the selector opens until the song ends, shots SHALL still score their points and end-of-ball bonus counts, but SHALL NOT advance the guest list, Standing Ovation, the floor nickel, or the nickel hunt. A lit extra ball or special SHALL stay lit and be collectable after the song.
+
+#### Scenario: Banks during a song
+- **WHEN** both drop banks are completed during a song
+- **THEN** they score and reset, but no floor nickel or Standing Ovation is awarded
+
+#### Scenario: A lit extra ball during Ruth Brown's Ladder
+- **WHEN** an extra ball is lit and the ball enters the Kitchen during the Ladder
+- **THEN** the rung counts and the extra ball stays lit until the song ends
+
 ### Requirement: Only the current target is directed
 From the moment the selector opens until the song ends, Modern SHALL NOT flash, show, or speak nickel-hunt directions or refusals. Only the song mode's own instructions SHALL direct the player. The nickel hunt SHALL resume when the song ends.
 

@@ -65,8 +65,13 @@ class TestModernRentParty(ModernTestCase):
             self.lock_ball()
             self.advance_time_and_run(3)
         self.mock_event("modern_rent_party_started")
+        self.mock_event("modern_rent_party_build_up")
         self.lock_ball()
         self.advance_time_and_run(5)
+        self.assertEventCalled("modern_rent_party_build_up")
+        self.assertEventNotCalled("modern_rent_party_started")
+        self.assertEqual(self.lock.balls, 3)  # every ball waits in the back room during the build-up
+        self.advance_time_and_run(S.RENT_PARTY_BUILD_UP_MS / 1000)
         self.assertEventCalled("modern_rent_party_started")
         self.assertFalse(self._last_event_kwargs["modern_rent_party_started"]["gate_crasher"])
         self.assertEqual(self.machine.game.balls_in_play, 3)
@@ -102,7 +107,7 @@ class TestModernRentParty(ModernTestCase):
         self.fill_guest_list()
         self.mock_event("modern_gate_crasher")
         self.lock_ball()
-        self.advance_time_and_run(5)
+        self.advance_time_and_run(5 + S.RENT_PARTY_BUILD_UP_MS / 1000)
         self.assertEventCalled("modern_gate_crasher")
         self.assertEqual(self.machine.game.balls_in_play, 3)
 

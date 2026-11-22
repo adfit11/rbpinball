@@ -5,6 +5,7 @@ import random
 from mpf.core.mode import Mode
 
 from custom_code.modern import settings
+from custom_code.modern.jukebox import song_mode_running
 from custom_code.modern.lamps import FLASH, director
 from custom_code.modern.scoring import award
 
@@ -40,9 +41,7 @@ class ModernNickels(Mode):
         return settings.NICKEL_COSTS[self.player.modern_nickel_step % len(settings.NICKEL_COSTS)]
 
     def hunting(self):
-        jukebox = self.machine.modes["modern_jukebox"]
-        busy = jukebox.active and jukebox.busy
-        return not self.suspended and not busy and not self.player.modern_nickel
+        return not self.suspended and not song_mode_running(self.machine) and not self.player.modern_nickel
 
     def _suspend(self, **kwargs):
         self.suspended += 1

@@ -13,6 +13,7 @@ from custom_code.classic_targets import ClassicTargets
 from custom_code.modern import settings
 from custom_code.modern.bonus import ovation
 from custom_code.modern.holes import plain_virtual
+from custom_code.modern.jukebox import song_mode_running
 from custom_code.modern.lamps import STEADY, director
 from custom_code.modern.scoring import award
 
@@ -132,7 +133,7 @@ class ModernTargets(Mode):
         self.down_targets.add((bank, target))
         self.player.modern_bonus_drops += 1
         award(self.machine, settings.SCORE_DROP, "drop")
-        if lit and self.skill_window:
+        if lit and self.skill_window and not song_mode_running(self.machine):
             self.skill_window = False
             award(self.machine, settings.SCORE_DROP_THE_NEEDLE, "drop_the_needle")
             self.player.modern_ovation = min(settings.MAX_OVATION - 1, self.player.modern_ovation + 1)
@@ -150,13 +151,16 @@ class ModernTargets(Mode):
         if bank in self.completing:
             return
         self.completing.add(bank)
-        self.down_banks.add(bank)
         award(self.machine, settings.SCORE_BANK, "bank")
         self.machine.events.post("modern_bank_completed", bank=bank)
-        if bank == settings.BOOTHS_BANK:
-            self._booths_full()
         # The completed bank pops straight back up; its bank lamp stays lit until both are completed.
         self.delay.reset(ms=500, name=f"reset_{bank}", callback=self._reset_bank, bank=bank)
+        if song_mode_running(self.machine):
+            self._show_lamps()
+            return  # points only: no Standing Ovation or floor nickel during a song
+        self.down_banks.add(bank)
+        if bank == settings.BOOTHS_BANK:
+            self._booths_full()
         if len(self.down_banks) == 2:
             self.machine.events.post("modern_floor_nickel")
             self.down_banks.clear()

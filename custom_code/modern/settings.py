@@ -102,6 +102,7 @@ GUEST_NAMES = {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "co
                "booths": "Booths", "top_bank": "Top Bank", "right_bank": "Right Bank"}
 GUESTS_TO_FILL = 5
 LOCKS_FOR_MULTIBALL = 3
+RENT_PARTY_BUILD_UP_MS = 8_000  # the riser and announcement before the locked balls are released
 SCORE_LOCK_LIT = 25_000
 SCORE_BALL_LOCKED = 50_000
 JACKPOT_BASE, JACKPOT_INCREMENT, JACKPOTS_FOR_SUPER = 250_000, 50_000, 3

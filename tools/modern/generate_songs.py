@@ -5,7 +5,8 @@ No original recordings are used. Existing files are kept unless --force is given
 so the owner's own MP3s are never overwritten.
 Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain, and the
 house_band_1-10.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random,
-and artist_pick.mp3, the loop played while the jukebox artist selector is open.
+artist_pick.mp3, the loop played while the jukebox artist selector is open, and the Rent Party
+music (rent_party.mp3) with its 8 s riser (sounds/modern_sfx/rent_party_build_up.mp3).
 Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
 """
 
@@ -111,6 +112,51 @@ def make_artist_pick(force=False, seconds=16):
     print("generated", out)
 
 
+RENT_PARTY = os.path.join(catalogue.ROOT, "sounds", "modern_music", "rent_party.mp3")
+BUILD_UP = os.path.join(catalogue.ROOT, "sounds", "modern_sfx", "rent_party_build_up.mp3")
+
+
+def make_rent_party(force=False, seconds=32):
+    """A fast, loud loop that plays while Rent Party multiball is alive; an owner's MP3 is never overwritten."""
+    out = os.path.normpath(RENT_PARTY)
+    if os.path.exists(out) and not force:
+        return
+    music = backing(seconds, 130, 200, 21) * 0.9
+    wav = tts.temp_wav()
+    write_wav(wav, music)
+    tts.to_mp3(wav, out, "48k")
+    os.remove(wav)
+    print("generated", out)
+
+
+def make_build_up(force=False, seconds=8):
+    """An 8 s riser before Rent Party: a climbing sweep, swelling noise and a snare roll that speeds up."""
+    out = os.path.normpath(BUILD_UP)
+    if os.path.exists(out) and not force:
+        return
+    t = np.arange(int(RATE * seconds)) / RATE
+    rise = t / seconds
+    freq = 110 * 2 ** (3 * rise)  # three octaves up
+    phase = 2 * np.pi * np.cumsum(freq) / RATE
+    sweep = (np.sin(phase) + 0.5 * np.sin(2 * phase) + 0.3 * np.sin(1.5 * phase)) * (0.1 + 0.3 * rise)
+    noise = np.random.default_rng(31).normal(0, 1, len(t)) * 0.12 * rise ** 2
+    roll = np.zeros(len(t))
+    pos = 0.0
+    while pos < seconds:
+        start = int(pos * RATE)
+        hit = np.random.default_rng(start).normal(0, 1, int(RATE * 0.05)) * np.exp(-np.arange(int(RATE * 0.05)) / 150)
+        roll[start:start + len(hit)] += hit[:len(roll) - start] * (0.15 + 0.35 * pos / seconds)
+        pos += 0.5 * (1 - pos / seconds) ** 1.5 + 0.03
+    tail = int(RATE * 0.05)
+    data = sweep + noise + roll
+    data[-tail:] *= np.linspace(1, 0, tail)
+    wav = tts.temp_wav()
+    write_wav(wav, data / max(1e-9, np.abs(data).max()) * 0.9)
+    tts.to_mp3(wav, out, "64k")
+    os.remove(wav)
+    print("generated", out)
+
+
 def make_playlists(force=False):
     """Ten house-band tracks for general play and five attract tracks; an owner's MP3 is never overwritten."""
     for prefix, count, seconds, base_tempo, seed in (("house_band", 10, 90, 132, 500), ("attract", 5, 60, 112, 600)):
@@ -156,6 +202,8 @@ def main(force=False, seconds=60):
     make_between_balls(force)
     make_playlists(force)
     make_artist_pick(force)
+    make_rent_party(force)
+    make_build_up(force)
 
 
 if __name__ == "__main__":
