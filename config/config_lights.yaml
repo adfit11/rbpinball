@@ -8,10 +8,7 @@ lights:
 #   l_same_player_shoots_again:
 #     number: 
 
-  l_xxx_01:
-    number: 01
-  l_xxx_02:
-    number: 02
+  # L0 game-over relay, L1 tilt relay and L2 coin lockout drive mechanisms, so they are not lights.
   l_xxx_03:
     number: 03
   l_xxx_04:

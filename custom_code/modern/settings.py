@@ -46,7 +46,7 @@ DROP_LAMPS = tuple(f"l_xxx_{n}" for n in range(19, 24))
 BOOTHS_LAMP = "booths"  # virtual: the lamp director maps it to L29 and the standing right-bank drop lamps
 BOOTHS_BANK = "right_bank"
 BANK_LAMPS = {"top_bank": "l_xxx_28", "right_bank": "l_xxx_29"}
-SHOOT_AGAIN_LAMP = "l_xxx_01"
+SHOOT_AGAIN_LAMP = "l_xxx_03"  # L1 is the stock tilt relay, not a lamp
 SPECIAL_LAMP = "l_xxx_44"
 EXTRA_BALL_LAMP = "l_xxx_45"
 
