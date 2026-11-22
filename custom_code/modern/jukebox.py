@@ -172,8 +172,6 @@ class ModernJukebox(Mode):
         player = self.player
         if not counted:
             self._count_song()
-        if player.modern_songs_played in settings.EXTRA_BALL_SONGS:
-            self.machine.events.post("modern_light_extra_ball")
         player.modern_song_active = 1
         length = catalogue.mp3_length_ms(os.path.join(catalogue.ROOT, song.path), settings.DEFAULT_SONG_MS)
         from custom_code.modern.songs import SLOT_RULES
@@ -224,6 +222,8 @@ class ModernJukebox(Mode):
         self.delay.remove("song")
         self.player.modern_song_active = 0
         self.machine.events.post("modern_song_ended", slot=song.slot, reason=reason)
+        if reason not in ("drain", "tilt") and self.player.modern_songs_played in settings.EXTRA_BALL_SONGS:
+            self.machine.events.post("modern_light_extra_ball")  # after the round, so it never competes with the mode
         if self.player.modern_songs_played >= settings.SPECIAL_AFTER_SONGS:
             self.machine.events.post("modern_light_special")
 

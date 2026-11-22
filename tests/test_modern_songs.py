@@ -56,6 +56,32 @@ class TestModernSongs(ModernTestCase):
         self.assertEqual(rule.rung, 4)
         self.assertTrue(rule.completed)
 
+    def test_ladder_rung_shows_the_next_value(self):
+        rule = self.start_slot(2)
+        overlays = []
+        self.machine.events.add_handler("modern_overlay", lambda **kwargs: overlays.append(kwargs))
+        self.mock_event("modern_song_shot")
+        self.hit_location("kitchen")
+        self.assertEventCalled("modern_song_shot")
+        self.assertIn(("RUNG 1!", "75,000  •  Next 150,000"), [(o["title"], o["subtitle"]) for o in overlays])
+        self.assertEqual(rule.status(), "LADDER  RUNG 1 / 4  •  NEXT 150K AT THE KITCHEN")
+
+    def test_ladder_round_lasts_the_whole_song(self):
+        self.start_slot(2)
+        self.assertGreater(self.machine.modes["modern_jukebox"].song_remaining(), S.JACKPOT_ROUND_MS)
+
+    def test_mode_shot_bursts_lamps_one_to_ten(self):
+        rule = self.start_slot(5)
+        rule.on_crater(1, False)
+        self.advance_time_and_run(.3)
+        self.assertLightColor("l_xxx_38", "white")
+        self.assertLightColor("l_xxx_42", "black")
+        self.advance_time_and_run(.3)
+        self.assertLightColor("l_xxx_42", "white")
+        self.advance_time_and_run(1)
+        self.assertLightColor("l_xxx_42", "black")
+        self.assertLightColor("l_xxx_33", "white")  # the song count shows again
+
     def test_build_and_collect_pot(self):
         rule = self.start_slot(3)
         for _ in range(3):
