@@ -41,7 +41,7 @@ http://127.0.0.1:8765/
 
 ### Modern: the Juke Joint
 
-Modern is a 1940s rhythm and blues club. Hit the club staff (Bar, Kitchen, Bandstand, Coat Check, Back Door) where the flashing lamp or screen directs you to earn a nickel, then shoot a lit crater to play the jukebox. Each artist runs a song mode; completed songs raise Standing Ovation, and every five songs raise the song multiplier.
+Modern is a 1940s rhythm and blues club. Hit the club staff (Bar, Kitchen, Bandstand, Coat Check, Booths) where the flashing lamp or screen directs you to earn a nickel, then shoot a lit crater to play the jukebox. Each artist runs a song mode; completed songs raise Standing Ovation, and every five songs raise the song multiplier.
 
 Everything Modern lives in `modes/modern_*`, `custom_code/modern/`, `slides/modern/`, `sounds/modern_*`, `sounds/music/jukebox/`, `images/modern/`, `fonts/modern/` and `tools/modern/`, so it can be removed without touching Classic. Tunable values are in `custom_code/modern/settings.py`.
 

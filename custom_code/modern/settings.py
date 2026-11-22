@@ -6,8 +6,8 @@ LOCATIONS = {
     "kitchen": ("the Kitchen", "l_xxx_45", "cook"),
     "bandstand": ("the Bandstand", "l_xxx_46", "bandleader"),
     "coat_check": ("the Coat Check", "l_xxx_43", "coat_check"),
-    # The Back Door insert's lamp output is not yet mapped, so it is screen-only.
-    "back_door": ("the Back Door", None, "doorman"),
+    # The Booths are whichever standing right-bank drop target the targets mode picks; its lamp follows.
+    "booths": ("the Booths", "booths", "hostess"),
 }
 LOCATION_NAMES = tuple(LOCATIONS)
 BANDSTAND_QUIET_MS = 1000
@@ -42,6 +42,8 @@ MULTIPLIER_LAMPS = ("l_xxx_04", "l_xxx_05", "l_xxx_06", "l_xxx_07")
 OVATION_LAMPS = ("l_xxx_30", "l_xxx_31", "l_xxx_32")
 CRATER_LAMPS = ("l_xxx_27", "l_xxx_26", "l_xxx_25", "l_xxx_24")  # craters 1..4
 DROP_LAMPS = tuple(f"l_xxx_{n}" for n in range(19, 24))
+BOOTHS_LAMP = "booths"  # virtual: the lamp director maps it to the picked drop target
+BOOTHS_BANK = "right_bank"
 BANK_LAMPS = {"top_bank": "l_xxx_28", "right_bank": "l_xxx_29"}
 SHOOT_AGAIN_LAMP = "l_xxx_01"
 SPECIAL_LAMP = "l_xxx_44"
@@ -95,7 +97,7 @@ DIAL_STEP_MS, DIAL_AUTO_STOP_MS, HIT_ME_VALUE, HIT_ME_HITS = 250, 5_000, 250_000
 # Rent Party multiball (Gate Crasher)
 GUESTS = LOCATION_NAMES + ("top_bank", "right_bank")
 GUEST_NAMES = {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check",
-               "back_door": "Back Door", "top_bank": "Top Bank", "right_bank": "Right Bank"}
+               "booths": "Booths", "top_bank": "Top Bank", "right_bank": "Right Bank"}
 GUESTS_TO_FILL = 5
 LOCKS_FOR_MULTIBALL = 3
 SCORE_LOCK_LIT = 25_000

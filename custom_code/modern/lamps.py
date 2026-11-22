@@ -1,6 +1,7 @@
 """Layered lamp requests for Modern: flashing directs a shot, steady shows a lit feature.
 
 SOLID is steady that also beats flash, for a feature whose lamp must never be read as a shot target.
+A virtual lamp (the Booths) is an alias the targets mode points at a real lamp.
 """
 
 import logging
@@ -23,6 +24,15 @@ class LampDirector:
         self.requests = {}
         self.flash_on = True
         self.shown = {}
+        self.aliases = {settings.BOOTHS_LAMP: None}
+
+    def alias(self, name, light):
+        """Point a virtual lamp's requests at a real lamp (or nowhere)."""
+        self.aliases[name] = light
+        self.refresh()
+
+    def _real(self, light):
+        return self.aliases.get(light, light)
 
     def start(self):
         self.mode.delay.reset(ms=settings.FLASH_MS, name="lamp_flash", callback=self._toggle)
@@ -52,7 +62,7 @@ class LampDirector:
             LOG.info("Lamp %s %s -> %s (%s)", light, NAMES[before], NAMES[after], key)
 
     def state(self, light):
-        return max((s for (_, l), s in self.requests.items() if l == light), default=OFF)
+        return max((s for (_, l), s in self.requests.items() if l == light or self._real(l) == light), default=OFF)
 
     def _toggle(self):
         self.flash_on = not self.flash_on
@@ -60,7 +70,8 @@ class LampDirector:
         self.mode.delay.reset(ms=settings.FLASH_MS, name="lamp_flash", callback=self._toggle)
 
     def refresh(self):
-        lights = {l for (_, l) in self.requests} | set(self.shown)
+        lights = {self._real(l) for (_, l) in self.requests} | set(self.shown)
+        lights.discard(None)
         for light in lights:
             state = self.state(light)
             on = state in (STEADY, SOLID) or (state == FLASH and self.flash_on)
@@ -82,6 +93,9 @@ class LampDirector:
 
 class _NullDirector:
     def set(self, *args, **kwargs):
+        pass
+
+    def alias(self, *args, **kwargs):
         pass
 
     def clear(self, *args, **kwargs):

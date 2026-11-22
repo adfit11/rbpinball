@@ -21,7 +21,7 @@ When a Modern game starts, the screen SHALL show a placeholder splash that intro
 - **THEN** the rules splash is shown, and play continues to the first ball
 
 ### Requirement: Name the club locations
-Modern SHALL treat five shots as club locations, each with a lamp: Bar (saucer, L47), Kitchen (fire pit, L45), Bandstand (spinner, L46), Coat Check (spot target, L43), and Back Door (kicking target, the ball-save inserts below switch 26). Until the Back Door lamp output is identified, Modern SHALL direct the Back Door on screen only.
+Modern SHALL treat five shots as club locations, each with a lamp: Bar (saucer, L47), Kitchen (fire pit, L45), Bandstand (spinner, L46), Coat Check (spot target, L43), and the Booths (one standing right-bank drop target, its own drop lamp L19–L23). Modern SHALL seat the Booths at a random standing right-bank target, move them to another standing target when that target is hit, and reseat them when the bank resets after every target is down. Other right-bank targets SHALL score as plain drop targets. The kicking target (switch 26) SHALL score as a plain switch.
 
 #### Scenario: A location is named on screen
 - **WHEN** any Modern feature directs the player to a location
@@ -52,12 +52,12 @@ Modern SHALL light the craters with Classic's cascading crater lights on L24-L27
 - **WHEN** no selector or mode uses green and the player taps green
 - **THEN** the crater lamps freeze as they do in Classic
 
-### Requirement: Hold completed drop banks
-A completed drop bank SHALL stay down until both banks are down or the ball ends, and then both SHALL reset.
+### Requirement: Reset completed drop banks and reward the right bank
+A completed drop bank SHALL score 25,000 and pop back up at once; its bank lamp (L28 or L29) SHALL stay lit until both banks have been completed, which drops a nickel on the floor. Completing the right bank SHALL also add one Standing Ovation step for the ball, show "EVERY BOOTH IS FULL!" with the new multiplier, and play a hostess line. The drop lamps SHALL cascade only until the ball is in play; then only the Booths lamp is lit, when something directs a shot there.
 
-#### Scenario: One bank is completed
-- **WHEN** the player completes the top bank and the right bank is still up
-- **THEN** the top bank stays down and its bank lamp (L28) lights
+#### Scenario: The right bank is completed
+- **WHEN** the player knocks down all five right-bank targets
+- **THEN** Standing Ovation rises one step, the screen shows "EVERY BOOTH IS FULL!", and the bank resets
 
 ### Requirement: Drop the Needle
 Modern SHALL run Classic's skill shot motor for each shooter-lane serve. It SHALL rotate the lit drop on L19-L23 and freeze it with green, the same as Classic. A lit drop hit SHALL score 50,000, add one Standing Ovation step for the ball, and ready the ball saver. The screen SHALL call it "Drop the Needle".

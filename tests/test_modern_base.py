@@ -4,7 +4,7 @@ from unittest.mock import patch
 from custom_code.modern import catalogue, settings
 from custom_code.modern.bonus import ovation
 from custom_code.modern.callouts import load_script
-from custom_code.modern.lamps import FLASH, STEADY, director
+from custom_code.modern.lamps import FLASH, OFF, STEADY, director
 from tests.modern_helpers import ModernTestCase
 
 CHILD_MODES = ("modern", "modern_targets", "modern_skill_shot", "modern_nickels", "modern_jukebox",
@@ -120,7 +120,7 @@ class TestModernNickels(ModernTestCase):
     def test_wrong_location_refuses_and_keeps_target(self):
         self.start_modern()
         target = self.player.modern_nickel_target
-        wrong = next(l for l in ("coat_check", "back_door", "bandstand") if l != target)
+        wrong = next(l for l in ("coat_check", "booths", "bandstand") if l != target)
         self.mock_event("modern_nickel_refused")
         self.mock_event("modern_voice")
         self.hit_location(wrong)
@@ -395,17 +395,84 @@ class TestModernBallFeatures(ModernTestCase):
             self.advance_time_and_run(2)
         remove.assert_any_call(ball_device="bd_classic_saucer")
 
-    def test_drop_lamps_keep_cascading_and_dropped_targets_stay_lit(self):
+    def test_drop_lamps_stop_cascading_once_the_ball_is_in_play(self):
         self.start_modern()
         targets = self.machine.modes["modern_targets"]
         lamps = director(self.machine)
-        self.hit_switch_and_run("s_right_drop_2_11", .5)
-        seen = set()
-        for _ in range(20):
+        self.assertTrue(targets.ball_active)
+        index = targets.drop_index
+        for _ in range(10):
             self.advance_time_and_run(.25)
-            seen.add(targets.drop_index)
-            self.assertEqual(lamps.state("l_xxx_20"), STEADY)
-        self.assertGreater(len(seen), 2)
+            self.assertEqual(targets.drop_index, index)
+        lit = [l for l in settings.DROP_LAMPS if lamps.state(l)]
+        booth_lamp = settings.DROP_LAMPS[targets.booth - 1]
+        self.assertEqual(lit, [booth_lamp] if lamps.state(booth_lamp) else [])
+
+    def _hunt_booths(self):
+        self.start_modern()
+        nickels = self.machine.modes["modern_nickels"]
+        self.player.modern_nickel_target = "booths"
+        self.player.modern_nickel_cost = 1
+        nickels._show()
+        return self.machine.modes["modern_targets"], director(self.machine)
+
+    def test_booths_flash_one_standing_right_drop_target(self):
+        targets, lamps = self._hunt_booths()
+        self.assertIn(targets.booth, range(1, 6))
+        for index, light in enumerate(settings.DROP_LAMPS, 1):
+            self.assertEqual(lamps.state(light), FLASH if index == targets.booth else OFF)
+
+    def test_other_right_drops_score_but_do_not_visit_the_booths(self):
+        targets, lamps = self._hunt_booths()
+        other = next(t for t in range(1, 6) if t != targets.booth)
+        self.mock_event("modern_location_hit")
+        self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][other - 1], .1)
+        self.assertEventNotCalled("modern_location_hit")
+        self.assertEqual(self.player.modern_nickel, 0)
+        self.assertEqual(self.player.modern_nickel_target, "booths")
+
+    def test_hitting_the_booth_target_collects_the_nickel_and_reseats_the_booths(self):
+        targets, lamps = self._hunt_booths()
+        booth = targets.booth
+        self.mock_event("modern_location_hit")
+        self.hit_location("booths")
+        self.assertEventCalledWith("modern_location_hit", location="booths")
+        self.assertEqual(self.player.modern_nickel, 1)
+        self.assertNotEqual(targets.booth, booth)
+        self.assertFalse(self.machine.switches[targets.DROP_SWITCHES["right_bank"][targets.booth - 1]].state)
+
+    def test_booths_wait_for_the_bank_to_reset_when_no_target_stands(self):
+        targets, lamps = self._hunt_booths()
+        for switch in targets.DROP_SWITCHES["right_bank"]:
+            if switch != targets.DROP_SWITCHES["right_bank"][targets.booth - 1]:
+                self.hit_switch_and_run(switch, .05)
+        self.hit_location("booths")
+        self.assertIsNone(targets.booth)
+        self.advance_time_and_run(1)
+        self.assertIn(targets.booth, range(1, 6))
+
+    def test_kicking_target_is_a_plain_switch(self):
+        self.start_modern()
+        self.mock_event("modern_location_hit")
+        start = self.player.score
+        self.hit_and_release_switch("s_kicking_target_26")
+        self.advance_time_and_run(.1)
+        self.assertEventNotCalled("modern_location_hit")
+        self.assertEqual(self.player.score - start, settings.SCORE_SWITCH)
+
+    def test_completing_the_right_bank_raises_standing_ovation(self):
+        self.start_modern()
+        self.mock_event("modern_booths_full")
+        self.mock_event("modern_overlay")
+        self.mock_event("modern_voice")
+        for switch in self.machine.modes["modern_targets"].DROP_SWITCHES["right_bank"]:
+            self.hit_switch_and_run(switch, .05)
+        self.advance_time_and_run(.1)
+        self.assertEqual(self.player.modern_ovation, 1)
+        self.assertEventCalledWith("modern_booths_full", ovation=2)
+        self.assertEventCalledWith("modern_overlay", title="EVERY BOOTH IS FULL!", subtitle="Standing Ovation ×2",
+                                   ms=2000, style="gold")
+        self.assertEventCalled("modern_voice")
 
     def test_lit_craters_stay_steady_while_holding_a_nickel(self):
         self.start_modern()

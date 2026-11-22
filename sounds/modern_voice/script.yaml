@@ -6,7 +6,7 @@ characters:
     voice: {model: en_US-hfc_female-medium, length_scale: 1.1}
     pools:
       direction: ["Come on up to the bar, sugar.", "Bar's open, honey. Step on up.", "Belly up to the bar, baby."]
-      refusal: ["What are you doing here? Kitchen's calling you.", "Not now, sugar. Try somewhere else.", "Honey, I ain't got your nickel. Go ask around.", "You lost? Go see the doorman."]
+      refusal: ["What are you doing here? Kitchen's calling you.", "Not now, sugar. Try somewhere else.", "Honey, I ain't got your nickel. Go ask around.", "You lost? Go see the hostess."]
       nickel: ["Here's your nickel, sugar. Go play us something.", "One shiny nickel. Don't spend it all in one place.", "That's a nickel, baby. Jukebox is waiting."]
       special: ["Drinks on the house! You won a free game!", "Lord have mercy, a special! Free game, sugar!"]
       held: ["Sit a spell, sugar. What are you drinking?", "Pull up a stool, honey.", "Another round for my friend here!"]
@@ -32,7 +32,7 @@ characters:
     voice: {model: en_US-kristin-medium, length_scale: 1.1}
     pools:
       direction: ["Check your coat, darling!", "Coat check, honey! Over here!", "Don't forget your hat, sweetie!"]
-      refusal: ["What are you doing here? I got no ticket for you.", "Not without a ticket, darling. Try the back door.", "Honey, I just hold coats. Go see the kitchen."]
+      refusal: ["What are you doing here? I got no ticket for you.", "Not without a ticket, darling. Try the booths.", "Honey, I just hold coats. Go see the kitchen."]
       nickel: ["Found a nickel in your pocket, darling.", "Here's a nickel, sweetie. Go dance.", "A nickel for your trouble, honey."]
   doorman:
     name: Big Otis, the doorman
@@ -40,10 +40,15 @@ characters:
     pools:
       guest: ["Come on in, you're on the list!", "Name's on the list. Step right in!", "Another guest for the party!"]
       gate_crasher: ["Hey! Those weren't your guests! Gate crasher!", "Sneaking in the back? Gate crasher!"]
-      direction: ["Back door, friend. Quick now.", "Psst! Back door!", "Round the back, quick!"]
-      refusal: ["Hey! What you doing back here? Go on inside.", "Back door's for staff, friend. Try the bar.", "Move along now. Bandstand's that way."]
-      nickel: ["Here's a nickel. Don't tell nobody.", "Slipped you a nickel. Go on in.", "Nickel for the jukebox. Keep it moving."]
       ball_saved: ["I got you, friend! Back in you go!", "Not tonight! Back on the floor!"]
+  hostess:
+    name: Lena, the hostess
+    voice: {model: en_US-amy-medium, length_scale: 1.1}
+    pools:
+      direction: ["Right this way to the booths, darling.", "Your booth is ready, sugar!", "Table for one? Over here, honey."]
+      refusal: ["Sorry, sugar, no reservation. Try the bar.", "This booth's taken, honey. Ask the coat check.", "Not tonight, darling. The kitchen's looking for you."]
+      nickel: ["Found a nickel in the booth, sugar. It's yours.", "Here's a nickel, honey. Enjoy the show.", "A nickel with your table, darling."]
+      booths_full: ["Every booth is full! On your feet, everybody!", "Standing room only! Give 'em a hand!", "We're packed to the rafters, darling!"]
   mc:
     name: Smooth Sam, the MC
     voice: {model: en_US-john-medium, length_scale: 1.05}
@@ -54,7 +59,7 @@ characters:
       target_kitchen: ["Shoot the kitchen!", "Head for the kitchen!", "Fire one into the kitchen!", "The kitchen's got your nickel!"]
       target_bandstand: ["Spin the bandstand!", "Head to the bandstand!", "Give that spinner a whirl!", "The bandstand's got your nickel!"]
       target_coat_check: ["Shoot the coat check!", "Head to the coat check!", "Hit the coat check target!", "The coat check's holding your nickel!"]
-      target_back_door: ["Hit the back door!", "Round to the back door!", "Kick the back door!", "The back door's got your nickel!"]
+      target_booths: ["Shoot the booths!", "Head for the booths!", "Hit the flashing drop target!", "The booths have your nickel!"]
       skill_shot: ["Drop the needle! Hit the lit drop target!", "Skill shot! Drop the needle on the lit target!", "Needle's up! Shoot that lit drop target!"]
       song_jackpot: ["Jackpot!", "Jukebox jackpot!", "Cha-ching! Jackpot!", "That's a jackpot, baby!"]
       song_rung: ["Up the ladder!", "One more rung!", "Keep on climbing!", "Higher, baby, higher!"]

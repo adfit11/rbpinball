@@ -9,14 +9,14 @@ from custom_code.modern.scoring import award
 BASE_SWITCHES = {
     "s_top_bumpers_35": "bumper", "s_bottom_bumpers_13": "bumper", "s_10_points_15": "standup",
     "s_rollunder_25": "rollunder", "s_return_left_16": "left_return",
-    "s_outlane_left_6": "outlane", "s_outlane_right_5": "outlane",
+    "s_outlane_left_6": "outlane", "s_outlane_right_5": "outlane", "s_kicking_target_26": "standup",
 }
 TASK_EVENTS = (
     "modern_nickel_directed", "modern_nickel_awarded", "modern_nickel_spent", "modern_selector_opened",
     "modern_selector_closed", "modern_song_started", "modern_song_ended", "modern_lock_lit", "modern_ball_locked",
     "multiball_modern_rent_party_started", "multiball_modern_rent_party_ended",
 )
-LOCATION_SWITCHES = {"s_spot_target_36": "coat_check", "s_kicking_target_26": "back_door"}
+LOCATION_SWITCHES = {"s_spot_target_36": "coat_check"}
 
 BALL_VARS = (
     "modern_nickel", "modern_nickel_progress", "modern_ovation", "modern_songs_completed_ball",

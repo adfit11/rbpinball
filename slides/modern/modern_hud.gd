@@ -12,7 +12,7 @@ const RED := Color("#8a1010")
 const OVERLAY_STYLES := {"teal": TEAL, "gold": BRASS, "red": RED}
 const DUCK_DB := -12.0
 const VOICE_CUT_MS := 600  # lines posted together play one after another instead of cutting each other off
-const LOCATIONS := ["Bar", "Kitchen", "Bandstand", "Coat Check", "Back Door"]
+const LOCATIONS := ["Bar", "Kitchen", "Bandstand", "Coat Check", "Booths"]
 const SONG_FADE_S := 2.0  # a song fades out when its round ends instead of cutting off
 
 var title_font: Font = load("res://fonts/modern/Limelight-Regular.ttf")
@@ -291,7 +291,7 @@ func _extra_ball_lit() -> bool:
 
 
 func _target_name(key: String) -> String:
-	var names := {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check", "back_door": "Back Door"}
+	var names := {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check", "booths": "Booths"}
 	return ("Go to the %s" % names[key]) if key in names else ""
 
 
