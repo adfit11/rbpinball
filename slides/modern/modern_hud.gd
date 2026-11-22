@@ -22,7 +22,6 @@ var body_font: Font = load("res://fonts/modern/Oswald-Variable.ttf")
 var scores: HBoxContainer
 var ball_label: Label
 var side_labels := {}
-var record_row: HBoxContainer
 var song_panel: PanelContainer
 var song_title: Label
 var song_bar: ProgressBar
@@ -175,7 +174,7 @@ func _build() -> void:
 	var side_panel := _panel(Color(TEAL, 0.85))
 	side_panel.add_child(side)
 	_place(side_panel, 1040, 130, 220, 400)
-	for key in ["multiplier", "nickel", "target", "locks", "guests", "ovation", "saver"]:
+	for key in ["nickel", "target", "locks", "guests"]:
 		var l := _label("", 22)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD
 		l.custom_minimum_size = Vector2(190, 0)
@@ -207,15 +206,6 @@ func _build() -> void:
 	task_panel.visible = false
 
 	caption = _place(_label("", 22, CREAM), 140, 585, 1000, 34)
-
-	record_row = HBoxContainer.new()
-	record_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	record_row.add_theme_constant_override("separation", 14)
-	_place(record_row, 200, 632, 880, 70)
-	for i in range(10):
-		var rec := ColorRect.new()
-		rec.custom_minimum_size = Vector2(60, 60)
-		record_row.add_child(rec)
 
 	select_ring = ProgressBar.new()
 	select_ring.show_percentage = false
@@ -331,19 +321,12 @@ func _render() -> void:
 		l.text = "P%d  %s" % [i + 1, MPF.util.comma_sep(int(player.get("score", 0)))]
 		l.add_theme_color_override("font_color", GOLD if i + 1 == number else CREAM)
 	ball_label.text = "BALL %d" % int(active.get("ball", 1))
-	side_labels.multiplier.text = "SONG ×%d" % int(active.get("modern_song_multiplier", 1))
 	var held := int(active.get("modern_nickel", 0)) > 0
 	side_labels.nickel.text = "NICKEL: HELD" if held else "NICKEL: %d / %d" % [
 		int(active.get("modern_nickel_progress", 0)), int(active.get("modern_nickel_cost", 1))]
 	side_labels.target.text = "Shoot a lit crater!" if held else _target_name(str(active.get("modern_nickel_target", "")))
 	side_labels.locks.text = "LOCKS %d / 3" % int(active.get("modern_locked_balls", 0))
 	side_labels.guests.text = "LOCK IS LIT" if int(active.get("modern_lock_lit", 0)) else "LOCK: TOP BANK"
-	side_labels.ovation.text = "OVATION ×%d" % min(4, 1 + int(active.get("modern_ovation", 0)) + int(active.get("modern_songs_completed_ball", 0)))
-	side_labels.saver.text = "BOUNCER READY" if int(active.get("modern_ball_saver_ready", 0)) else ""
-	var lit := int(active.get("modern_round_songs", 0))
-	for i in range(record_row.get_child_count()):
-		var rec: ColorRect = record_row.get_child(i)
-		rec.color = GOLD if i < lit else Color(0.08, 0.05, 0.05, 0.9)
 
 
 func _extra_ball_lit() -> bool:

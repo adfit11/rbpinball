@@ -6,6 +6,7 @@ import random
 from mpf.core.mode import Mode
 
 from custom_code.modern import catalogue, settings
+from custom_code.modern.bonus import ovation
 from custom_code.modern.lamps import STEADY, director
 
 TRANSFER_FALLBACK_MS = 15_000
@@ -38,6 +39,8 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("modern_ball_released", self._resume)
         self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ball_eject_success",
                                     self._start_pending)
+        for name in ("player_modern_ovation", "player_modern_songs_completed_ball"):
+            self.add_mode_event_handler(name, self._show_ovation)
         self._show()
 
     # Craters ---------------------------------------------------------------
@@ -227,6 +230,9 @@ class ModernJukebox(Mode):
         if self.player.modern_songs_played >= settings.SPECIAL_AFTER_SONGS:
             self.machine.events.post("modern_light_special")
 
+    def _show_ovation(self, **kwargs):
+        self._show()
+
     def _show(self):
         lamps = self.lamps
         for index, light in enumerate(settings.SONG_LAMPS):
@@ -234,6 +240,9 @@ class ModernJukebox(Mode):
         mult = self.player.modern_song_multiplier
         for index, light in enumerate(settings.MULTIPLIER_LAMPS, 2):
             lamps.set("multiplier", light, STEADY if index == mult else 0)
+        level = ovation(self.player)
+        for index, light in enumerate(settings.OVATION_LAMPS, 2):
+            lamps.set("ovation", light, STEADY if index == level else 0)
 
     def mode_stop(self, **kwargs):
         if self.selector_open:
@@ -250,5 +259,6 @@ class ModernJukebox(Mode):
         try:
             self.lamps.clear("songs")
             self.lamps.clear("multiplier")
+            self.lamps.clear("ovation")
         except KeyError:
             pass

@@ -192,11 +192,11 @@ Each song played SHALL light the next lamp of L33-L42 in order. The lamps SHALL 
 - **THEN** lamps L33-L35 are lit for that player
 
 ### Requirement: Raise the song multiplier every five songs
-The song multiplier SHALL be 2x after five songs, 3x after ten, 4x after fifteen, and 5x after twenty songs played, and SHALL apply to all Modern scoring for that player for the rest of the game. Lamps L4-L7 SHALL show the current multiplier.
+The song multiplier SHALL be 2x after five songs, 3x after ten, and 4x after fifteen songs played, and SHALL apply to all Modern scoring for that player for the rest of the game. The playfield's 2x-4x lamps (L30-L32) SHALL show the current multiplier by lighting the lamp for that level only; the back-box screen SHALL NOT show it.
 
 #### Scenario: The fifth song starts
 - **WHEN** the player's fifth song starts
-- **THEN** the song multiplier becomes 2x, lamp L4 lights, and later scores are doubled
+- **THEN** the song multiplier becomes 2x, lamp L30 lights, and later scores are doubled
 
 ### Requirement: Award the special after ten songs
 When the player's tenth song ends, Modern SHALL light the special at the Bar, flashing lamp L44. Collecting it SHALL fire the knocker, show an on-screen free-game award, and score the special points. The special SHALL be awarded at most once per player per game.

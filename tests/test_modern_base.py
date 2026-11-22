@@ -353,6 +353,28 @@ class TestModernBallFeatures(ModernTestCase):
         self.assertEqual(kwargs["ovation"], 2)
         self.assertEqual(kwargs["points"], kwargs["subtotal"] * 2)
 
+    def test_multiplier_lamps_show_song_and_ovation_levels(self):
+        self.start_modern()
+        lamps = director(self.machine)
+        jukebox = self.machine.modes["modern_jukebox"]
+
+        def lit(group):
+            return [l for l in group if lamps.state(l) == STEADY]
+        self.assertEqual(lit(settings.MULTIPLIER_LAMPS + settings.OVATION_LAMPS), [])
+        self.player.modern_songs_played = settings.MULTIPLIER_EVERY * 10 - 1
+        jukebox._count_song()
+        self.assertEqual(self.player.modern_song_multiplier, 4)
+        self.assertEqual(lit(settings.MULTIPLIER_LAMPS), ["l_xxx_32"])
+        self.player.modern_ovation = 1
+        self.advance_time_and_run(.1)
+        self.assertEqual(lit(settings.OVATION_LAMPS), ["l_xxx_04"])
+        self.player.modern_ovation = settings.MAX_OVATION - 1
+        self.player.modern_songs_completed_ball = 2
+        self.advance_time_and_run(.1)
+        self.assertEqual(ovation(self.player), 5)
+        self.assertEqual(lit(settings.OVATION_LAMPS), ["l_xxx_07"])
+        self.assertEqual(lit(settings.MULTIPLIER_LAMPS), ["l_xxx_32"])
+
     def test_extra_ball_collected_at_kitchen(self):
         self.start_modern()
         self.post_event("modern_light_extra_ball", .1)

@@ -83,7 +83,7 @@ Modern SHALL show a designed screen, not plain debug text, for each state: the r
 - **THEN** its own screen or overlay is shown in the juke-joint style
 
 ### Requirement: Keep the base HUD visible
-During play, the base HUD SHALL show the player, ball, score, song multiplier, Standing Ovation, nickel progress or held nickel, the songs played, the lock state, and the subway lock count. Feature screens SHALL overlay it rather than hide it, except the selector, the splash, and the bonus.
+During play, the base HUD SHALL show the player, ball, score, nickel progress or held nickel, the lock state, and the subway lock count. The songs played, the song multiplier, Standing Ovation, and the Bouncer ball saver SHALL be shown only by their playfield lamps, not on the HUD. Feature screens SHALL overlay it rather than hide it, except the selector, the splash, and the bonus.
 
 #### Scenario: A mode is running
 - **WHEN** a song mode is active
