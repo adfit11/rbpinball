@@ -29,6 +29,7 @@ class ModernRentParty(Mode):
         self.jackpots = 0
         self.super_lit = False
         self.total = 0
+        self.building = False
         self.add_mode_event_handler("multiball_lock_modern_subway_lock_full", self._build_up)
         self.add_mode_event_handler("modern_location_hit", self._location)
         self.add_mode_event_handler("modern_bank_completed", self._bank)
@@ -111,6 +112,7 @@ class ModernRentParty(Mode):
     # Rent Party --------------------------------------------------------------
     def _build_up(self, **kwargs):
         """The third lock holds every ball while the riser plays; the multiball starts when it peaks."""
+        self.building = True
         self.machine.events.post("modern_rent_party_build_up", ms=S.RENT_PARTY_BUILD_UP_MS)
         self.machine.events.post("modern_overlay", title="THE BACK ROOM IS FULL!", subtitle="Get ready for the RENT PARTY…",
                                  ms=S.RENT_PARTY_BUILD_UP_MS, style="gold")
@@ -122,6 +124,7 @@ class ModernRentParty(Mode):
         owners = self.lock_owners
         crasher = any(owner != self.player.number for owner in owners)
         self._owners = []
+        self.building = False
         self.multiball, self.jackpots, self.super_lit, self.total = True, 0, False, 0
         self.player.modern_lock_lit = 0
         self.player.modern_guests = 0
@@ -163,3 +166,7 @@ class ModernRentParty(Mode):
 
     def mode_stop(self, **kwargs):
         self.lamps.clear("rent_party")
+        if self.building:  # a tilt cancelled the party; free the back room so the next ball can be served
+            self.building = False
+            self.lock_owners.clear()
+            self.machine.ball_devices[LOCK_DEVICE].eject_all()

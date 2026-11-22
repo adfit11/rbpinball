@@ -123,3 +123,22 @@ class TestModernRentParty(ModernTestCase):
         self.assertFalse(jukebox.selector_open)
         self.assertEventNotCalled("modern_nickel_spent")
         self.assertEqual(self.player.modern_nickel, 1)
+
+    def test_tilt_during_build_up_releases_the_back_room(self):
+        self.start_modern()
+        self.fill_guest_list()
+        for _ in range(3):
+            self.lock_ball()
+            self.advance_time_and_run(3)
+        self.assertEqual(self.lock.balls, 3)
+        for _ in range(S.WARNINGS_TO_TILT + 1):
+            self.hit_and_release_switch("s_tilt_46")
+            self.advance_time_and_run(1.5)
+        self.advance_time_and_run(5)
+        self.assertEqual(self.lock.balls, 0)
+        for _ in range(3):
+            self.drain_one_ball()
+            self.advance_time_and_run(4)
+        self.advance_time_and_run(10)
+        self.assertBallNumber(2)
+        self.assertEqual(self.machine.playfield.balls, 1)
