@@ -163,11 +163,11 @@ Each song mode SHALL have its own designed display, in front of the artist video
 - **THEN** a completed screen animates in with the mode's points and the completion award, then clears back to the HUD
 
 ### Requirement: Celebrate each mode shot
-Each shot that pays a song mode's goal SHALL light lamps 1-10 (L33-L42) one after another from 1 to 10, flash them all twice, then return them to their normal state. It SHALL also play the jackpot sound and flash the screen gold. Mode shots include a jackpot, a rung, a hurry-up collect, a pot collect, a roving-shot hit, an order pickup or delivery, a request, and a Hit me! hit.
+Each shot that pays a song mode's goal SHALL light every playfield lamp in rows from the bottom of the table to the top, including lamps 1-10, the song and Standing Ovation multiplier lamps and the lava level lamps, flash them all twice, then return them to their normal state. Lamps L8, L15 and L16 drive coils and SHALL NOT be part of it. It SHALL also play the jackpot sound and flash the screen gold. Mode shots include a jackpot, a rung, a hurry-up collect, a pot collect, a roving-shot hit, an order pickup or delivery, a request, and a Hit me! hit.
 
 #### Scenario: A jackpot is made
 - **WHEN** the player collects a Jukebox jackpot
-- **THEN** lamps 1-10 burst upward and flash, then show the songs played again
+- **THEN** the playfield lamps burst from bottom to top and flash, then return to their normal state
 
 ### Requirement: Voice each song mode
 Each song mode SHALL have callout pools for its start, its progress hits, completion, failure, and running low on time, spoken in character.

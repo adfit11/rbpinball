@@ -9,6 +9,7 @@ Everything below was verified only in simulation. Check each item on the real ma
 - [ ] Location lamps flash when the player is directed to them: Bar L47, Kitchen L45, Bandstand L46, Coat Check L43.
 - [ ] Booths: with the Booths as the nickel target, check L29 and the lamp by every standing right-bank target flash, and a knocked-down target's lamp goes dark.
 - [ ] Shoot Again L3, extra ball L45 and special L44 light as described.
+- [ ] Song-mode shot burst: every playfield lamp lights in rows from the bottom of the table to the top, then flashes twice. L8, L15 and L16 (coils) stay out of it.
 - [ ] Classic note: Classic lights L4-L6 for ball save ready, but the lamp sheet says those are multiplier lamps. Confirm, and fix it separately if wrong.
 
 ## Ball handling
@@ -16,6 +17,7 @@ Everything below was verified only in simulation. Check each item on the real ma
 - [ ] After a song is picked, the ball returns through the subway kicker and the song clock starts only then.
 - [ ] Bar (saucer) and Kitchen (fire pit) holds release after about 1 s, including the Ladder and Order Up holds.
 - [ ] Locked balls stay in the subway between players and games. Modern never kicks them out.
+- [ ] Completing the top drop bank lights the lock; a lit crater then locks one ball and the lock goes out.
 - [ ] Rent Party: the third lock releases all three balls and play continues with 3 balls.
 - [ ] Gate Crasher: with 2 players, player 1 locks 2 balls and player 2 locks the third. "GATE CRASHER!" shows.
 

@@ -98,9 +98,7 @@ class TestModernDirections(ModernTestCase):
         self.start_modern()
         self.start_song()
         party = self.machine.modes["modern_rent_party"]
-        for guest in S.GUESTS:
-            party._guest(guest)
-        self.assertEqual(self.player.modern_guests, 0)
+        party._bank("top_bank")
         self.assertEqual(self.player.modern_lock_lit, 0)
         targets = self.machine.modes["modern_targets"]
         ovation, start = self.player.modern_ovation, self.player.score
