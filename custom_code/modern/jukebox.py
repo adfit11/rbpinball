@@ -21,7 +21,6 @@ class ModernJukebox(Mode):
         self.ball_waiting = False
         self.song = None
         self.pending_song = None
-        self.lock_entry = False
         self.song_remaining_ms = 0
         self.song_started_at = None
         self.pauses = set()
@@ -33,8 +32,6 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("modern_ball_released", self._resume)
         self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ball_eject_success",
                                     self._start_pending)
-        # A locked jukebox ball: the song starts as the replacement leaves the trough.
-        self.add_mode_event_handler("balldevice_bd_trough_ball_eject_success", self._start_pending)
         self._show()
 
     # Craters ---------------------------------------------------------------
@@ -52,18 +49,15 @@ class ModernJukebox(Mode):
         if self.machine.game.balls_in_play > 1:
             return
         rent_party = self.machine.modes["modern_rent_party"]
+        if rent_party.active and rent_party.qualify_lock():
+            return  # the lock takes the ball; a nickel is kept for the next lit crater
         if not player.modern_nickel or not lit:
-            if rent_party.active and rent_party.qualify_lock():
-                return
             if not player.modern_nickel:
                 self.machine.events.post("modern_jukebox_no_nickel")
                 self.machine.events.post("modern_callout", pool="mc_needs_nickel")
             return
-        locking = rent_party.active and rent_party.qualify_lock()
         self.machine.events.post("modern_nickel_spent")
-        self.lock_entry = locking
-        if not locking:
-            self.machine.events.post("modern_jukebox_hold_enable")
+        self.machine.events.post("modern_jukebox_hold_enable")
         self._open_selector()
 
     # Selector --------------------------------------------------------------
@@ -127,13 +121,8 @@ class ModernJukebox(Mode):
         if not self.chosen:
             return
         song, self.chosen = self.chosen, None
-        if self.lock_entry:
-            # The ball stayed in the lock; its replacement is already being served.
-            self.lock_entry = False
-            self._start_song(song)
-        else:
-            self._count_song()
-            self._start_song(song, counted=True)
+        self._count_song()
+        self._start_song(song, counted=True)
 
     def _read_done(self):
         self.machine.events.post("modern_record_crackle_stop")
