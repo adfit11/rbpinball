@@ -95,6 +95,33 @@ class TestModernSongs(ModernTestCase):
         self.assertEventCalledWith("modern_song_jackpot", crater=3, value=S.JACKPOT_VALUES[2], count=1)
         self.assertIn("mc_song_jackpot", callouts)
 
+    def test_jukebox_jackpot_round_lasts_45_seconds(self):
+        self.start_slot(5)
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.mock_event("modern_song_started")
+        self.assertLessEqual(jukebox.song_remaining(), S.JACKPOT_ROUND_MS)
+        self.mock_event("modern_song_failed")
+        self.advance_time_and_run(S.JACKPOT_ROUND_MS / 1000 - 1)
+        self.assertIsNotNone(jukebox.song)
+        self.advance_time_and_run(1.5)
+        self.assertIsNone(jukebox.song)
+        self.assertEventCalled("modern_song_failed")
+
+    def test_jukebox_jackpot_ends_on_the_third_jackpot(self):
+        rule = self.start_slot(5)
+        for crater in (1, 2, 3):
+            rule.on_crater(crater, False)
+            self.advance_time_and_run(.1)
+        self.assertTrue(rule.completed)
+        self.assertIsNone(self.machine.modes["modern_jukebox"].song)
+        self.assertIsNone(self.machine.modes["modern_songs"].rule)
+
+    def test_jukebox_jackpot_status_shows_each_crater_value(self):
+        rule = self.start_slot(5)
+        rule.on_crater(4, False)
+        self.assertIn("1: 175K", rule.status())
+        self.assertIn("4: 325K", rule.status())
+
     def test_party_time_doubles_and_pays_last_dance(self):
         rule = self.start_slot(6)
         self.assertEqual(self.player.modern_ball_saver_ready, 1)

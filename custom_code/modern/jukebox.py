@@ -176,6 +176,10 @@ class ModernJukebox(Mode):
             self.machine.events.post("modern_light_extra_ball")
         player.modern_song_active = 1
         length = catalogue.mp3_length_ms(os.path.join(catalogue.ROOT, song.path), settings.DEFAULT_SONG_MS)
+        from custom_code.modern.songs import SLOT_RULES
+        round_ms = SLOT_RULES[song.slot].round_ms
+        if round_ms:
+            length = min(length, round_ms)
         self.song = song
         self.song_remaining_ms = length
         self.pauses.clear()

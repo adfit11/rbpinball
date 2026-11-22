@@ -6,11 +6,15 @@ Gives each Modern jukebox song a short, artist-neutral challenge, with comparabl
 ## Requirements
 
 ### Requirement: Time each mode by its song
-A song mode SHALL run for the length of its song cut, which is about 60 s. The timer and the song SHALL pause while the ball is held in the saucer, the fire pit, or the subway, and resume when the ball is released.
+A song mode SHALL run for its round length: the length of its song cut (about 60 s) unless the mode sets a shorter round. When a shorter round ends, the song SHALL fade out over 2 s instead of stopping abruptly. The timer and the song SHALL pause while the ball is held in the saucer or the fire pit, and resume when the ball is released. Subway trips SHALL NOT pause them.
 
 #### Scenario: The ball is held during a song
 - **WHEN** the ball is held for 1 s in the fire pit during a song
 - **THEN** the remaining song time is the same when the ball is released
+
+#### Scenario: A 45 s round ends
+- **WHEN** Jukebox jackpot has run for 45 s
+- **THEN** the mode ends and the song fades out
 
 ### Requirement: End the mode on drain
 A drain SHALL end the active song mode immediately, and the song SHALL still count as played.
@@ -90,11 +94,15 @@ One location SHALL light and move to a different random location every 3 s. Hitt
 - **THEN** the lit location stops moving
 
 ### Requirement: Mode 5 Jukebox jackpot
-All four crater lamps SHALL light. Each crater entry SHALL pay a jackpot of 150,000, 200,000, 250,000, or 300,000 for craters 1-4, plus 25,000 per jackpot already collected. The ball SHALL kick straight back without locking or opening the selector. Three jackpots SHALL complete the mode, which runs until the song ends.
+The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry SHALL pay a jackpot of 150,000, 200,000, 250,000, or 300,000 for craters 1-4, plus 25,000 per jackpot already collected. The ball SHALL kick straight back without locking or opening the selector. Three jackpots SHALL complete and end the mode. The mode banner SHALL show the jackpots collected and the current value of each crater.
 
 #### Scenario: The second jackpot
 - **WHEN** the player has one jackpot and enters crater 4
 - **THEN** 325,000 scores and the ball is kicked back
+
+#### Scenario: The third jackpot
+- **WHEN** the player collects a third jackpot
+- **THEN** the mode is completed and ends, and the song fades out
 
 ### Requirement: Mode 6 Party time
 All scoring SHALL be doubled for the song, on top of the song multiplier. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
@@ -136,7 +144,7 @@ A dial SHALL cycle through the five locations about four times a second. A green
 - **THEN** the dial stops on a location, which flashes for 250,000, and the craters do not freeze
 
 ### Requirement: Present each song mode
-Each song mode SHALL have its own designed overlay showing the artist, the song, the time remaining, the mode's goal and progress, and its live values. Examples are the hurry-up value draining, the ladder rungs, the pot, the roving shot, the jackpot values, the bumper count, the order and table, the open requests, and the dial. Each mode SHALL have animated start, completed, and failed screens.
+Each song mode SHALL have its own designed display, in front of the artist video and the HUD widgets, showing the artist, the song, the time remaining, the mode's goal and progress, and its live values. Examples are the hurry-up value draining, the ladder rungs, the pot, the roving shot, the jackpot values, the bumper count, the order and table, the open requests, and the dial. Each mode SHALL have animated start, completed, and failed screens.
 
 #### Scenario: The ladder overlay
 - **WHEN** Ladder is running and the player has climbed two rungs
