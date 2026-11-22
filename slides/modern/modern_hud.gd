@@ -38,6 +38,8 @@ var selector_cells: Array = []
 var selector_timer: Label
 var select_ring: ProgressBar
 var music: AudioStreamPlayer
+var effects: AudioStreamPlayer  # one-shot effects such as the Rent Party riser
+var rent_party_song: AudioStream
 var music_fade: Tween  # fades the house band out while the record crackles, and a song out when its round ends
 var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
@@ -68,7 +70,7 @@ const EVENTS := [
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
-	"modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
+	"modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
 
@@ -217,6 +219,9 @@ func _build() -> void:
 	music.bus = "music"
 	add_child(music)
 	music.finished.connect(_on_music_finished)
+	effects = AudioStreamPlayer.new()
+	effects.bus = "effects"
+	add_child(effects)
 	voice = AudioStreamPlayer.new()
 	voice.bus = "voice"
 	voice.finished.connect(_voice_done)
@@ -446,6 +451,31 @@ func _play_artist_pick() -> void:
 	music.stop()
 	if artist_pick_song:
 		music.stream = artist_pick_song
+		music.volume_db = 0.0
+		music.play()
+
+
+func _play_rent_party_build_up() -> void:
+	_fade_out_music(0.5)
+	var stream := _load_audio("res://sounds/modern_sfx/rent_party_build_up.mp3")
+	if stream:
+		effects.stream = stream
+		effects.volume_db = 0.0
+		effects.play()
+
+
+func _play_rent_party() -> void:
+	## Loops for as long as the multiball is alive.
+	effects.stop()
+	if rent_party_song == null:
+		rent_party_song = _load_audio("res://sounds/modern_music/rent_party.mp3")
+		if rent_party_song is AudioStreamMP3:
+			rent_party_song.loop = true
+	_stop_music_fade()
+	music.stop()
+	playing_house_band = false
+	if rent_party_song:
+		music.stream = rent_party_song
 		music.volume_db = 0.0
 		music.play()
 
@@ -695,6 +725,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 			show_overlay("TILT", "The bouncer shows you the door", 3000)
 		"ball_will_end":
 			between_balls = true
+			effects.stop()
 			_stop_artist_video()
 			song_panel.visible = false
 			_play_between_balls()
@@ -707,7 +738,11 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_overlay":
 			show_overlay(str(payload.get("title", "")), str(payload.get("subtitle", "")), int(payload.get("ms", 1800)),
 				OVERLAY_STYLES.get(str(payload.get("style", "")), BURGUNDY))
+		"modern_rent_party_build_up":
+			_play_rent_party_build_up()
 		"modern_rent_party_started":
+			if not between_balls:
+				_play_rent_party()
 			mode_banner.text = "RENT PARTY  •  LIT CRATERS = JACKPOT %s" % MPF.util.comma_sep(int(payload.get("jackpot", 0)))
 		"modern_song_shot":
 			flash_screen(GOLD)
@@ -720,6 +755,10 @@ func _on_event(payload: Dictionary = {}) -> void:
 			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT COLLECTED!"
 		"modern_rent_party_ended":
 			mode_banner.text = ""
+			if not between_balls and music.stream == rent_party_song:
+				_fade_out_music(1.0, func():
+					if not between_balls:
+						_play_house_band())
 		"modern_task":
 			task_title.text = str(payload.get("title", ""))
 			task_detail.text = str(payload.get("detail", ""))

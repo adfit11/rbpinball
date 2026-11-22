@@ -87,8 +87,13 @@ class TestModernRentParty(ModernTestCase):
             self.advance_time_and_run(3)
         self.mock_event("modern_rent_party_started")
         self.fill_guest_list()
+        self.mock_event("modern_rent_party_build_up")
         self.lock_ball()
         self.advance_time_and_run(5)
+        self.assertEventCalled("modern_rent_party_build_up")
+        self.assertEventNotCalled("modern_rent_party_started")
+        self.assertEqual(self.lock.balls, 3)  # every ball waits in the back room during the build-up
+        self.advance_time_and_run(S.RENT_PARTY_BUILD_UP_MS / 1000)
         self.assertEventCalled("modern_rent_party_started")
         self.assertFalse(self._last_event_kwargs["modern_rent_party_started"]["gate_crasher"])
         self.assertEqual(self.machine.game.balls_in_play, 3)
@@ -125,7 +130,7 @@ class TestModernRentParty(ModernTestCase):
         self.fill_guest_list()
         self.mock_event("modern_gate_crasher")
         self.lock_ball()
-        self.advance_time_and_run(5)
+        self.advance_time_and_run(5 + S.RENT_PARTY_BUILD_UP_MS / 1000)
         self.assertEventCalled("modern_gate_crasher")
         self.assertEqual(self.machine.game.balls_in_play, 3)
 
@@ -146,3 +151,22 @@ class TestModernRentParty(ModernTestCase):
         self.advance_time_and_run(1)
         self.assertTrue(jukebox.selector_open)
         self.assertEventCalled("modern_nickel_spent")
+
+    def test_tilt_during_build_up_releases_the_back_room(self):
+        self.start_modern()
+        for _ in range(3):
+            self.fill_guest_list()
+            self.lock_ball()
+            self.advance_time_and_run(3)
+        self.assertEqual(self.lock.balls, 3)
+        for _ in range(S.WARNINGS_TO_TILT + 1):
+            self.hit_and_release_switch("s_tilt_46")
+            self.advance_time_and_run(1.5)
+        self.advance_time_and_run(5)
+        self.assertEqual(self.lock.balls, 0)
+        for _ in range(3):
+            self.drain_one_ball()
+            self.advance_time_and_run(4)
+        self.advance_time_and_run(10)
+        self.assertBallNumber(2)
+        self.assertEqual(self.machine.playfield.balls, 1)

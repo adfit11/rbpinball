@@ -6,7 +6,7 @@ Defines how a Modern player lights and makes physical subway locks through the g
 ## Requirements
 
 ### Requirement: Fill the guest list
-Each club location and each completed drop bank SHALL count once as a guest, making seven possible guests. A guest SHALL count at most once per list, and three guests SHALL fill it. Guests SHALL count during a song. The screen SHALL show the list. A location hit SHALL count toward the guest list and the nickel hunt at the same time.
+Each club location and each completed drop bank SHALL count once as a guest, making seven possible guests. A guest SHALL count at most once per list, and three guests SHALL fill it. Guests SHALL NOT count during a song, because only the song mode advances then. The screen SHALL show the list. A location hit SHALL count toward the guest list and the nickel hunt at the same time.
 
 #### Scenario: A guest arrives
 - **WHEN** the player hits the Bandstand for the first time on this list
@@ -19,12 +19,12 @@ Each club location and each completed drop bank SHALL count once as a guest, mak
 ### Requirement: Reset the guest list at drain
 The guest list and its progress SHALL reset at the end of every ball, and a lit lock SHALL go out with it.
 
-#### Scenario: The ball drains with four guests
+#### Scenario: The ball drains with two guests
 - **WHEN** the ball ends with two guests on the list
 - **THEN** the player's next ball starts with an empty list and no lit lock
 
 ### Requirement: Lock balls at a lit crater
-Filling the guest list SHALL light the lock for the current player until one ball is locked or the ball ends. If the list fills during a song, the "lock is lit" overlay and callout SHALL wait until the song ends, because craters do not lock during a song. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Each lock SHALL put the lock out and empty the guest list, so every lock needs a full list. An unlit crater SHALL NOT lock.
+Filling the guest list SHALL light the lock for the current player until one ball is locked or the ball ends. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Each lock SHALL put the lock out and empty the guest list, so every lock needs a full list. An unlit crater SHALL NOT lock.
 
 #### Scenario: The first lock
 - **WHEN** the lock is lit, the subway is empty, and the ball enters a lit crater
@@ -57,11 +57,11 @@ Locked balls SHALL stay in the subway across turn changes and SHALL NOT be eject
 - **THEN** the screen shows two balls locked
 
 ### Requirement: Start Rent Party with three balls
-The third locked ball SHALL start Rent Party, releasing the subway to put three balls in play. The jukebox SHALL stay closed during Rent Party.
+The third locked ball SHALL start an 8 s build-up: every ball stays in the subway while a rising effect plays and the MC announces the Rent Party over it. When the build-up ends, Rent Party SHALL start, releasing the subway to put three balls in play, and the Rent Party music SHALL loop until the multiball ends. The jukebox SHALL stay closed during Rent Party.
 
 #### Scenario: The third lock
 - **WHEN** the subway holds two balls and a third is locked
-- **THEN** Rent Party starts with three balls in play
+- **THEN** the build-up plays for 8 s with all three balls held, then Rent Party starts with three balls in play and its music
 
 ### Requirement: Pay Rent Party jackpots
 During Rent Party, entering a lit crater SHALL pay a jackpot of 250,000 plus 50,000 for each jackpot already paid. After three jackpots, the Bar SHALL light for a 1,000,000 super jackpot. Values are before the song multiplier.

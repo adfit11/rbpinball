@@ -22,4 +22,4 @@ multiballs:
     ball_locks: bd_classic_subway_lock
     replace_balls_in_play: true
     shoot_again: 0
-    start_events: multiball_lock_modern_subway_lock_full
+    start_events: modern_rent_party_go  # after the build-up

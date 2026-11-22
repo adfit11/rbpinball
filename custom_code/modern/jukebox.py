@@ -11,6 +11,12 @@ from custom_code.modern.lamps import STEADY, director
 TRANSFER_FALLBACK_MS = 15_000
 
 
+def song_mode_running(machine):
+    """From the selector opening until the song ends, only the song mode's rules advance."""
+    jukebox = machine.modes["modern_jukebox"]
+    return bool(jukebox.active and jukebox.busy)
+
+
 class ModernJukebox(Mode):
 
     def mode_start(self, **kwargs):
