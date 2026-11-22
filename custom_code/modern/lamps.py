@@ -56,9 +56,10 @@ class LampDirector:
             self.pattern.kick()
 
     def ambient_free(self, name):
-        """Lamps the ambient layer may light: unrequested, and never a location, special or shoot-again lamp."""
+        """Lamps the ambient layer may light: unrequested, and never a location, special, multiplier or shoot-again lamp."""
         busy = {settings.SHOOT_AGAIN_LAMP}
         if name != "multiball":
+            busy |= set(settings.MULTIPLIER_LAMPS) | set(settings.OVATION_LAMPS)
             busy |= WATCHED | set(settings.DROP_LAMPS) | {settings.BANK_LAMPS["right_bank"], settings.SPECIAL_LAMP}
         return [l for l in settings.LAMP_XY if l not in busy and self.state(l) == OFF]
 

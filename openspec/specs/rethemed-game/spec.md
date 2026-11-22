@@ -74,11 +74,11 @@ Modern SHALL NOT re-serve a drained ball automatically. Its only ball save SHALL
 - **THEN** the ball ends
 
 ### Requirement: Multiply the bonus by Standing Ovation
-The end-of-ball bonus SHALL be 100 per bumper hit, 2,500 per club location hit, 1,000 per drop target, and 25,000 per song played this ball. It SHALL be multiplied by Standing Ovation: 1 plus the songs completed this ball plus Drop the Needle steps, capped at 4x. Lamps L30-L32 SHALL show 2x-4x, and Standing Ovation SHALL reset every ball.
+The end-of-ball bonus SHALL be 100 per bumper hit, 2,500 per club location hit, 1,000 per drop target, and 25,000 per song played this ball. It SHALL be multiplied by Standing Ovation: 1 plus the songs completed this ball plus Drop the Needle steps, capped at 5x. The playfield's 2x-5x lamps (L4-L7) SHALL show the current level by lighting the lamp for that level only, the back-box screen SHALL NOT show it, and Standing Ovation SHALL reset every ball.
 
 #### Scenario: Two songs completed this ball
 - **WHEN** a ball ends after the player completed two songs and made no Drop the Needle
-- **THEN** the bonus is counted at 3x, and L30 and L31 were lit during the ball
+- **THEN** the bonus is counted at 3x, and lamp L5 (3x) is lit when the ball ends
 
 ### Requirement: Award Modern extra balls at the Kitchen
 The player's third and seventh songs SHALL each light an extra ball at the Kitchen when the song ends, so no song mode starts with an extra ball lit. A song cut short by a drain or tilt SHALL NOT light one. At most one extra ball SHALL be lit at a time, and a player SHALL earn at most two per game. Entering the Kitchen SHALL collect a lit extra ball and light shoot again (L3). A lit, uncollected extra ball SHALL be lost at drain.
