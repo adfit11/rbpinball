@@ -206,12 +206,17 @@ class TestModernSongs(ModernTestCase):
         self.assertTrue(rule.completed)
 
     def test_hit_me_dial_green_stops_without_freezing(self):
+        self.mock_event("modern_hit_me_dial")
         rule = self.start_slot(10)
         self.mock_event("modern_lamps_frozen")
         self.advance_time_and_run(.6)
+        self.assertTrue(self._last_event_kwargs["modern_hit_me_dial"]["spinning"])
         self.hit_and_release_switch("s_green_button_right_56")
         self.advance_time_and_run(.1)
         self.assertFalse(rule.spinning)
+        dial = self._last_event_kwargs["modern_hit_me_dial"]
+        self.assertEqual((dial["index"], dial["spinning"]), (rule.index, False))
+        self.assertEqual(dial["names"].split("|")[rule.index], S.LOCATIONS[rule.target][0].removeprefix("the "))
         self.assertEventNotCalled("modern_lamps_frozen")
         for _ in range(3):
             rule.stop_dial()

@@ -89,6 +89,9 @@ var hurry_total_ms := 1.0
 var hurry_elapsed_ms := 0.0
 var hurry_start := 0
 var hurry_end := 0
+var dial_root: Control  # Hit me!'s dial: turns with the playfield lamps and stops where they stop
+var dial: HitMeDial
+var dial_label: Label
 const HURRY_GREEN := Color("#5ad65a")
 const HURRY_RED := Color("#ff3b30")
 const HURRY_PANIC_MS := 5000.0
@@ -103,7 +106,7 @@ const EVENTS := [
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
-	"modern_hurry_up_started", "modern_hurry_up_ended",
+	"modern_hurry_up_started", "modern_hurry_up_ended", "modern_hit_me_dial",
 ]
 
 
@@ -313,6 +316,20 @@ func _build() -> void:
 	hurry_value.size = Vector2(280, 56)
 	hurry_root.visible = false
 
+	dial_root = Control.new()
+	_place(dial_root, 30, 170, 280, 330)
+	dial_root.pivot_offset = Vector2(140, 165)
+	dial_label = _label("", 22, CREAM, title_font)
+	dial_root.add_child(dial_label)
+	dial_label.position = Vector2(0, 0)
+	dial_label.size = Vector2(280, 44)
+	dial = HitMeDial.new()
+	dial.font = body_font
+	dial.position = Vector2(20, 70)
+	dial.size = Vector2(240, 240)
+	dial_root.add_child(dial)
+	dial_root.visible = false
+
 	overlay_root = Control.new()
 	_place(overlay_root, 0, 0, 1280, 720)
 	_build_selector()
@@ -454,13 +471,14 @@ func _extra_ball_lit() -> bool:
 func _process(delta: float) -> void:
 	_spin_process(delta)
 	_hurry_process(delta)
+	_dial_process(delta)
 	if song_live and song_length_ms > 0:
 		if not song_paused:
 			song_elapsed_ms += delta * 1000.0
 		card_bar.value = 100.0 * (1.0 - min(1.0, song_elapsed_ms / song_length_ms))
 		var left := int(ceil(max(0.0, song_length_ms - song_elapsed_ms) / 1000.0))
 		card_label.text = "%s  •  %d:%02d LEFT" % [song_artist.to_upper(), left / 60, left % 60]
-	var side := hurry_root.visible or spin_root.visible  # Louis Jordan's clock and Big Joe's record sit on the left
+	var side := hurry_root.visible or spin_root.visible or dial_root.visible  # mode widgets sit on the left
 	var w := 720.0 if side else 800.0
 	card.custom_minimum_size.x = w
 	card.size = Vector2(w, 0)
@@ -616,6 +634,87 @@ func _end_hurry(payload: Dictionary) -> void:
 		tw.tween_interval(0.8)
 	tw.tween_property(hurry_root, "modulate:a", 0.0, 0.4)
 	tw.tween_callback(func(): hurry_root.visible = false)
+
+
+# Hit me!'s dial ----------------------------------------------------------
+class HitMeDial extends Control:
+	## A wheel of the five locations under a fixed pointer; it turns one wedge per lamp step.
+	var names := PackedStringArray()
+	var top := 0  # the wedge under the pointer
+	var angle := 0.0
+	var target_angle := 0.0
+	var landed := false
+	var glow := 0.0
+	var font: Font
+
+	func _draw() -> void:
+		var n := names.size()
+		if n == 0:
+			return
+		var c := size / 2.0
+		var r: float = min(size.x, size.y) / 2.0
+		var seg := TAU / n
+		if landed:
+			draw_circle(c, r + 10.0, Color(1.0, 0.81, 0.35, 0.25 + 0.35 * glow))
+		for i in n:
+			var mid := -PI / 2 + angle + i * seg
+			var pts := PackedVector2Array([c])
+			for k in 13:
+				var a := mid - seg / 2.0 + seg * k / 12.0
+				pts.append(c + Vector2(cos(a), sin(a)) * r)
+			var color := Color("#0f4a4a") if i % 2 == 0 else Color("#5a1020")
+			if landed and i == top:
+				color = Color("#ffcf5a")
+			draw_colored_polygon(pts, color)
+			draw_line(c, c + Vector2(cos(mid - seg / 2.0), sin(mid - seg / 2.0)) * r, Color("#f6e7c8"), 2.0)
+			draw_set_transform(c + Vector2(cos(mid), sin(mid)) * r * 0.62, mid + PI / 2, Vector2.ONE)
+			draw_string(font, Vector2(-60, 8), names[i].to_upper(), HORIZONTAL_ALIGNMENT_CENTER, 120, 20,
+				Color("#111111") if landed and i == top else Color("#f6e7c8"))
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		draw_arc(c, r, 0, TAU, 64, Color("#ffcf5a"), 4.0)
+		draw_circle(c, r * 0.16, Color("#ffcf5a"))
+		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -r + 18), c + Vector2(-16, -r - 22), c + Vector2(16, -r - 22)]), Color.WHITE)
+
+
+func _show_dial(payload: Dictionary) -> void:
+	var index := int(payload.get("index", -1))
+	if index < 0:
+		dial_root.visible = false
+		return
+	dial.names = str(payload.get("names", "")).split("|")
+	var n: int = max(1, dial.names.size())
+	var seg := TAU / n
+	if not dial_root.visible:
+		dial.top = index
+		dial.angle = -index * seg
+		dial.target_angle = dial.angle
+		dial_root.visible = true
+		dial_root.scale = Vector2(0.3, 0.3)
+		create_tween().tween_property(dial_root, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	else:
+		dial.target_angle -= posmod(index - dial.top, n) * seg  # always turns the same way
+		dial.top = index
+	var was_landed := dial.landed
+	dial.landed = not payload.get("spinning", true)
+	if dial.landed:
+		dial_label.text = "SHOOT THE " + dial.names[index].to_upper()
+		dial_label.add_theme_color_override("font_color", GOLD)
+		if not was_landed:
+			dial_root.scale = Vector2(1.25, 1.25)
+			create_tween().tween_property(dial_root, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK)
+	else:
+		dial_label.text = "TAP GREEN TO STOP!"
+
+
+func _dial_process(delta: float) -> void:
+	if not dial_root.visible:
+		return
+	dial.angle = lerpf(dial.angle, dial.target_angle, 1.0 - exp(-18.0 * delta))
+	var beat := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 1000.0 * 8.0)
+	dial.glow = beat
+	if not dial.landed:
+		dial_label.add_theme_color_override("font_color", CREAM.lerp(GOLD, beat))
+	dial.queue_redraw()
 
 
 # Overlays ---------------------------------------------------------------
@@ -979,6 +1078,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_play_artist_video(str(payload.get("path", "")))
 		"modern_song_ended":
 			_stop_artist_video()
+			dial_root.visible = false
 			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
 				hurry_live = false
 				hurry_root.visible = false
@@ -1024,6 +1124,8 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_start_hurry(payload)
 		"modern_hurry_up_ended":
 			_end_hurry(payload)
+		"modern_hit_me_dial":
+			_show_dial(payload)
 		"modern_ball_locked":
 			flash_screen(GOLD, 2)
 		"modern_award_extra_ball":

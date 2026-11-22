@@ -145,7 +145,7 @@ Both bumper groups SHALL score 5x their normal value for the song. The screen SH
 - **THEN** 550,000 scores, the mode is completed, and bumpers keep scoring 5x
 
 ### Requirement: Mode 10 Hit me!
-A dial SHALL cycle through the five locations about four times a second. A green tap, or 5 s without one, SHALL stop it and flash the location it lands on. Hitting that location SHALL pay 250,000 and restart the dial. Three hits SHALL complete and end the mode. Green SHALL drive only the dial during this mode.
+A dial SHALL cycle through the five locations about four times a second, shown on screen as a wheel of the five locations that turns with the lamps and stops where they stop. A green tap, or 5 s without one, SHALL stop it and flash the location it lands on. Hitting that location SHALL pay 250,000 and restart the dial. Three hits SHALL complete and end the mode. Green SHALL drive only the dial during this mode.
 
 #### Scenario: The dial is stopped
 - **WHEN** the dial is spinning and the player taps green

@@ -403,6 +403,12 @@ class HitMe(SongRule):
     def spin_dial(self):
         self.spinning, self.index, self.target = True, 0, None
         self.spun_at = self.stepped = self.now_ms()
+        self._show_dial()
+
+    def _show_dial(self, index=None):
+        """The on-screen dial turns with the lamps and stops where they do; index -1 hides it."""
+        self.machine.events.post("modern_hit_me_dial", index=self.index if index is None else index,
+                                 spinning=self.spinning, names="|".join(S.LOCATIONS[loc][0].removeprefix("the ") for loc in LOC))
 
     def tick(self):
         if not self.spinning:
@@ -412,6 +418,7 @@ class HitMe(SongRule):
             self.stepped = now
             self.index = (self.index + 1) % len(LOC)
             self.flash([LOC[self.index]])
+            self._show_dial()
         if now - self.spun_at >= S.DIAL_AUTO_STOP_MS:
             self.stop_dial()
 
@@ -419,6 +426,7 @@ class HitMe(SongRule):
         self.spinning = False
         self.target = LOC[self.index]
         self.flash([self.target])
+        self._show_dial()
         self.machine.events.post("modern_overlay", title="HIT ME!", subtitle=S.LOCATIONS[self.target][0], ms=1200)
 
     def on_tap(self):
@@ -438,6 +446,7 @@ class HitMe(SongRule):
     def stop(self):
         super().stop()
         self.machine.modes["modern"].release_green("song")
+        self._show_dial(-1)
 
     def status(self):
         return "THE DIAL IS SPINNING..." if self.spinning else f"SHOOT {S.LOCATIONS[self.target][0].upper()}"
