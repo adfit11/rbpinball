@@ -61,6 +61,21 @@ class TestGameRelay(MpfGameTestCase):
         self.assertGameIsNotRunning()
         self.assertEqual(relay.current_brightness, 0)
 
+    def test_trough_release_is_held_on_for_540ms(self):
+        coil = self.machine.coils['c_trough_release']
+        calls = []
+        coil.enable = lambda *a, **k: calls.append(('on', self.machine.clock.get_time()))
+        coil.disable = lambda *a, **k: calls.append(('off', self.machine.clock.get_time()))
+        self.hit_switch_and_run('s_trough_1_40', 1)
+        self.hit_switch_and_run('s_trough_2_30', 1)
+        self.hit_and_release_switch('s_start_47')
+        self.start_game(start_switch='s_start_47')
+        self.assertEqual(type(self.machine.ball_devices['bd_trough'].ejector).__name__, 'EnableCoilEjector')
+        self.hit_and_release_switch('s_start_47')  # skip the Modern rules splash
+        self.advance_time_and_run(1)
+        self.assertEqual([c[0] for c in calls[:2]], ['on', 'off'])
+        self.assertAlmostEqual(calls[1][1] - calls[0][1], .54, places=2)
+
     def test_trough_counts_each_arrival_once(self):
         trough = self.machine.ball_devices['bd_trough']
         entrance = 's_trough_1_40'
