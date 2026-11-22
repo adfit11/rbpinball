@@ -120,7 +120,7 @@ All scoring SHALL be doubled for the song, on top of the song multiplier. The Bo
 - **THEN** 600,000 scores and the mode is completed
 
 ### Requirement: Mode 7 Order up
-The Kitchen SHALL light first. A Kitchen hit SHALL pay 75,000, hold the ball 1 s, and name one random table among the Bar, Bandstand, Coat Check, and Back Door. Its value SHALL drain from 900,000 to 100,000. A delivery SHALL pay the value and complete the mode. A cold order SHALL fail it. Either SHALL end the mode.
+The Kitchen SHALL light first. A Kitchen hit SHALL pay 75,000, hold the ball 1 s, and name one random table among the Bar, Bandstand, Coat Check, and the Booths. Its value SHALL drain from 900,000 to 100,000. A delivery SHALL pay the value and complete the mode. A cold order SHALL fail it. Either SHALL end the mode.
 
 #### Scenario: The order is delivered
 - **WHEN** the order is for the Coat Check and the player hits it showing 600,000

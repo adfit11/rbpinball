@@ -66,6 +66,6 @@ class ModernTestCase(MpfGameTestCase):
         elif location == "coat_check":
             self.hit_and_release_switch("s_spot_target_36")
             self.advance_time_and_run(.1)
-        elif location == "back_door":
-            self.hit_and_release_switch("s_kicking_target_26")
-            self.advance_time_and_run(.1)
+        elif location == "booths":
+            targets = self.machine.modes["modern_targets"]
+            self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][targets.booth - 1], .1)
