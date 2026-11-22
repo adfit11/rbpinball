@@ -16,6 +16,8 @@ ball_devices:
       entrance_switch_ignore_window_ms: 200ms
       entrance_switch_full_timeout: 500ms
       ball_capacity: 3
+    ejector:
+      class: custom_code.trough_ejector.RetryingTroughEjector
     eject_coil: c_trough_release
     # The mechanical plunger has no switch; its lane is part of the playfield.
     eject_targets: playfield
