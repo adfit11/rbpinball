@@ -17,8 +17,6 @@ ball_devices:
       entrance_switch_full_timeout: 500ms
       ball_capacity: 3
     eject_coil: c_trough_release
-    # LISY caps a pulse at 255 ms, so the release is held on for its full time instead.
-    eject_coil_enable_time: 540ms
     # The mechanical plunger has no switch; its lane is part of the playfield.
     eject_targets: playfield
     tags: trough, home
