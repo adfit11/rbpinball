@@ -281,7 +281,9 @@ class OrderUp(SongRule):
             self.shot()
             self.destination = random.choice([l for l in LOC if l != "kitchen"])
             self.started = self.now_ms()
-            self.machine.events.post("modern_callout", pool="cook_order_up")
+            self.machine.events.post("modern_callout", pool=f"cook_order_up_{self.destination}")
+            self.machine.events.post("modern_overlay", title="ORDER UP!",
+                                     subtitle=f"Deliver to {S.LOCATIONS[self.destination][0]}", ms=2000, style="gold")
             self.flash([self.destination])
 
     def value(self):

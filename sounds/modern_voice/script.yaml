@@ -19,6 +19,10 @@ characters:
       nickel: ["Here's a nickel from the tip jar. Go on!", "Take this nickel and play something with some grease on it.", "Nickel for you. Now get out of my kitchen!"]
       extra_ball: ["Seconds! Extra ball coming up!", "Extra helping! Shoot again!"]
       order_up: ["Order up!", "Hot plate! Order up!"]
+      order_up_bar: ["Order up! Take it out to the bar!", "Hot plate for the bar! Move it, move it!"]
+      order_up_bandstand: ["Order up! Run it to the bandstand, the band is starving!", "Hot plate for the bandstand! Go, go, go!"]
+      order_up_coat_check: ["Order up! Take it to the coat check!", "Hot plate for the coat check girl! Hurry now!"]
+      order_up_booths: ["Order up! Booths are waiting, get it over there!", "Hot plate for the booths! Don't let it get cold!"]
       held: ["Mind the grease, now!", "Fresh off the skillet!", "Something good cooking back here!"]
   bandleader:
     name: Cornelius, the bandleader

@@ -170,8 +170,12 @@ class TestModernSongs(ModernTestCase):
 
     def test_order_up_delivery(self):
         rule = self.start_slot(7)
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.hit_location("kitchen")
         self.assertIsNotNone(rule.destination)
+        self.assertIn(f"cook_order_up_{rule.destination}", pools)
+        self.assertIn(f"cook_order_up_{rule.destination}", self.machine.modes["modern_callouts"].pools)
         rule.on_location(rule.destination)
         self.assertTrue(rule.completed)
 
