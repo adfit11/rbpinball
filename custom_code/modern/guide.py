@@ -7,7 +7,7 @@ WHERE = {
     "kitchen": "the fire-pit kicker on the left",
     "bandstand": "the spinner",
     "coat_check": "the spot target",
-    "booths": "the flashing right drop target",
+    "booths": "any right-bank drop target",
 }
 
 

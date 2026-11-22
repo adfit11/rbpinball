@@ -68,4 +68,5 @@ class ModernTestCase(MpfGameTestCase):
             self.advance_time_and_run(.1)
         elif location == "booths":
             targets = self.machine.modes["modern_targets"]
-            self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][targets.booth - 1], .1)
+            switch = next(s for s in targets.DROP_SWITCHES["right_bank"] if not self.machine.switches[s].state)
+            self.hit_switch_and_run(switch, .1)

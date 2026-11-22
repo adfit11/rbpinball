@@ -95,6 +95,9 @@ class ModernNickels(Mode):
         if not self.hunting():
             return
         if location != self.player.modern_nickel_target:
+            if self.delay.check(f"refused_{location}"):
+                return
+            self.delay.add(ms=settings.REFUSAL_GAP_MS, name=f"refused_{location}", callback=lambda: None)
             self._callout("refusal", location)
             self.machine.events.post("modern_nickel_refused", location=location,
                                      location_name=settings.LOCATIONS[location][0],

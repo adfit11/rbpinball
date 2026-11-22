@@ -2,7 +2,7 @@
 
 The crater cascade timings mirror Classic's ClassicTargets, but live here so Modern can be
 removed without touching Classic. The drop lamps cascade only for the skill shot; once the
-ball is in play they stay dark except the Booths, one standing right-bank target picked at random.
+ball is in play they stay dark except the Booths: the whole right bank, any target of which is a visit.
 """
 
 import random
@@ -39,7 +39,6 @@ class ModernTargets(Mode):
         self.down_banks = set()
         self.down_targets = set()
         self.skill_window = False
-        self.booth = None
         for bank, switches in self.DROP_SWITCHES.items():
             for target, switch in enumerate(switches, 1):
                 self.add_mode_event_handler(switch + "_active", self._drop_hit, bank=bank, target=target)
@@ -53,7 +52,7 @@ class ModernTargets(Mode):
         self._clear_simulated_drops()
         self._schedule("drops", SCAN_MS, self._advance_drops)
         self._schedule("craters", SCAN_MS, self._advance_craters)
-        self._pick_booth()
+        self._show_booths()
         self._show_lamps()
 
     @property
@@ -73,13 +72,12 @@ class ModernTargets(Mode):
         self._show_lamps()
         self._schedule("drops", SCAN_MS, self._advance_drops)
 
-    def _pick_booth(self):
-        """Seat the Booths at a random standing right-bank target, or nowhere while none stands."""
+    def _show_booths(self):
+        """The Booths lamp is the right bank's lamp plus the lamp of every target still standing."""
         bank = settings.BOOTHS_BANK
-        standing = [t for t, switch in enumerate(self.DROP_SWITCHES[bank], 1)
+        standing = [settings.DROP_LAMPS[t - 1] for t, switch in enumerate(self.DROP_SWITCHES[bank], 1)
                     if (bank, t) not in self.down_targets and not self.machine.switches[switch].state]
-        self.booth = random.choice(standing) if standing else None
-        self.lamps.alias(settings.BOOTHS_LAMP, settings.DROP_LAMPS[self.booth - 1] if self.booth else None)
+        self.lamps.alias(settings.BOOTHS_LAMP, [settings.BANK_LAMPS[bank], *standing])
 
     def _advance_craters(self):
         self.crater_index = (self.crater_index - 1) % 5
@@ -135,8 +133,8 @@ class ModernTargets(Mode):
         self._playfield_hit()
         self._show_lamps()
         self.machine.events.post("modern_drop_hit", bank=bank, lit=lit)
-        if bank == settings.BOOTHS_BANK and target == self.booth:
-            self._pick_booth()
+        if bank == settings.BOOTHS_BANK:
+            self._show_booths()
             self.machine.modes["modern"].location_hit("booths")
 
     def _bank_down(self, bank, **kwargs):
@@ -166,16 +164,14 @@ class ModernTargets(Mode):
 
     def _bank_up(self, bank, **kwargs):
         self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
-        if bank == settings.BOOTHS_BANK and not self.booth:
-            self._pick_booth()
+        self._show_booths()
         self._show_lamps()
 
     def _reset_bank(self, bank):
         self.machine.drop_target_banks[bank].reset()
         self._clear_simulated_drops(bank)
-        if bank == settings.BOOTHS_BANK and not self.booth:
-            self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
-            self._pick_booth()
+        self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
+        self._show_booths()
 
     def _clear_simulated_drops(self, bank=None):
         """mpf -x: the reset coil can't raise simulated targets, so release their switches."""

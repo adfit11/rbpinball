@@ -400,56 +400,65 @@ class TestModernBallFeatures(ModernTestCase):
         targets = self.machine.modes["modern_targets"]
         lamps = director(self.machine)
         self.assertTrue(targets.ball_active)
+        self.player.modern_nickel_target = "bar"
+        self.machine.modes["modern_nickels"]._show()
         index = targets.drop_index
         for _ in range(10):
             self.advance_time_and_run(.25)
             self.assertEqual(targets.drop_index, index)
-        lit = [l for l in settings.DROP_LAMPS if lamps.state(l)]
-        booth_lamp = settings.DROP_LAMPS[targets.booth - 1]
-        self.assertEqual(lit, [booth_lamp] if lamps.state(booth_lamp) else [])
+            self.assertEqual([l for l in settings.DROP_LAMPS if lamps.state(l)], [])
 
-    def _hunt_booths(self):
+    def _hunt_booths(self, cost=1):
         self.start_modern()
         nickels = self.machine.modes["modern_nickels"]
         self.player.modern_nickel_target = "booths"
-        self.player.modern_nickel_cost = 1
+        self.player.modern_nickel_cost = cost
+        self.player.modern_nickel_step = settings.NICKEL_COSTS.index(cost)
         nickels._show()
         return self.machine.modes["modern_targets"], director(self.machine)
 
-    def test_booths_flash_one_standing_right_drop_target(self):
+    def test_booths_flash_the_right_bank_lamp_and_every_standing_target(self):
         targets, lamps = self._hunt_booths()
-        self.assertIn(targets.booth, range(1, 6))
-        for index, light in enumerate(settings.DROP_LAMPS, 1):
-            self.assertEqual(lamps.state(light), FLASH if index == targets.booth else OFF)
+        for light in (settings.BANK_LAMPS["right_bank"], *settings.DROP_LAMPS):
+            self.assertEqual(lamps.state(light), FLASH)
+        self.hit_switch_and_run("s_right_drop_3_21", .1)
+        self.assertEqual(lamps.state(settings.DROP_LAMPS[2]), OFF)
 
-    def test_other_right_drops_score_but_do_not_visit_the_booths(self):
+    def test_any_right_drop_target_visits_the_booths(self):
         targets, lamps = self._hunt_booths()
-        other = next(t for t in range(1, 6) if t != targets.booth)
         self.mock_event("modern_location_hit")
-        self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][other - 1], .1)
-        self.assertEventNotCalled("modern_location_hit")
-        self.assertEqual(self.player.modern_nickel, 0)
-        self.assertEqual(self.player.modern_nickel_target, "booths")
-
-    def test_hitting_the_booth_target_collects_the_nickel_and_reseats_the_booths(self):
-        targets, lamps = self._hunt_booths()
-        booth = targets.booth
-        self.mock_event("modern_location_hit")
-        self.hit_location("booths")
+        self.hit_switch_and_run("s_right_drop_4_31", .1)
         self.assertEventCalledWith("modern_location_hit", location="booths")
         self.assertEqual(self.player.modern_nickel, 1)
-        self.assertNotEqual(targets.booth, booth)
-        self.assertFalse(self.machine.switches[targets.DROP_SWITCHES["right_bank"][targets.booth - 1]].state)
 
-    def test_booths_wait_for_the_bank_to_reset_when_no_target_stands(self):
-        targets, lamps = self._hunt_booths()
+    def test_a_burst_of_right_drop_hits_refuses_only_once(self):
+        self.start_modern()
+        nickels = self.machine.modes["modern_nickels"]
+        self.player.modern_nickel_target = "bar"
+        nickels._show()
+        self.mock_event("modern_nickel_refused")
+        for switch in ("s_right_drop_1_1", "s_right_drop_2_11", "s_right_drop_3_21"):
+            self.hit_switch_and_run(switch, .2)
+        self.assertEqual(self._events["modern_nickel_refused"], 1)
+        self.advance_time_and_run(settings.REFUSAL_GAP_MS / 1000)
+        self.hit_switch_and_run("s_right_drop_4_31", .1)
+        self.assertEqual(self._events["modern_nickel_refused"], 2)
+
+    def test_booths_lamps_return_when_the_bank_resets(self):
+        self.start_modern()
+        nickels = self.machine.modes["modern_nickels"]
+        targets = self.machine.modes["modern_targets"]
+        lamps = director(self.machine)
+        self.player.modern_nickel_target = "bar"
+        nickels._show()
         for switch in targets.DROP_SWITCHES["right_bank"]:
-            if switch != targets.DROP_SWITCHES["right_bank"][targets.booth - 1]:
-                self.hit_switch_and_run(switch, .05)
-        self.hit_location("booths")
-        self.assertIsNone(targets.booth)
+            self.hit_switch_and_run(switch, .05)
+        self.player.modern_nickel_target = "booths"
+        nickels._show()
+        self.assertEqual([l for l in settings.DROP_LAMPS if lamps.state(l)], [])
         self.advance_time_and_run(1)
-        self.assertIn(targets.booth, range(1, 6))
+        for light in settings.DROP_LAMPS:
+            self.assertEqual(lamps.state(light), FLASH)
 
     def test_kicking_target_is_a_plain_switch(self):
         self.start_modern()
