@@ -47,7 +47,9 @@ func _initialize() -> void:
 		failed += 1
 	var dir := DirAccess.open("res://videos/modern/jukebox")
 	for folder in dir.get_directories():
-		if not (load("res://videos/modern/jukebox/%s/video.ogv" % folder) is VideoStream):
+		var clips: PackedStringArray = hud_script.artist_clip_paths("res://sounds/music/jukebox/%s/song_1.mp3" % folder)
+		var first := clips[0] if not clips.is_empty() else "res://videos/modern/jukebox/%s/video.ogv" % folder
+		if not (load(first) is VideoStream):
 			push_error("Cannot load video for %s" % folder)
 			failed += 1
 	if not (load("res://videos/modern/jukebox/club.ogv") is VideoStream):

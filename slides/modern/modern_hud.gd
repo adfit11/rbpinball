@@ -41,6 +41,8 @@ var music: AudioStreamPlayer
 var music_fade: Tween  # fades the house band out while the record crackles, and a song out when its round ends
 var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
+var artist_clips := PackedStringArray()
+var artist_clip_last := -1
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
 var voice_started_ms := -VOICE_CUT_MS
 const Playlist := preload("res://slides/playlist.gd")
@@ -438,6 +440,18 @@ func _play_between_balls() -> void:
 		music.play()
 
 
+static func artist_clip_paths(song_path: String) -> PackedStringArray:
+	## res://videos/modern/jukebox/<folder>/clip_01.ogv, clip_02.ogv ...: short sections of the artist's footage.
+	var folder := song_path.get_base_dir().get_file()
+	var paths := PackedStringArray()
+	for i in range(1, 100):
+		var path := "res://videos/modern/jukebox/%s/clip_%02d.ogv" % [folder, i]
+		if not ResourceLoader.exists(path):
+			break
+		paths.append(path)
+	return paths
+
+
 static func artist_video_paths(song_path: String) -> PackedStringArray:
 	## res://sounds/music/jukebox/<folder>/song_<n>.mp3 -> song video, artist video, club video.
 	var folder := song_path.get_base_dir().get_file()
@@ -460,17 +474,53 @@ func _new_artist_video(below: Control) -> void:
 
 func _play_artist_video(song_path: String) -> void:
 	_stop_artist_video()
-	for path in artist_video_paths(song_path):
+	var paths := artist_video_paths(song_path)
+	if ResourceLoader.exists(paths[0]):
+		_start_artist_video(load(paths[0]) as VideoStream, true)
+		return
+	# Godot's Theora player can't seek, so a random start is a random section, then another, for the whole song.
+	artist_clips = artist_clip_paths(song_path)
+	if not artist_clips.is_empty():
+		artist_clip_last = -1
+		_next_artist_clip()
+		return
+	for path in paths.slice(1):
 		if ResourceLoader.exists(path):
-			var stream := load(path) as VideoStream
-			if stream:
-				artist_video.stream = stream
-				artist_video.visible = true
-				artist_video.play()
-				return
+			_start_artist_video(load(path) as VideoStream, true)
+			return
+
+
+func _next_artist_clip() -> void:
+	if artist_clips.is_empty():
+		return
+	var choices: Array = range(artist_clips.size()).filter(func(i): return i != artist_clip_last)
+	if choices.is_empty():
+		choices = [0]
+	artist_clip_last = choices.pick_random()
+	if artist_video.stream != null:
+		_replace_artist_video()
+	_start_artist_video(load(artist_clips[artist_clip_last]) as VideoStream, false)
+
+
+func _start_artist_video(stream: VideoStream, loop: bool) -> void:
+	if stream == null:
+		return
+	artist_video.stream = stream
+	artist_video.loop = loop
+	if not loop:
+		artist_video.finished.connect(_next_artist_clip)
+	artist_video.visible = true
+	artist_video.play()
+	artist_video.paused = song_paused
 
 
 func _stop_artist_video() -> void:
+	artist_clips = PackedStringArray()
+	_replace_artist_video()
+
+
+func _replace_artist_video() -> void:
+	## Each stream gets a fresh player: reusing one VideoStreamPlayer for a new Theora stream can hang Godot.
 	if artist_video.stream == null:
 		return
 	var old := artist_video
