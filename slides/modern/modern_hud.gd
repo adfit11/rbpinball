@@ -286,6 +286,10 @@ func _render() -> void:
 		rec.color = GOLD if i < lit else Color(0.08, 0.05, 0.05, 0.9)
 
 
+func _extra_ball_lit() -> bool:
+	return int(MPF.game.player.get("modern_extra_ball_lit", 0)) == 1
+
+
 func _target_name(key: String) -> String:
 	var names := {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check", "back_door": "Back Door"}
 	return ("Go to the %s" % names[key]) if key in names else ""
@@ -317,8 +321,10 @@ func flash_screen(color: Color = GOLD, pulses: int = 3) -> void:
 	tw.tween_callback(flash.queue_free)
 
 
-func show_overlay(title: String, subtitle: String = "", ms: int = 2000, color: Color = BURGUNDY) -> void:
-	overlay_queue.append([title, subtitle, ms, color])
+func show_overlay(title: String, subtitle: String = "", ms: int = 2000, color: Color = BURGUNDY,
+		still_true: Callable = Callable()) -> void:
+	## still_true is checked when a queued card reaches the screen; the card is dropped if it no longer holds.
+	overlay_queue.append([title, subtitle, ms, color, still_true if overlay_busy else Callable()])
 	if not overlay_busy:
 		_next_overlay()
 
@@ -329,6 +335,9 @@ func _next_overlay() -> void:
 		return
 	overlay_busy = true
 	var item: Array = overlay_queue.pop_front()
+	if item[4].is_valid() and not item[4].call():
+		_next_overlay()
+		return
 	var card := _panel(Color(item[3], 0.92))
 	var box := VBoxContainer.new()
 	card.add_child(box)
@@ -663,7 +672,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_ball_saved":
 			show_overlay("THE BOUNCER SAVED YOU!", "", 1500, TEAL)
 		"modern_extra_ball_lit":
-			show_overlay("EXTRA BALL IS LIT", "Shoot the Kitchen", 1500, TEAL)
+			show_overlay("EXTRA BALL IS LIT", "Shoot the Kitchen", 1500, TEAL, _extra_ball_lit)
 		"modern_award_extra_ball":
 			show_overlay("EXTRA BALL!", "Shoot again", 2000)
 		"modern_special_lit":
