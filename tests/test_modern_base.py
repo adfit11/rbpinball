@@ -460,6 +460,27 @@ class TestModernBallFeatures(ModernTestCase):
         for light in settings.DROP_LAMPS:
             self.assertEqual(lamps.state(light), FLASH)
 
+    def test_each_right_bank_completion_raises_standing_ovation(self):
+        self.start_modern()
+        targets = self.machine.modes["modern_targets"]
+        for _ in range(2):
+            for switch in targets.DROP_SWITCHES["right_bank"]:
+                self.hit_switch_and_run(switch, .05)
+            self.advance_time_and_run(1)
+        self.assertEqual(self.player.modern_ovation, 2)
+
+    def test_a_replacement_serve_gets_its_own_skill_shot(self):
+        self.start_modern()
+        targets = self.machine.modes["modern_targets"]
+        self.assertFalse(targets.cascading)
+        targets._serve(target=self.machine.playfield)
+        self.advance_time_and_run(.5)
+        self.assertTrue(targets.cascading)
+        self.mock_event("modern_drop_the_needle")
+        self.hit_switch_and_run(targets.DROP_SWITCHES["top_bank"][targets.drop_index - 1], .1)
+        self.assertEventCalled("modern_drop_the_needle")
+        self.assertFalse(targets.cascading)
+
     def test_kicking_target_is_a_plain_switch(self):
         self.start_modern()
         self.mock_event("modern_location_hit")

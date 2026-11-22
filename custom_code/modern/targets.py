@@ -34,9 +34,11 @@ class ModernTargets(Mode):
         self.drop_index = 1
         self.crater_index = 4
         self.ball_active = False
+        self.cascading = True
         self.can_freeze = True
         self.frozen = False
         self.down_banks = set()
+        self.completing = set()
         self.down_targets = set()
         self.skill_window = False
         for bank, switches in self.DROP_SWITCHES.items():
@@ -66,7 +68,7 @@ class ModernTargets(Mode):
         self.delay.reset(ms=delay, name=name, callback=callback)
 
     def _advance_drops(self):
-        if self.ball_active:
+        if not self.cascading:
             return
         self.drop_index = self.drop_index % 5 + 1
         self._show_lamps()
@@ -87,6 +89,11 @@ class ModernTargets(Mode):
     def _serve(self, target=None, **kwargs):
         if target is self.machine.playfield:
             self.skill_window = True
+            # Every serve, including a lock's replacement ball, gets its own skill-shot cascade.
+            if not self.cascading:
+                self.cascading = True
+                self._schedule("drops", SCAN_MS, self._advance_drops)
+                self._show_lamps()
             self.machine.events.post("modern_skill_shot_ready")
             self.machine.events.post("modern_callout", pool="mc_skill_shot")
 
@@ -95,8 +102,10 @@ class ModernTargets(Mode):
         if not self.ball_active:
             self.ball_active = True
             self.machine.events.post("modern_ball_in_play")
-            self.delay.remove("drops")
             self._schedule("craters", RESUME_MS, self._advance_craters)
+        if self.cascading:
+            self.cascading = False
+            self.delay.remove("drops")
             self._show_lamps()
         self.can_freeze = True
 
@@ -119,7 +128,7 @@ class ModernTargets(Mode):
         return lit
 
     def _drop_hit(self, bank, target, **kwargs):
-        lit = not self.ball_active and target == self.drop_index
+        lit = self.cascading and target == self.drop_index
         self.down_targets.add((bank, target))
         self.player.modern_bonus_drops += 1
         award(self.machine, settings.SCORE_DROP, "drop")
@@ -138,8 +147,9 @@ class ModernTargets(Mode):
             self.machine.modes["modern"].location_hit("booths")
 
     def _bank_down(self, bank, **kwargs):
-        if bank in self.down_banks:
+        if bank in self.completing:
             return
+        self.completing.add(bank)
         self.down_banks.add(bank)
         award(self.machine, settings.SCORE_BANK, "bank")
         self.machine.events.post("modern_bank_completed", bank=bank)
@@ -163,6 +173,7 @@ class ModernTargets(Mode):
         self.machine.events.post("modern_callout", pool="hostess_booths_full")
 
     def _bank_up(self, bank, **kwargs):
+        self.completing.discard(bank)
         self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
         self._show_booths()
         self._show_lamps()
@@ -170,6 +181,7 @@ class ModernTargets(Mode):
     def _reset_bank(self, bank):
         self.machine.drop_target_banks[bank].reset()
         self._clear_simulated_drops(bank)
+        self.completing.discard(bank)
         self.down_targets = {(b, t) for b, t in self.down_targets if b != bank}
         self._show_booths()
 
@@ -189,7 +201,7 @@ class ModernTargets(Mode):
             return
         lamps = self.lamps
         for index, light in enumerate(settings.DROP_LAMPS, 1):
-            lamps.set("drops", light, STEADY if not self.ball_active and index == self.drop_index else 0)
+            lamps.set("drops", light, STEADY if self.cascading and index == self.drop_index else 0)
         for crater, light in enumerate(settings.CRATER_LAMPS, 1):
             lamps.set("craters", light, STEADY if self.crater_lit(crater) else 0)
         for bank, light in settings.BANK_LAMPS.items():
