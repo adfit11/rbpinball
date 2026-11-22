@@ -34,12 +34,12 @@ Filling the guest list SHALL light the lock for the current player for the rest 
 - **WHEN** the lock is lit and the ball enters an unlit crater
 - **THEN** the ball is not locked and returns to play
 
-### Requirement: Combine a lock and a jukebox entry
-When a lit crater entry both locks a ball and finds the player holding a nickel, Modern SHALL lock the ball, open the selector, and start the chosen song when the replacement ball is plunged.
+### Requirement: A lock takes priority over the jukebox
+When a crater entry locks a ball while the player holds a nickel, Modern SHALL lock the ball and serve the replacement without opening the selector. The player SHALL keep the nickel for a later lit crater.
 
 #### Scenario: Lock and nickel together
 - **WHEN** the lock is lit, the player holds a nickel, and the ball enters a lit crater
-- **THEN** the ball is locked, the selector opens, a replacement is served, and the song starts as it is plunged
+- **THEN** the ball is locked, a replacement is served, the selector stays closed, and the player still holds the nickel
 
 ### Requirement: Keep locks physical and stealable
 Locked balls SHALL stay in the subway across turn changes and SHALL NOT be ejected to return them to their owner. The screen SHALL show the subway's lock count at all times. A player's lock SHALL start counting from the balls already in the subway.
