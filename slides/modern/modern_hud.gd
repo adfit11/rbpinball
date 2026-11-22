@@ -49,6 +49,7 @@ const Playlist := preload("res://slides/playlist.gd")
 var house_band := Playlist.new(Playlist.HOUSE_BAND_PREFIX, Playlist.HOUSE_BAND_COUNT)
 var playing_house_band := false
 var between_balls_song: AudioStream
+var artist_pick_song: AudioStream  # loops while the jukebox artist selector is open
 var between_balls := false  # a drained ball plays its own song until the next ball starts
 var song_length_ms := 0.0
 var song_elapsed_ms := 0.0
@@ -426,6 +427,20 @@ func _on_music_finished() -> void:
 		_play_house_band()
 
 
+func _play_artist_pick() -> void:
+	if artist_pick_song == null:
+		artist_pick_song = _load_audio("res://sounds/modern_music/artist_pick.mp3")
+	if artist_pick_song is AudioStreamMP3:
+		artist_pick_song.loop = true
+	playing_house_band = false
+	_stop_music_fade()
+	music.stop()
+	if artist_pick_song:
+		music.stream = artist_pick_song
+		music.volume_db = 0.0
+		music.play()
+
+
 func _play_between_balls() -> void:
 	playing_house_band = false
 	if between_balls_song == null:
@@ -590,17 +605,20 @@ func _on_event(payload: Dictionary = {}) -> void:
 			caption.text = "The jukebox needs a nickel"
 		"modern_selector_opened":
 			_show_selector(payload)
+			_play_artist_pick()
 		"modern_selector_highlight":
 			selector_deadline = Time.get_ticks_msec() / 1000.0 + float(payload.get("timeout_ms", 10000)) / 1000.0
 			_highlight(int(payload.get("highlight", 0)))
 		"modern_artist_chosen":
 			_highlight(int(payload.get("slot", 1)) - 1)
-			_fade_out_music()
+			_fade_out_music(0.25)
 			var tw := create_tween()
 			tw.tween_interval(0.6)
 			tw.tween_callback(func(): selector.visible = false)
 		"modern_selector_closed":
 			selector.visible = false
+			if music.stream == artist_pick_song:
+				music.stop()
 		"modern_song_started":
 			selector.visible = false
 			song_title.text = "%s — %s" % [payload.get("title", ""), payload.get("artist", "")]

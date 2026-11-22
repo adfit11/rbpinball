@@ -4,7 +4,8 @@ Each placeholder is a synthesized boogie-woogie loop with the title spoken over 
 No original recordings are used. Existing files are kept unless --force is given,
 so the owner's own MP3s are never overwritten.
 Also makes sounds/modern_music/between_balls.mp3, the loop played after a drain, and the
-house_band_1-10.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random.
+house_band_1-10.mp3 (general play) and attract_1-5.mp3 (attract mode) tracks, each picked at random,
+and artist_pick.mp3, the loop played while the jukebox artist selector is open.
 Usage: ~/tts/bin/python tools/modern/generate_songs.py [--force] [--seconds 60]
 """
 
@@ -94,6 +95,22 @@ def make_between_balls(force=False, seconds=40):
     print("generated", out)
 
 
+ARTIST_PICK = os.path.join(catalogue.ROOT, "sounds", "modern_music", "artist_pick.mp3")
+
+
+def make_artist_pick(force=False, seconds=16):
+    """A bright, quick loop for the artist selector; an owner's MP3 is never overwritten."""
+    out = os.path.normpath(ARTIST_PICK)
+    if os.path.exists(out) and not force:
+        return
+    music = backing(seconds, 110, 176, 11) * 0.8
+    wav = tts.temp_wav()
+    write_wav(wav, music)
+    tts.to_mp3(wav, out, "48k")
+    os.remove(wav)
+    print("generated", out)
+
+
 def make_playlists(force=False):
     """Ten house-band tracks for general play and five attract tracks; an owner's MP3 is never overwritten."""
     for prefix, count, seconds, base_tempo, seed in (("house_band", 10, 90, 132, 500), ("attract", 5, 60, 112, 600)):
@@ -138,6 +155,7 @@ def main(force=False, seconds=60):
     print(f"generated {made} song files")
     make_between_balls(force)
     make_playlists(force)
+    make_artist_pick(force)
 
 
 if __name__ == "__main__":
