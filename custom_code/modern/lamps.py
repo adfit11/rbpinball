@@ -7,6 +7,7 @@ A virtual lamp (the Booths) is an alias the targets mode points at a group of re
 import logging
 
 from custom_code.modern import settings
+from custom_code.modern.ambient import PATTERNS, RANKS
 
 LOG = logging.getLogger("modern.lamps")
 WATCHED = {light for (_, light, _) in settings.LOCATIONS.values() if light}
@@ -25,6 +26,9 @@ class LampDirector:
         self.flash_on = True
         self.shown = {}
         self.aliases = {settings.BOOTHS_LAMP: ()}
+        self.ambients = {"base": ("base", None)}  # key -> (pattern name, rule it reads speed/origin from)
+        self.pattern, self.pattern_key = None, None
+        self.ambient_lit = set()
 
     def alias(self, name, lights):
         """Point a virtual lamp's requests at a group of real lamps (or none)."""
@@ -36,6 +40,49 @@ class LampDirector:
 
     def start(self):
         self.mode.delay.reset(ms=settings.FLASH_MS, name="lamp_flash", callback=self._toggle)
+        if settings.AMBIENT_ENABLED:
+            self.mode.delay.reset(ms=settings.AMBIENT_MS, name="lamp_ambient", callback=self._ambient)
+
+    # Ambient layer --------------------------------------------------------
+    def set_ambient(self, key, name, source=None):
+        """Run an ambient pattern; the most intense one requested plays (base < artist mode < multiball)."""
+        self.ambients[key] = (name, source)
+
+    def clear_ambient(self, key):
+        self.ambients.pop(key, None)
+
+    def ambient_kick(self):
+        if self.pattern:
+            self.pattern.kick()
+
+    def ambient_free(self, name):
+        """Lamps the ambient layer may light: unrequested, and never a location, special or shoot-again lamp."""
+        busy = {settings.SHOOT_AGAIN_LAMP}
+        if name != "multiball":
+            busy |= WATCHED | set(settings.DROP_LAMPS) | {settings.BANK_LAMPS["right_bank"], settings.SPECIAL_LAMP}
+        return [l for l in settings.LAMP_XY if l not in busy and self.state(l) == OFF]
+
+    def ambient_targets(self):
+        """Where each flashing request is, so a stream can lead the player to it."""
+        spots = []
+        for (_, light), state in sorted(self.requests.items()):
+            real = [l for l in self._real(light) if l in settings.LAMP_XY]
+            if state == FLASH and real:
+                spot = tuple(sum(settings.LAMP_XY[l][i] for l in real) / len(real) for i in (0, 1))
+                if spot not in spots:
+                    spots.append(spot)
+        return spots
+
+    def _ambient(self):
+        self.mode.delay.reset(ms=settings.AMBIENT_MS, name="lamp_ambient", callback=self._ambient)
+        key = max(self.ambients, key=lambda k: RANKS[self.ambients[k][0]])
+        name, source = self.ambients[key]
+        if key != self.pattern_key or not isinstance(self.pattern, PATTERNS[name]):
+            self.pattern, self.pattern_key = PATTERNS[name](source), key
+        lit = self.pattern.advance(settings.AMBIENT_MS, self.ambient_free(name), self.ambient_targets())
+        if lit != self.ambient_lit:
+            self.ambient_lit = lit
+            self.refresh()
 
     def set(self, key, light, state=STEADY):
         if light is None:
@@ -70,10 +117,10 @@ class LampDirector:
         self.mode.delay.reset(ms=settings.FLASH_MS, name="lamp_flash", callback=self._toggle)
 
     def refresh(self):
-        lights = {real for (_, l) in self.requests for real in self._real(l)} | set(self.shown)
+        lights = {real for (_, l) in self.requests for real in self._real(l)} | set(self.shown) | self.ambient_lit
         for light in lights:
             state = self.state(light)
-            on = state in (STEADY, SOLID) or (state == FLASH and self.flash_on)
+            on = state in (STEADY, SOLID) or (state == FLASH and self.flash_on) or (state == OFF and light in self.ambient_lit)
             if self.shown.get(light) == on:
                 continue
             self.shown[light] = on
@@ -83,6 +130,8 @@ class LampDirector:
 
     def stop(self):
         self.mode.delay.remove("lamp_flash")
+        self.mode.delay.remove("lamp_ambient")
+        self.ambient_lit = set()
         for light in self.shown:
             if light in self.machine.lights:
                 self.machine.lights[light].remove_from_stack_by_key("modern_lamps")
@@ -98,6 +147,15 @@ class _NullDirector:
         pass
 
     def clear(self, *args, **kwargs):
+        pass
+
+    def set_ambient(self, *args, **kwargs):
+        pass
+
+    def clear_ambient(self, *args, **kwargs):
+        pass
+
+    def ambient_kick(self):
         pass
 
 

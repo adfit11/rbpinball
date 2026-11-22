@@ -157,15 +157,7 @@ class TestModernSongs(ModernTestCase):
         self.assertIn("4: 325K", rule.status())
 
     def test_party_time_doubles_and_pays_last_dance(self):
-        self.mock_event("modern_party_time_lights")
-        self.mock_event("modern_party_time_lights_stop")
         rule = self.start_slot(6)
-        self.assertEventCalled("modern_party_time_lights")
-        seen = set()
-        for _ in range(70):
-            self.advance_time_and_run(.1)
-            seen.add(self.machine.lights["l_xxx_47"].get_color().name)
-        self.assertGreaterEqual(len(seen), 2)  # the Bar lamp is part of the moving show
         self.assertEqual(self.player.modern_ball_saver_ready, 1)
         start = self.player.score
         self.hit_and_release_switch("s_top_bumpers_35")
@@ -175,7 +167,6 @@ class TestModernSongs(ModernTestCase):
         self.advance_time_and_run(.1)
         self.assertTrue(rule.completed)
         self.assertEqual(self.player.modern_score_factor, 1)
-        self.assertEventCalled("modern_party_time_lights_stop")
 
     def test_order_up_delivery(self):
         rule = self.start_slot(7)

@@ -4,6 +4,7 @@ import random
 
 from mpf.core.mode import Mode
 
+from custom_code.modern import ambient
 from custom_code.modern import settings as S
 from custom_code.modern.lamps import FLASH, director
 from custom_code.modern.scoring import award
@@ -21,6 +22,7 @@ class SongRule:
     goal = ""
     ends_on_complete = False
     round_ms = S.ROUND_MS  # the song fades out here if it is longer
+    ambient = "guide"  # the background lamp pattern while this rule runs (custom_code/modern/ambient.py)
 
     def __init__(self, songs):
         self.songs, self.machine, self.mode = songs, songs.machine, songs
@@ -58,8 +60,15 @@ class SongRule:
     def status(self):
         return ""
 
+    def ambient_speed(self):
+        return 1.0
+
     def start(self): pass
-    def stop(self): self.lamps.clear("song")
+
+    def stop(self):
+        self.lamps.clear("song")
+        self.lamps.clear_ambient("song")
+
     def tick(self): pass
     def on_location(self, location): pass
     def on_crater(self, crater, lit): pass
@@ -82,6 +91,9 @@ class HurryUp(SongRule):
 
     def value(self):
         return drain_value(S.HURRY_START, S.HURRY_END, S.HURRY_MS, self.now_ms() - self.started)
+
+    def ambient_speed(self):
+        return 1 + 1.5 * min(1.0, (self.now_ms() - self.started) / S.HURRY_MS)
 
     def tick(self):
         if self.now_ms() - self.started >= S.HURRY_MS:
@@ -107,6 +119,9 @@ class Ladder(SongRule):
 
     def next_value(self):
         return S.LADDER_RUNGS[self.rung] if self.rung < len(S.LADDER_RUNGS) else None
+
+    def ambient_speed(self):
+        return 1 + 0.3 * self.rung
 
     def on_hole_held(self, hole):
         if hole == "kitchen" and self.rung < len(S.LADDER_RUNGS):
@@ -208,6 +223,9 @@ class JukeboxJackpot(SongRule):
     def value(self, crater):
         return S.JACKPOT_VALUES[crater - 1] + S.JACKPOT_STEP * self.jackpots
 
+    def ambient_speed(self):
+        return 1 + 0.3 * self.jackpots
+
     def on_crater(self, crater, lit):
         if self.completed:
             return
@@ -227,11 +245,11 @@ class JukeboxJackpot(SongRule):
 class PartyTime(SongRule):
     key = "party_time"
     title, goal = "PARTY TIME", "Double scoring and the Bouncer is ready. Survive the song!"
+    ambient = "wander"  # no single target: lamps drift all over the table
 
     def start(self):
         self.machine.game.player.modern_score_factor = S.PARTY_FACTOR
         self.machine.modes["modern_ball_saver"].ready()
-        self.machine.events.post("modern_party_time_lights")
 
     def on_ball_saved(self):
         self.machine.modes["modern_ball_saver"].ready()
@@ -242,7 +260,6 @@ class PartyTime(SongRule):
 
     def stop(self):
         super().stop()
-        self.machine.events.post("modern_party_time_lights_stop")
         self.machine.game.player.modern_score_factor = 1
 
     def status(self):
@@ -269,6 +286,13 @@ class OrderUp(SongRule):
 
     def value(self):
         return drain_value(S.ORDER_START, S.ORDER_END, S.ORDER_MS, self.now_ms() - self.started)
+
+    def ambient_speed(self):
+        return 1 + 1.5 * min(1.0, (self.now_ms() - self.started) / S.ORDER_MS) if self.destination else 1.0
+
+    def ambient_origin(self):
+        """A delivery runs from the Kitchen to the table."""
+        return S.LAMP_XY[S.LOCATIONS["kitchen"][1]] if self.destination else ambient.FLIPPERS
 
     def tick(self):
         if self.destination and self.now_ms() - self.started >= S.ORDER_MS:
@@ -309,6 +333,9 @@ class RequestNight(SongRule):
                 self.pay(S.FINAL_REQUEST_AWARD, "final_request")
                 self.complete()
 
+    def ambient_speed(self):
+        return 1 + 0.2 * (len(LOC) - len(self.remaining))
+
     def status(self):
         return f"REQUESTS {len(LOC) - len(self.remaining)} / {len(LOC)}"
 
@@ -316,6 +343,7 @@ class RequestNight(SongRule):
 class DanceFloor(SongRule):
     key = "dance_floor"
     title, goal = "DANCE FLOOR", "Bumpers score 5×. Pack the floor with 25 hits"
+    ambient = "ripple"  # rings spread out from the bumpers on every hit
 
     def start(self):
         self.hits = 0
@@ -323,6 +351,7 @@ class DanceFloor(SongRule):
 
     def on_bumper(self):
         self.hits += 1
+        self.lamps.ambient_kick()
         if self.hits == S.DANCE_HITS:
             self.pay(S.PACKED_FLOOR_AWARD, "packed_floor")
             self.complete()
@@ -432,6 +461,7 @@ class ModernSongs(Mode):
         self.paused_total, self.paused_at = 0, None  # a hold left over from the previous song
         self.rule = SLOT_RULES[slot](self)
         self.rule.start()
+        self.rule.lamps.set_ambient("song", self.rule.ambient, self.rule)
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
         self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)
         self._tick()

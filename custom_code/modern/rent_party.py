@@ -113,6 +113,7 @@ class ModernRentParty(Mode):
         self._owners = []
         self.building = False
         self.multiball, self.jackpots, self.super_lit, self.total = True, 0, False, 0
+        self.lamps.set_ambient("rent_party", "multiball")
         self.player.modern_lock_lit = 0
         if crasher:
             self.machine.events.post("modern_gate_crasher", player=self.player.number)
@@ -145,6 +146,7 @@ class ModernRentParty(Mode):
     def _party_ended(self, **kwargs):
         self.multiball, self.super_lit = False, False
         self.lamps.clear("rent_party")
+        self.lamps.clear_ambient("rent_party")
         self._update_locks()
         self.machine.events.post("modern_rent_party_ended", total=self.total, jackpots=self.jackpots)
         self.machine.events.post("modern_overlay", title="RENT PARTY TOTAL", subtitle=f"{self.total:,}", ms=2500)
@@ -152,6 +154,7 @@ class ModernRentParty(Mode):
 
     def mode_stop(self, **kwargs):
         self.lamps.clear("rent_party")
+        self.lamps.clear_ambient("rent_party")
         if self.building:  # a tilt cancelled the party; free the back room so the next ball can be served
             self.building = False
             self.lock_owners.clear()

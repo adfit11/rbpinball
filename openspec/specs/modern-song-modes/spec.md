@@ -113,7 +113,7 @@ The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry 
 - **THEN** the mode is completed and ends, and the song fades out
 
 ### Requirement: Mode 6 Party time
-All scoring SHALL be doubled for the song, on top of the song multiplier. A looping table-wide light show SHALL run for the song, inviting the player to play anywhere; the shoot-again lamp SHALL be left out so it still shows the Bouncer. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
+All scoring SHALL be doubled for the song, on top of the song multiplier. Its ambient lamps SHALL wander all over the table, inviting the player to play anywhere. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
 
 #### Scenario: The Bouncer saves during Party time
 - **WHEN** the ball enters the left outlane and the Bouncer saves it
