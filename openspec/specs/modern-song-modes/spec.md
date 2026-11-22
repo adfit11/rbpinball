@@ -6,11 +6,15 @@ Gives each Modern jukebox song a short, artist-neutral challenge, with comparabl
 ## Requirements
 
 ### Requirement: Time each mode by its song
-A song mode SHALL run for its round length: the length of its song cut (about 60 s) unless the mode sets a shorter round. When a shorter round ends, the song SHALL fade out over 2 s instead of stopping abruptly. The timer and the song SHALL pause while the ball is held in the saucer or the fire pit, and resume when the ball is released. Subway trips SHALL NOT pause them.
+A song mode SHALL run for its round length: 60 s unless the mode sets a shorter round, or the whole song if the song file is shorter. Full-length song files SHALL NOT lengthen a round. When the round ends before the song, the song SHALL fade out over 2 s instead of stopping abruptly. The timer and the song SHALL pause while the ball is held in the saucer or the fire pit, and resume when the ball is released. Subway trips SHALL NOT pause them.
 
 #### Scenario: The ball is held during a song
 - **WHEN** the ball is held for 1 s in the fire pit during a song
 - **THEN** the remaining song time is the same when the ball is released
+
+#### Scenario: A full-length song is chosen
+- **WHEN** the chosen song file is three minutes long
+- **THEN** the mode ends after 60 s and the song fades out
 
 #### Scenario: A 45 s round ends
 - **WHEN** Jukebox jackpot has run for 45 s
@@ -69,7 +73,7 @@ One random location SHALL light with a value draining from 1,000,000 to 100,000 
 - **THEN** the mode fails and ends
 
 ### Requirement: Mode 2 Ladder
-The round SHALL last the whole song cut (about 60 s). The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung, hold the ball 2 s, and show the rung climbed with the next rung's value. The mode banner SHALL show the rungs climbed and the next rung's value. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
+The round SHALL last 60 s. The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung, hold the ball 2 s, and show the rung climbed with the next rung's value. The mode banner SHALL show the rungs climbed and the next rung's value. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
 
 #### Scenario: The top rung is reached
 - **WHEN** the player makes the fourth Kitchen hit
