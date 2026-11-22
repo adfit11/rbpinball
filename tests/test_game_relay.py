@@ -109,6 +109,15 @@ class TestGameRelay(MpfGameTestCase):
         self.assertAlmostEqual(pulses[1] - pulses[0], 1.5, places=1)
         self.assertEventCalled('trough_serve_failed', 1)
 
+    def test_subway_release_is_one_lisy_timed_pulse(self):
+        coil = self.machine.coils['c_subway_lock']
+        self.assertEqual(coil.get_and_verify_pulse_ms(None), 255)  # LISY's maximum
+        calls = []
+        coil.pulse = lambda *a, **k: calls.append(('pulse', k.get('pulse_ms')))
+        coil.enable = lambda *a, **k: calls.append(('on', None))
+        self.machine.ball_devices['bd_classic_subway_lock'].ejector._fire_coil_for_search(True)
+        self.assertEqual(calls, [('pulse', None)])
+
     def test_trough_serve_that_moves_a_switch_is_not_pulsed_again(self):
         pulses = self._serve_on_cabinet()
         self.release_switch_and_run('s_trough_1_40', 6)

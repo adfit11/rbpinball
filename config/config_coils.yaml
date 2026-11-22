@@ -27,7 +27,8 @@ coils:
   c_subway_lock:
     number: 1
     default_hold_power: .1
-    default_pulse_ms: 300
+    # LISY's longest pulse; the board times and ends it, so it never depends on MPF.
+    default_pulse_ms: 255
   c_top_drops:
     number: 2
     default_hold_power: .1
