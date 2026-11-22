@@ -7,7 +7,7 @@ Everything below was verified only in simulation. Check each item on the real ma
 - [ ] The song multiplier 2x-5x is L4-L7, and Standing Ovation 2x-4x is L30-L32.
 - [ ] Crater lamps L27, L26, L25, L24 match craters 1-4, and the lit crater cascades as in Classic.
 - [ ] Location lamps flash when the player is directed to them: Bar L47, Kitchen L45, Bandstand L46, Coat Check L43.
-- [ ] Booths: with the right bank up, check each right-bank target's lamp (L19–L23, left to right in `settings.DROP_LAMPS`) sits by that target, so the flashing Booths lamp marks the right target.
+- [ ] Booths: with the Booths as the nickel target, check L29 and the lamp by every standing right-bank target flash, and a knocked-down target's lamp goes dark.
 - [ ] Shoot Again L1, extra ball L45 and special L44 light as described.
 - [ ] Classic note: Classic lights L4-L6 for ball save ready, but the lamp sheet says those are multiplier lamps. Confirm, and fix it separately if wrong.
 

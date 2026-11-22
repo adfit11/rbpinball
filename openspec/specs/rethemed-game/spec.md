@@ -21,7 +21,7 @@ When a Modern game starts, the screen SHALL show a placeholder splash that intro
 - **THEN** the rules splash is shown, and play continues to the first ball
 
 ### Requirement: Name the club locations
-Modern SHALL treat five shots as club locations, each with a lamp: Bar (saucer, L47), Kitchen (fire pit, L45), Bandstand (spinner, L46), Coat Check (spot target, L43), and the Booths (one standing right-bank drop target, its own drop lamp L19–L23). Modern SHALL seat the Booths at a random standing right-bank target, move them to another standing target when that target is hit, and reseat them when the bank resets after every target is down. Other right-bank targets SHALL score as plain drop targets. The kicking target (switch 26) SHALL score as a plain switch.
+Modern SHALL treat five shots as club locations, each with a lamp: Bar (saucer, L47), Kitchen (fire pit, L45), Bandstand (spinner, L46), Coat Check (spot target, L43), and the Booths (the whole right drop bank, L29 plus the drop lamp L19–L23 of every target still standing). Any right-bank target hit SHALL visit the Booths. A location SHALL refuse a wrong-location visit at most once every 3 s. The kicking target (switch 26) SHALL score as a plain switch.
 
 #### Scenario: A location is named on screen
 - **WHEN** any Modern feature directs the player to a location
@@ -53,7 +53,7 @@ Modern SHALL light the craters with Classic's cascading crater lights on L24-L27
 - **THEN** the crater lamps freeze as they do in Classic
 
 ### Requirement: Reset completed drop banks and reward the right bank
-A completed drop bank SHALL score 25,000 and pop back up at once; its bank lamp (L28 or L29) SHALL stay lit until both banks have been completed, which drops a nickel on the floor. Completing the right bank SHALL also add one Standing Ovation step for the ball, show "EVERY BOOTH IS FULL!" with the new multiplier, and play a hostess line. The drop lamps SHALL cascade only until the ball is in play; then only the Booths lamp is lit, when something directs a shot there.
+A completed drop bank SHALL score 25,000 and pop back up at once; its bank lamp (L28 or L29) SHALL stay lit until both banks have been completed, which drops a nickel on the floor. Completing the right bank SHALL also add one Standing Ovation step for the ball, show "EVERY BOOTH IS FULL!" with the new multiplier, and play a hostess line. The drop lamps SHALL cascade only until the ball is in play; then they light only as part of the Booths, when something directs a shot there.
 
 #### Scenario: The right bank is completed
 - **WHEN** the player knocks down all five right-bank targets
