@@ -66,9 +66,15 @@ class TestModernSongs(ModernTestCase):
         self.assertIn(("RUNG 1!", "75,000  •  Next 150,000"), [(o["title"], o["subtitle"]) for o in overlays])
         self.assertEqual(rule.status(), "LADDER  RUNG 1 / 4  •  NEXT 150K AT THE KITCHEN")
 
-    def test_ladder_round_lasts_the_whole_song(self):
-        self.start_slot(2)
-        self.assertGreater(self.machine.modes["modern_jukebox"].song_remaining(), S.JACKPOT_ROUND_MS)
+    def test_full_length_songs_are_capped_at_60_seconds(self):
+        from unittest.mock import patch
+        with patch("custom_code.modern.catalogue.mp3_length_ms", return_value=180_000):
+            self.start_slot(2)
+        jukebox = self.machine.modes["modern_jukebox"]
+        self.assertLessEqual(jukebox.song_remaining(), S.ROUND_MS)
+        self.assertGreater(jukebox.song_remaining(), S.JACKPOT_ROUND_MS)
+        self.advance_time_and_run(S.ROUND_MS / 1000 + 1)
+        self.assertIsNone(jukebox.song)
 
     def test_mode_shot_bursts_lamps_one_to_ten(self):
         rule = self.start_slot(5)

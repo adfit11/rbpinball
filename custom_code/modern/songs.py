@@ -20,7 +20,7 @@ class SongRule:
     title = ""
     goal = ""
     ends_on_complete = False
-    round_ms = None  # None: the round lasts the whole song cut
+    round_ms = S.ROUND_MS  # the song fades out here if it is longer
 
     def __init__(self, songs):
         self.songs, self.machine, self.mode = songs, songs.machine, songs
