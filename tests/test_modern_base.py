@@ -289,6 +289,9 @@ class TestModernJukebox(ModernTestCase):
         self.mock_event("modern_light_special")
         for count in range(1, 11):
             jukebox._start_song(song)
+            if count == 3:
+                self.advance_time_and_run(.1)
+                self.assertEqual(self.player.modern_extra_ball_lit, 0)  # not while the mode runs
             jukebox.end_song()
             if count == 3:
                 self.advance_time_and_run(.1)

@@ -69,11 +69,15 @@ One random location SHALL light with a value draining from 1,000,000 to 100,000 
 - **THEN** the mode fails and ends
 
 ### Requirement: Mode 2 Ladder
-The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung and hold the ball 1 s. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
+The round SHALL last the whole song cut (about 60 s). The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung, hold the ball 2 s, and show the rung climbed with the next rung's value. The mode banner SHALL show the rungs climbed and the next rung's value. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
 
 #### Scenario: The top rung is reached
 - **WHEN** the player makes the fourth Kitchen hit
 - **THEN** 300,000 scores, the mode is completed, and the mode ends
+
+#### Scenario: A rung is climbed
+- **WHEN** the player makes the second Kitchen hit
+- **THEN** 150,000 scores, a "RUNG 2!" screen shows the next rung's value of 225,000, and the MC calls the climb
 
 ### Requirement: Mode 3 Build and collect
 Each spin SHALL add to a pot. The per-spin amount SHALL start at 5,000 and grow by 1,250 each spin. A Bar hit SHALL pay the pot plus 50,000, then reset the pot and the per-spin amount. Collecting can repeat until the song ends. Three collects SHALL complete the mode. An uncollected pot SHALL be lost.
@@ -153,6 +157,13 @@ Each song mode SHALL have its own designed display, in front of the artist video
 #### Scenario: A mode is completed
 - **WHEN** a mode's goal is met
 - **THEN** a completed screen animates in with the mode's points and the completion award, then clears back to the HUD
+
+### Requirement: Celebrate each mode shot
+Each shot that pays a song mode's goal SHALL light lamps 1-10 (L33-L42) one after another from 1 to 10, flash them all twice, then return them to their normal state. It SHALL also play the jackpot sound and flash the screen gold. Mode shots include a jackpot, a rung, a hurry-up collect, a pot collect, a roving-shot hit, an order pickup or delivery, a request, and a Hit me! hit.
+
+#### Scenario: A jackpot is made
+- **WHEN** the player collects a Jukebox jackpot
+- **THEN** lamps 1-10 burst upward and flash, then show the songs played again
 
 ### Requirement: Voice each song mode
 Each song mode SHALL have callout pools for its start, its progress hits, completion, failure, and running low on time, spoken in character.

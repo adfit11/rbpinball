@@ -67,7 +67,7 @@ const EVENTS := [
 	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
-	"modern_rent_party_started", "modern_song_jackpot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
+	"modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
 
@@ -681,7 +681,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 				OVERLAY_STYLES.get(str(payload.get("style", "")), BURGUNDY))
 		"modern_rent_party_started":
 			mode_banner.text = "RENT PARTY  •  LIT CRATERS = JACKPOT %s" % MPF.util.comma_sep(int(payload.get("jackpot", 0)))
-		"modern_song_jackpot":
+		"modern_song_shot":
 			flash_screen(GOLD)
 		"modern_jackpot":
 			flash_screen(GOLD, 2)

@@ -81,10 +81,10 @@ The end-of-ball bonus SHALL be 100 per bumper hit, 2,500 per club location hit, 
 - **THEN** the bonus is counted at 3x, and L30 and L31 were lit during the ball
 
 ### Requirement: Award Modern extra balls at the Kitchen
-The player's third and seventh songs SHALL each light an extra ball at the Kitchen. At most one extra ball SHALL be lit at a time, and a player SHALL earn at most two per game. Entering the Kitchen SHALL collect a lit extra ball and light shoot again (L1). A lit, uncollected extra ball SHALL be lost at drain.
+The player's third and seventh songs SHALL each light an extra ball at the Kitchen when the song ends, so no song mode starts with an extra ball lit. A song cut short by a drain or tilt SHALL NOT light one. At most one extra ball SHALL be lit at a time, and a player SHALL earn at most two per game. Entering the Kitchen SHALL collect a lit extra ball and light shoot again (L1). A lit, uncollected extra ball SHALL be lost at drain.
 
 #### Scenario: The third song lights an extra ball
-- **WHEN** the player's third song starts and no extra ball is lit
+- **WHEN** the player's third song ends and no extra ball is lit
 - **THEN** L45 lights for the extra ball, and entering the Kitchen awards it
 
 #### Scenario: The extra-ball limit is reached

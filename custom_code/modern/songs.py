@@ -42,6 +42,14 @@ class SongRule:
             self.lamps.set("song", S.LOCATIONS[loc][1], FLASH)
         self.machine.events.post("modern_song_targets", locations=",".join(locations))
 
+    def shot(self, title=None, subtitle="", pool=None):
+        """A mode shot: lamps 1-10 burst upward, the screen flashes, and an optional overlay and callout."""
+        self.machine.events.post("modern_song_shot", mode=self.key)
+        if title:
+            self.machine.events.post("modern_overlay", title=title, subtitle=subtitle, ms=1500, style="gold")
+        if pool:
+            self.machine.events.post("modern_callout", pool=pool)
+
     def complete(self):
         if not self.completed:
             self.completed = True
@@ -82,6 +90,7 @@ class HurryUp(SongRule):
     def on_location(self, location):
         if location == self.target:
             self.pay(self.value(), "hurry_up")
+            self.shot()
             self.complete()
 
     def status(self):
@@ -96,17 +105,27 @@ class Ladder(SongRule):
         self.rung = 0
         self.flash(["kitchen"])
 
+    def next_value(self):
+        return S.LADDER_RUNGS[self.rung] if self.rung < len(S.LADDER_RUNGS) else None
+
     def on_hole_held(self, hole):
         if hole == "kitchen" and self.rung < len(S.LADDER_RUNGS):
-            self.machine.modes["modern_holes"].extend("kitchen", 1000 + S.HOLE_HOLD_MS)
-            self.pay(S.LADDER_RUNGS[self.rung], "ladder")
+            self.machine.modes["modern_holes"].extend("kitchen", S.LADDER_HOLD_MS)
+            value = self.next_value()
+            self.pay(value, "ladder")
             self.rung += 1
-            if self.rung == len(S.LADDER_RUNGS):
+            after = self.next_value()
+            self.shot(f"RUNG {self.rung}!", f"{value:,}  •  " + (f"Next {after:,}" if after else "Top of the ladder!"),
+                      "mc_song_rung")
+            if after is None:
                 self.lamps.clear("song")
                 self.complete()
 
     def status(self):
-        return f"LADDER  rung {self.rung} / {len(S.LADDER_RUNGS)}  •  Kitchen"
+        rungs = len(S.LADDER_RUNGS)
+        after = self.next_value()
+        where = f"NEXT {after // 1000}K AT THE KITCHEN" if after else "TOP RUNG"
+        return f"LADDER  RUNG {self.rung} / {rungs}  •  {where}"
 
 
 class BuildAndCollect(SongRule):
@@ -124,6 +143,7 @@ class BuildAndCollect(SongRule):
     def on_location(self, location):
         if location == "bar" and self.pot:
             self.pay(self.pot + S.POT_COLLECT_BONUS, "pot")
+            self.shot()
             self.pot, self.per_spin = 0, S.POT_START
             self.collects += 1
             if self.collects >= S.POT_COLLECTS:
@@ -160,6 +180,7 @@ class RovingShot(SongRule):
     def on_location(self, location):
         if location == self.target and self.hits < S.ROVE_HITS:
             self.pay(S.ROVE_VALUE, "roving")
+            self.shot()
             self.hits += 1
             if self.hits >= S.ROVE_HITS:
                 self.lamps.clear("song")
@@ -193,9 +214,7 @@ class JukeboxJackpot(SongRule):
         self.pay(value, "jukebox_jackpot")
         self.jackpots += 1
         self.machine.events.post("modern_song_jackpot", crater=crater, value=value, count=self.jackpots)
-        self.machine.events.post("modern_callout", pool="mc_song_jackpot")
-        self.machine.events.post("modern_overlay", title="JACKPOT!", subtitle=f"{value:,}  •  Crater {crater}",
-                                 ms=1500, style="gold")
+        self.shot("JACKPOT!", f"{value:,}  •  Crater {crater}", "mc_song_jackpot")
         if self.jackpots >= S.JACKPOTS_TO_COMPLETE:
             self.complete()
 
@@ -239,6 +258,7 @@ class OrderUp(SongRule):
         if hole == "kitchen" and self.destination is None and not self.completed:
             self.machine.modes["modern_holes"].extend("kitchen", 1000 + S.HOLE_HOLD_MS)
             self.pay(S.ORDER_PICKUP, "order_pickup")
+            self.shot()
             self.destination = random.choice([l for l in LOC if l != "kitchen"])
             self.started = self.now_ms()
             self.machine.events.post("modern_callout", pool="cook_order_up")
@@ -255,6 +275,7 @@ class OrderUp(SongRule):
     def on_location(self, location):
         if self.destination and location == self.destination:
             self.pay(self.value(), "delivery")
+            self.shot()
             self.destination = None
             self.lamps.clear("song")
             self.complete()
@@ -279,6 +300,7 @@ class RequestNight(SongRule):
         if location in self.remaining:
             self.remaining.remove(location)
             self.pay(S.REQUEST_VALUES[len(LOC) - len(self.remaining) - 1], "request")
+            self.shot()
             self.flash(self.remaining)
             if not self.remaining:
                 self.pay(S.FINAL_REQUEST_AWARD, "final_request")
@@ -347,6 +369,7 @@ class HitMe(SongRule):
     def on_location(self, location):
         if self.target and location == self.target:
             self.pay(S.HIT_ME_VALUE, "hit_me")
+            self.shot()
             self.hits += 1
             if self.hits >= S.HIT_ME_HITS:
                 self.complete()

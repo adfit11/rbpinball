@@ -1,0 +1,106 @@
+#show_version=6
+
+# Song-mode shot: lamps 1-10 burst upward, then flash twice.
+# Played over the Modern lamps; they return when the show ends.
+- duration: 40ms
+  lights:
+    l_xxx_33: off
+    l_xxx_34: off
+    l_xxx_35: off
+    l_xxx_36: off
+    l_xxx_37: off
+    l_xxx_38: off
+    l_xxx_39: off
+    l_xxx_40: off
+    l_xxx_41: off
+    l_xxx_42: off
+- duration: 40ms
+  lights:
+    l_xxx_33: on
+- duration: 40ms
+  lights:
+    l_xxx_34: on
+- duration: 40ms
+  lights:
+    l_xxx_35: on
+- duration: 40ms
+  lights:
+    l_xxx_36: on
+- duration: 40ms
+  lights:
+    l_xxx_37: on
+- duration: 40ms
+  lights:
+    l_xxx_38: on
+- duration: 40ms
+  lights:
+    l_xxx_39: on
+- duration: 40ms
+  lights:
+    l_xxx_40: on
+- duration: 40ms
+  lights:
+    l_xxx_41: on
+- duration: 40ms
+  lights:
+    l_xxx_42: on
+- duration: 80ms
+  lights:
+    l_xxx_33: off
+    l_xxx_34: off
+    l_xxx_35: off
+    l_xxx_36: off
+    l_xxx_37: off
+    l_xxx_38: off
+    l_xxx_39: off
+    l_xxx_40: off
+    l_xxx_41: off
+    l_xxx_42: off
+- duration: 120ms
+  lights:
+    l_xxx_33: on
+    l_xxx_34: on
+    l_xxx_35: on
+    l_xxx_36: on
+    l_xxx_37: on
+    l_xxx_38: on
+    l_xxx_39: on
+    l_xxx_40: on
+    l_xxx_41: on
+    l_xxx_42: on
+- duration: 80ms
+  lights:
+    l_xxx_33: off
+    l_xxx_34: off
+    l_xxx_35: off
+    l_xxx_36: off
+    l_xxx_37: off
+    l_xxx_38: off
+    l_xxx_39: off
+    l_xxx_40: off
+    l_xxx_41: off
+    l_xxx_42: off
+- duration: 160ms
+  lights:
+    l_xxx_33: on
+    l_xxx_34: on
+    l_xxx_35: on
+    l_xxx_36: on
+    l_xxx_37: on
+    l_xxx_38: on
+    l_xxx_39: on
+    l_xxx_40: on
+    l_xxx_41: on
+    l_xxx_42: on
+- duration: 60ms
+  lights:
+    l_xxx_33: off
+    l_xxx_34: off
+    l_xxx_35: off
+    l_xxx_36: off
+    l_xxx_37: off
+    l_xxx_38: off
+    l_xxx_39: off
+    l_xxx_40: off
+    l_xxx_41: off
+    l_xxx_42: off
