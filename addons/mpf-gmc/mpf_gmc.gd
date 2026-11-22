@@ -75,6 +75,9 @@ func _init():
 		# If an explicit value is set for this log, use it
 		if self[s[0]] is LoggingNode:
 			var script_log_level = self.get_config_value("gmc", "logging_%s" % s[0], -1)
+			# rbpinball: detailed per-script logging is for development (debug) builds only.
+			if not OS.has_feature("debug") and script_log_level != -1 and script_log_level < GMCLogger.LogLevel.LOG:
+				script_log_level = -1
 			self[s[0]].configure_logging(s[2], script_log_level)
 
 func _enter_tree():

@@ -5,7 +5,9 @@
 config:
   - diagnostic_switches.yaml
 
-custom_code: custom_code.coil9_test.Coil115Test
+custom_code:
+  - custom_code.log_retention.LogRetention
+  - custom_code.coil9_test.Coil115Test
 
 coils:
   c_test_output115:
