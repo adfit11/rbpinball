@@ -19,6 +19,12 @@ config/icon="res://icon.svg"
 
 MPF="*res://addons/mpf-gmc/mpf_gmc.gd"
 
+[debug]
+
+file_logging/enable_file_logging.debug=true
+file_logging/enable_file_logging.pc=false
+file_logging/max_log_files=2
+
 [display]
 
 window/size/viewport_width=1280

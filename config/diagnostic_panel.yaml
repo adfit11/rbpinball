@@ -12,4 +12,6 @@ digital_outputs:
     number: 0
     type: light
 
-custom_code: custom_code.coil_panel.CoilPanel
+custom_code:
+  - custom_code.log_retention.LogRetention
+  - custom_code.coil_panel.CoilPanel

@@ -15,6 +15,7 @@ config:
   - config_drop_targets.yaml
 
 custom_code:
+  - custom_code.log_retention.LogRetention
   - custom_code.sim_monitor_colors.SimMonitorColors
 
 modes:
