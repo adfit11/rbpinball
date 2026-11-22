@@ -4,7 +4,7 @@ from mpf.core.mode import Mode
 from mpf.platforms.virtual import VirtualHardwarePlatform
 
 from custom_code.modern import settings
-from custom_code.modern.lamps import FLASH, STEADY, director
+from custom_code.modern.lamps import FLASH, SOLID, director
 from custom_code.modern.scoring import award
 
 HOLES = {"bar": "ball_hold_modern_saucer_held_ball", "kitchen": "ball_hold_modern_firepit_held_ball"}
@@ -94,7 +94,8 @@ class ModernHoles(Mode):
 
     def _show(self):
         lamps = self.lamps
-        lamps.set("extra_ball", settings.EXTRA_BALL_LAMP, STEADY if self.player.modern_extra_ball_lit else 0)
+        # The Kitchen shares this lamp: it flashes as a target, but stays solid while extra ball is lit.
+        lamps.set("extra_ball", settings.EXTRA_BALL_LAMP, SOLID if self.player.modern_extra_ball_lit else 0)
         special = self.player.modern_special_state == 1
         lamps.set("special", settings.SPECIAL_LAMP, FLASH if special else 0)
         lamps.set("special", settings.LOCATIONS["bar"][1], FLASH if special else 0)

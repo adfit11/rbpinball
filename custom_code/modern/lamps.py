@@ -1,4 +1,7 @@
-"""Layered lamp requests for Modern: flashing directs a shot, steady shows a lit feature."""
+"""Layered lamp requests for Modern: flashing directs a shot, steady shows a lit feature.
+
+SOLID is steady that also beats flash, for a feature whose lamp must never be read as a shot target.
+"""
 
 import logging
 
@@ -6,13 +9,13 @@ from custom_code.modern import settings
 
 LOG = logging.getLogger("modern.lamps")
 WATCHED = {light for (_, light, _) in settings.LOCATIONS.values() if light}
-NAMES = {0: "OFF", 1: "STEADY", 2: "FLASH"}
+NAMES = {0: "OFF", 1: "STEADY", 2: "FLASH", 3: "SOLID"}
 
-OFF, STEADY, FLASH = 0, 1, 2
+OFF, STEADY, FLASH, SOLID = 0, 1, 2, 3
 
 
 class LampDirector:
-    """Resolve every Modern lamp request, with flash taking precedence over steady."""
+    """Resolve every Modern lamp request: solid beats flash, which beats steady."""
 
     def __init__(self, mode):
         self.mode = mode
@@ -60,7 +63,7 @@ class LampDirector:
         lights = {l for (_, l) in self.requests} | set(self.shown)
         for light in lights:
             state = self.state(light)
-            on = state == STEADY or (state == FLASH and self.flash_on)
+            on = state in (STEADY, SOLID) or (state == FLASH and self.flash_on)
             if self.shown.get(light) == on:
                 continue
             self.shown[light] = on
