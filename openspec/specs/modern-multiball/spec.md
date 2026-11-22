@@ -6,11 +6,15 @@ Defines how a Modern player lights and makes physical subway locks by completing
 ## Requirements
 
 ### Requirement: Light the lock at the top bank
-Completing the top drop bank SHALL light the lock for the current player. Location visits and the right bank SHALL NOT light it. Completing the top bank SHALL NOT light the lock during a song, because only the song mode advances then, during Rent Party, or while the subway already holds three balls. The HUD SHALL show "LOCK: TOP BANK" until the lock is lit, then "LOCK IS LIT".
+Completing the top drop bank SHALL light the lock for the current player. Location visits and the right bank SHALL NOT light it. Completing the top bank SHALL light the lock at any time, including during a song or Rent Party, because the ball falls into that bank during those modes; a ball SHALL NOT lock until the song or Rent Party ends. It SHALL NOT light the lock while the subway already holds three balls. The HUD SHALL show "LOCK: TOP BANK" until the lock is lit, then "LOCK IS LIT".
 
 #### Scenario: The top bank lights the lock
 - **WHEN** the player completes the top drop bank in base play
 - **THEN** the lock is lit, the "THE BACK ROOM IS OPEN" overlay shows, and the MC calls it
+
+#### Scenario: The top bank during a song
+- **WHEN** the player completes the top drop bank during a song
+- **THEN** the lock is lit, and the next lit crater after the song ends locks the ball
 
 #### Scenario: The right bank does not light the lock
 - **WHEN** the player completes the right drop bank

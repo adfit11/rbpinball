@@ -39,7 +39,7 @@ When the player hits a club location that is not the flashing one, Modern SHALL 
 - **THEN** the refusal does not send the player to the Kitchen, the Bandstand, or the Booths
 
 ### Requirement: Only the song mode advances during a song
-From the moment the selector opens until the song ends, shots SHALL still score their points and end-of-ball bonus counts, but SHALL NOT light the lock, advance Standing Ovation, the floor nickel, or the nickel hunt. A lit extra ball or special SHALL stay lit and be collectable after the song.
+From the moment the selector opens until the song ends, shots SHALL still score their points and end-of-ball bonus counts, but SHALL NOT advance Standing Ovation, the floor nickel, or the nickel hunt. Completing the top bank still lights the lock. A lit extra ball or special SHALL stay lit and be collectable after the song.
 
 #### Scenario: Banks during a song
 - **WHEN** both drop banks are completed during a song
