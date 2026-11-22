@@ -23,6 +23,8 @@ sound_player:
     jackpot:
       bus: effects
   modern_artist_chosen:
+    artist_pick:
+      bus: effects
     record_crackle:
       bus: effects
       loops: -1
