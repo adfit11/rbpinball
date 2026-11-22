@@ -146,6 +146,7 @@ class TestModernNickels(ModernTestCase):
 
     def test_floor_nickel_from_both_banks_keeps_cost(self):
         self.start_modern()
+        self.player.modern_nickel_target = "bar"  # the right bank is the Booths, which would earn its own nickel
         cost = self.machine.modes["modern_nickels"].cost()
         self.mock_event("modern_nickel_awarded")
         for switch in self.machine.modes["modern_targets"].DROP_SWITCHES["top_bank"] + \
