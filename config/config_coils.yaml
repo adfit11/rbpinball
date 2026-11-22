@@ -53,8 +53,8 @@ coils:
     default_pulse_ms: 65 
   c_trough_release:
     number: 115 # uses light bank
-    default_hold_power: 0.075
-    default_pulse_ms: 270
+    # LISY's longest pulse; the board times and ends it, so it never depends on MPF.
+    default_pulse_ms: 255
   c_side_kicker_left:
     number: 108 # uses light bank
     default_pulse_ms: 15
