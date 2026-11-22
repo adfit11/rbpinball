@@ -131,6 +131,7 @@ class SubwayStartupClear:
         trough_counter = self.machine.ball_devices["bd_trough"].ball_count_handler.counter
         if hasattr(trough_counter, "reconcile_empty_at_start"):
             trough_counter.reconcile_empty_at_start()
+            trough_counter.reconcile_partial_at_start()
         lock = controller.is_active(switches["s_subway_lock_10"])
         kicker = controller.is_active(switches["s_subway_kicker_0"])
         release = self.machine.ball_devices["bd_classic_subway_lock"].ejector
