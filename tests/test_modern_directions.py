@@ -135,3 +135,17 @@ class TestKitchenReturns(ModernTestCase):
             self.kitchen()
             self.advance_time_and_run(3.5)  # the eject confirms on its timeout
             self.assertEqual(rule.rung, rung)
+
+    def test_plunge_through_the_spinner_before_the_hunt_starts(self):
+        self.start_modern(skip_splash=False)
+        self.hit_and_release_switch("s_start_47")
+        self.advance_time_and_run(2)
+        self.assertEqual(self.player.modern_nickel_target, "")
+        self.mock_event("modern_nickel_refused")
+        self.hit_and_release_switch("s_spinner_44")
+        self.advance_time_and_run(.1)
+        self.assertEventNotCalled("modern_nickel_refused")
+        self.assertEqual(self.player.modern_nickel_progress, 0)
+        self.hit_and_release_switch("s_10_points_15")
+        self.advance_time_and_run(.1)
+        self.assertTrue(self.player.modern_nickel_target)
