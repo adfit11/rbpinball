@@ -49,6 +49,15 @@ class TestModernSongs(ModernTestCase):
         self.assertEventCalled("modern_song_failed")
         self.assertIsNone(self.machine.modes["modern_jukebox"].song)
 
+    def test_hurry_up_clock_starts_and_ends(self):
+        self.mock_event("modern_hurry_up_started")
+        self.mock_event("modern_hurry_up_ended")
+        rule = self.start_slot(1)
+        self.assertEventCalledWith("modern_hurry_up_started", ms=S.HURRY_MS, start=S.HURRY_START, end=S.HURRY_END,
+                                   target=S.LOCATIONS[rule.target][0])
+        self.advance_time_and_run(S.HURRY_MS / 1000 + 1)
+        self.assertEventCalledWith("modern_hurry_up_ended", collected=False, value=0)
+
     def test_ladder_four_rungs(self):
         rule = self.start_slot(2)
         for _ in range(4):

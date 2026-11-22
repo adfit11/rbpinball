@@ -62,7 +62,7 @@ Each artist slot SHALL run one mode:
 - **THEN** the Ladder mode runs for her song
 
 ### Requirement: Mode 1 Hurry-up
-One random location SHALL light with a value draining from 1,000,000 to 100,000 over 20 s. Collecting it SHALL pay the current value and complete the mode. Reaching 100,000 uncollected SHALL fail the mode. Either outcome SHALL end the mode immediately.
+One random location SHALL light with a value draining from 1,000,000 to 100,000 over 20 s. Collecting it SHALL pay the current value and complete the mode. Reaching 100,000 uncollected SHALL fail the mode. Either outcome SHALL end the mode immediately. The screen SHALL show a stopwatch ring emptying with the seconds left, the draining value and the target; it SHALL turn from green to red, throb faster through the last 5 s, and burst on a collect or shake on a miss.
 
 #### Scenario: The hurry-up is collected
 - **WHEN** the player hits the lit location while it shows 700,000

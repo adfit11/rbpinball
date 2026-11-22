@@ -88,6 +88,8 @@ class HurryUp(SongRule):
         self.target = random.choice(LOC)
         self.started = self.now_ms()
         self.flash([self.target])
+        self.machine.events.post("modern_hurry_up_started", ms=S.HURRY_MS, start=S.HURRY_START, end=S.HURRY_END,
+                                 target=S.LOCATIONS[self.target][0])
 
     def value(self):
         return drain_value(S.HURRY_START, S.HURRY_END, S.HURRY_MS, self.now_ms() - self.started)
@@ -97,10 +99,12 @@ class HurryUp(SongRule):
 
     def tick(self):
         if self.now_ms() - self.started >= S.HURRY_MS:
+            self.machine.events.post("modern_hurry_up_ended", collected=False, value=0)
             self.songs.failed(self, end_song=True)
 
     def on_location(self, location):
         if location == self.target:
+            self.machine.events.post("modern_hurry_up_ended", collected=True, value=self.value())
             self.pay(self.value(), "hurry_up")
             self.shot()
             self.complete()
