@@ -62,7 +62,7 @@ Each artist slot SHALL run one mode:
 - **THEN** the Ladder mode runs for her song
 
 ### Requirement: Mode 1 Hurry-up
-One random location SHALL light with a value draining from 1,000,000 to 100,000 over 20 s. Collecting it SHALL pay the current value and complete the mode. Reaching 100,000 uncollected SHALL fail the mode. Either outcome SHALL end the mode immediately.
+One random location SHALL light with a value draining from 1,000,000 to 100,000 over 20 s. Collecting it SHALL pay the current value and complete the mode. Reaching 100,000 uncollected SHALL fail the mode. Either outcome SHALL end the mode immediately. The screen SHALL show a stopwatch ring emptying with the seconds left, the draining value and the target; it SHALL turn from green to red, throb faster through the last 5 s, and burst on a collect or shake on a miss.
 
 #### Scenario: The hurry-up is collected
 - **WHEN** the player hits the lit location while it shows 700,000
@@ -113,7 +113,7 @@ The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry 
 - **THEN** the mode is completed and ends, and the song fades out
 
 ### Requirement: Mode 6 Party time
-All scoring SHALL be doubled for the song, on top of the song multiplier. A looping table-wide light show SHALL run for the song, inviting the player to play anywhere; the shoot-again lamp SHALL be left out so it still shows the Bouncer. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
+All scoring SHALL be doubled for the song, on top of the song multiplier. Its ambient lamps SHALL wander all over the table, inviting the player to play anywhere. The Bouncer ball saver SHALL stay ready and re-arm after each save. If the ball is still in play when the song ends, the mode SHALL be completed and pay a 600,000 last-dance award.
 
 #### Scenario: The Bouncer saves during Party time
 - **WHEN** the ball enters the left outlane and the Bouncer saves it
@@ -124,7 +124,7 @@ All scoring SHALL be doubled for the song, on top of the song multiplier. A loop
 - **THEN** 600,000 scores and the mode is completed
 
 ### Requirement: Mode 7 Order up
-The Kitchen SHALL light first. A Kitchen hit SHALL pay 75,000, hold the ball 1 s, and name one random table among the Bar, Bandstand, Coat Check, and the Booths. Its value SHALL drain from 900,000 to 100,000. A delivery SHALL pay the value and complete the mode. A cold order SHALL fail it. Either SHALL end the mode.
+The Kitchen SHALL light first. A Kitchen hit SHALL pay 75,000, hold the ball 1 s, and name one random table among the Bar, Bandstand, Coat Check, and the Booths. The cook SHALL announce where to take the order, and the screen SHALL show it. Its value SHALL drain from 900,000 to 100,000. A delivery SHALL pay the value and complete the mode. A cold order SHALL fail it. Either SHALL end the mode.
 
 #### Scenario: The order is delivered
 - **WHEN** the order is for the Coat Check and the player hits it showing 600,000

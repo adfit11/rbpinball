@@ -49,6 +49,15 @@ class TestModernSongs(ModernTestCase):
         self.assertEventCalled("modern_song_failed")
         self.assertIsNone(self.machine.modes["modern_jukebox"].song)
 
+    def test_hurry_up_clock_starts_and_ends(self):
+        self.mock_event("modern_hurry_up_started")
+        self.mock_event("modern_hurry_up_ended")
+        rule = self.start_slot(1)
+        self.assertEventCalledWith("modern_hurry_up_started", ms=S.HURRY_MS, start=S.HURRY_START, end=S.HURRY_END,
+                                   target=S.LOCATIONS[rule.target][0])
+        self.advance_time_and_run(S.HURRY_MS / 1000 + 1)
+        self.assertEventCalledWith("modern_hurry_up_ended", collected=False, value=0)
+
     def test_ladder_four_rungs(self):
         rule = self.start_slot(2)
         for _ in range(4):
@@ -157,15 +166,7 @@ class TestModernSongs(ModernTestCase):
         self.assertIn("4: 325K", rule.status())
 
     def test_party_time_doubles_and_pays_last_dance(self):
-        self.mock_event("modern_party_time_lights")
-        self.mock_event("modern_party_time_lights_stop")
         rule = self.start_slot(6)
-        self.assertEventCalled("modern_party_time_lights")
-        seen = set()
-        for _ in range(70):
-            self.advance_time_and_run(.1)
-            seen.add(self.machine.lights["l_xxx_47"].get_color().name)
-        self.assertGreaterEqual(len(seen), 2)  # the Bar lamp is part of the moving show
         self.assertEqual(self.player.modern_ball_saver_ready, 1)
         start = self.player.score
         self.hit_and_release_switch("s_top_bumpers_35")
@@ -175,12 +176,15 @@ class TestModernSongs(ModernTestCase):
         self.advance_time_and_run(.1)
         self.assertTrue(rule.completed)
         self.assertEqual(self.player.modern_score_factor, 1)
-        self.assertEventCalled("modern_party_time_lights_stop")
 
     def test_order_up_delivery(self):
         rule = self.start_slot(7)
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.hit_location("kitchen")
         self.assertIsNotNone(rule.destination)
+        self.assertIn(f"cook_order_up_{rule.destination}", pools)
+        self.assertIn(f"cook_order_up_{rule.destination}", self.machine.modes["modern_callouts"].pools)
         rule.on_location(rule.destination)
         self.assertTrue(rule.completed)
 

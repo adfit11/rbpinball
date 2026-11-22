@@ -4,8 +4,21 @@ from pathlib import Path
 
 from mpf.tests.MpfGameTestCase import MpfGameTestCase
 
+from custom_code.modern import settings
+
 
 class ModernTestCase(MpfGameTestCase):
+    ambient = False  # the moving background lamps; off so lamp assertions see only feature lamps
+
+    def setUp(self):
+        self._ambient_was = settings.AMBIENT_ENABLED
+        settings.AMBIENT_ENABLED = self.ambient
+        super().setUp()
+
+    def tearDown(self):
+        super().tearDown()
+        settings.AMBIENT_ENABLED = self._ambient_was
+
     def get_machine_path(self):
         return str(Path(__file__).resolve().parents[1])
 

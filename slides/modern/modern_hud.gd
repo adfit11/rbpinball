@@ -66,6 +66,19 @@ var spin_pot: Label
 var spin_gain: Label
 var spin_hide_ms := 0
 const SPIN_SHOW_MS := 1500
+var hurry_root: Control  # Louis Jordan's hurry-up clock: a ring and the value draining as time runs out
+var hurry_clock: HurryClock
+var hurry_target: Label
+var hurry_secs: Label
+var hurry_value: Label
+var hurry_live := false
+var hurry_total_ms := 1.0
+var hurry_elapsed_ms := 0.0
+var hurry_start := 0
+var hurry_end := 0
+const HURRY_GREEN := Color("#5ad65a")
+const HURRY_RED := Color("#ff3b30")
+const HURRY_PANIC_MS := 5000.0
 
 const EVENTS := [
 	"modern_splash_show", "modern_splash_hide", "modern_nickel_directed", "modern_nickel_refused",
@@ -77,6 +90,7 @@ const EVENTS := [
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
+	"modern_hurry_up_started", "modern_hurry_up_ended",
 ]
 
 
@@ -229,6 +243,27 @@ func _build() -> void:
 	spin_gain.pivot_offset = Vector2(130, 22)
 	spin_root.visible = false
 
+	hurry_root = Control.new()
+	_place(hurry_root, 30, 110, 280, 360)
+	hurry_root.pivot_offset = Vector2(140, 180)
+	hurry_target = _label("", 30, CREAM, title_font)
+	hurry_root.add_child(hurry_target)
+	hurry_target.position = Vector2(0, 0)
+	hurry_target.size = Vector2(280, 44)
+	hurry_clock = HurryClock.new()
+	hurry_clock.position = Vector2(30, 50)
+	hurry_clock.size = Vector2(220, 220)
+	hurry_root.add_child(hurry_clock)
+	hurry_secs = _label("", 84, CREAM, title_font)
+	hurry_clock.add_child(hurry_secs)
+	hurry_secs.position = Vector2.ZERO
+	hurry_secs.size = Vector2(220, 220)
+	hurry_value = _label("", 40, GOLD, title_font)
+	hurry_root.add_child(hurry_value)
+	hurry_value.position = Vector2(0, 282)
+	hurry_value.size = Vector2(280, 56)
+	hurry_root.visible = false
+
 	mode_panel = _panel(Color(0, 0, 0, 0.75))
 	mode_banner = _label("", 26, CREAM)
 	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -322,6 +357,7 @@ func _target_name(key: String) -> String:
 
 func _process(delta: float) -> void:
 	_spin_process(delta)
+	_hurry_process(delta)
 	mode_panel.visible = mode_banner.text != ""
 	if song_panel.visible and not song_paused and song_length_ms > 0:
 		song_elapsed_ms += delta * 1000.0
@@ -375,6 +411,106 @@ func _spin_process(delta: float) -> void:
 	if Time.get_ticks_msec() >= spin_hide_ms:
 		spin_root.visible = false
 		spin_record.speed = 0.0
+
+
+# Louis Jordan's hurry-up -------------------------------------------------
+class HurryClock extends Control:
+	## A stopwatch face: the ring empties clockwise and turns green -> gold -> red as the value drains.
+	var left := 1.0
+	var color := Color("#5ad65a")
+	var glow := 0.0
+
+	func _draw() -> void:
+		var c := size / 2.0
+		var r: float = min(size.x, size.y) / 2.0
+		draw_circle(c, r, Color(0.05, 0.03, 0.02, 0.85))
+		if glow > 0.0:
+			draw_circle(c, r, Color(color.r, color.g, color.b, 0.25 * glow))
+		for i in range(20):
+			var a := -PI / 2 + TAU * i / 20.0
+			var d := Vector2(cos(a), sin(a))
+			draw_line(c + d * r * 0.74, c + d * r * 0.82, Color(1, 1, 1, 0.35), 2.0)
+		draw_arc(c, r * 0.91, 0, TAU, 96, Color(0.25, 0.2, 0.15, 0.9), 14.0)
+		if left > 0.0:
+			draw_arc(c, r * 0.91, -PI / 2, -PI / 2 + TAU * left, 96, color, 14.0)
+			var tip := -PI / 2 + TAU * left
+			draw_circle(c + Vector2(cos(tip), sin(tip)) * r * 0.91, 10.0, Color.WHITE)
+
+
+func _hurry_color(left: float) -> Color:
+	if left > 0.5:
+		return HURRY_GREEN.lerp(GOLD, (1.0 - left) * 2.0)
+	return GOLD.lerp(HURRY_RED, clamp((0.5 - left) * 4.0, 0.0, 1.0))
+
+
+func _start_hurry(payload: Dictionary) -> void:
+	hurry_total_ms = max(1.0, float(payload.get("ms", 20000)))
+	hurry_start = int(payload.get("start", 0))
+	hurry_end = int(payload.get("end", 0))
+	hurry_elapsed_ms = 0.0
+	hurry_target.text = "SHOOT " + str(payload.get("target", "")).to_upper()
+	hurry_live = true
+	hurry_root.position.x = 30.0
+	hurry_root.modulate = Color.WHITE
+	hurry_root.scale = Vector2(0.3, 0.3)
+	hurry_root.visible = true
+	create_tween().tween_property(hurry_root, "scale", Vector2.ONE, 0.35).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+func _hurry_process(delta: float) -> void:
+	if not hurry_live:
+		return
+	if not song_paused:
+		hurry_elapsed_ms = min(hurry_total_ms, hurry_elapsed_ms + delta * 1000.0)
+	var remaining := hurry_total_ms - hurry_elapsed_ms
+	var left := remaining / hurry_total_ms
+	var color := _hurry_color(left)
+	hurry_clock.left = left
+	hurry_clock.color = color
+	hurry_secs.text = "%d" % ceil(remaining / 1000.0)
+	hurry_value.text = commas(int(max(hurry_end, hurry_start - (hurry_start - hurry_end) * (1.0 - left))))
+	hurry_value.add_theme_color_override("font_color", color.lerp(GOLD, 0.4))
+	var t := Time.get_ticks_msec() / 1000.0
+	var warn := CREAM
+	if remaining < HURRY_PANIC_MS:  # the last five seconds: the clock throbs faster and the numbers flash red
+		var rate := lerpf(6.0, 16.0, 1.0 - remaining / HURRY_PANIC_MS)
+		var beat := 0.5 + 0.5 * sin(t * rate)
+		hurry_root.scale = Vector2.ONE * (1.0 + 0.06 * beat)
+		hurry_clock.glow = beat
+		warn = HURRY_RED if beat > 0.5 else CREAM
+	elif hurry_elapsed_ms > 400.0:  # after the pop-in tween
+		hurry_root.scale = Vector2.ONE
+		hurry_clock.glow = 0.0
+	hurry_secs.add_theme_color_override("font_color", warn)
+	hurry_target.add_theme_color_override("font_color", warn)
+	hurry_clock.queue_redraw()
+
+
+func _end_hurry(payload: Dictionary) -> void:
+	if not hurry_root.visible:
+		return
+	hurry_live = false
+	hurry_clock.glow = 0.0
+	hurry_clock.queue_redraw()
+	var tw := create_tween()
+	if payload.get("collected", false):
+		hurry_target.text = "COLLECTED!"
+		hurry_target.add_theme_color_override("font_color", GOLD)
+		hurry_value.text = commas(int(payload.get("value", 0)))
+		hurry_value.add_theme_color_override("font_color", GOLD)
+		tw.tween_property(hurry_root, "scale", Vector2(1.3, 1.3), 0.25).set_trans(Tween.TRANS_BACK)
+		tw.tween_interval(0.9)
+	else:
+		hurry_target.text = "TOO LATE!"
+		hurry_target.add_theme_color_override("font_color", HURRY_RED)
+		hurry_secs.text = "0"
+		hurry_value.text = commas(hurry_end)
+		hurry_clock.left = 0.0
+		for dx in [-14.0, 12.0, -9.0, 6.0, 0.0]:
+			tw.tween_property(hurry_root, "position:x", 30.0 + dx, 0.05)
+		tw.tween_interval(0.8)
+	tw.tween_property(hurry_root, "modulate:a", 0.0, 0.4)
+	tw.tween_callback(func(): hurry_root.visible = false)
 
 
 # Overlays ---------------------------------------------------------------
@@ -738,6 +874,9 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_play_artist_video(str(payload.get("path", "")))
 		"modern_song_ended":
 			_stop_artist_video()
+			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
+				hurry_live = false
+				hurry_root.visible = false
 			song_panel.visible = false
 			mode_banner.text = ""
 			if not between_balls:
@@ -775,6 +914,10 @@ func _on_event(payload: Dictionary = {}) -> void:
 			show_overlay("EXTRA BALL IS LIT", "Shoot the Kitchen", 1500, TEAL, _extra_ball_lit)
 		"modern_pot_spin":
 			_show_spin(payload)
+		"modern_hurry_up_started":
+			_start_hurry(payload)
+		"modern_hurry_up_ended":
+			_end_hurry(payload)
 		"modern_ball_locked":
 			flash_screen(GOLD, 2)
 		"modern_award_extra_ball":

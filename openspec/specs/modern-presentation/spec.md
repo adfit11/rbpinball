@@ -19,6 +19,16 @@ Modern SHALL play a callout from a matching pool at key game events, such as gam
 - **WHEN** the player earns a nickel
 - **THEN** a random line from the nickel pool plays, and it differs from the last nickel line
 
+### Requirement: Ambient lamp layer
+Modern SHALL run a moving background pattern on lamps no feature is using, at three intensities: base, artist mode and multiball. Lamp requests SHALL always win, so flashing targets and lit features read unchanged. Outside multiball it SHALL never light a location, drop, Booths, special or shoot-again lamp.
+- Base: one slow lamp walks from the flippers to each flashing target, with an occasional twinkle.
+- Artist modes: a quicker two-lamp stream runs to each flashing target in turn, faster as the rule heats up (hurry-up and Order Up drain, more rungs, jackpots or requests). Order Up deliveries run from the Kitchen. Party Time wanders over the whole table; Dance Floor sends a ring out from the bumpers on each hit.
+- Multiball: a full-table show (rolling band, trading lamps, sparkle, lamps 1–10 ping-pong, flashes).
+
+#### Scenario: A hurry-up guides the player
+- **WHEN** the hurry-up target flashes
+- **THEN** a stream of lamps runs from the flippers toward it, and speeds up as the value drains
+
 ### Requirement: Celebrate a locked ball
 Every ball locked before the third SHALL play an excited MC announcement, the jackpot sound, the lamp burst, a gold screen flash and a "BALL n LOCKED!" card. The third lock SHALL use the Rent Party build-up instead.
 
