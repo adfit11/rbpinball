@@ -19,18 +19,32 @@ var title_font: Font = load("res://fonts/modern/Limelight-Regular.ttf")
 var neon_font: Font = load("res://fonts/modern/Monoton-Regular.ttf")
 var body_font: Font = load("res://fonts/modern/Oswald-Variable.ttf")
 
-var scores: HBoxContainer
-var ball_label: Label
-var side_labels := {}
-var song_panel: PanelContainer
-var song_title: Label
-var song_bar: ProgressBar
-var mode_banner: Label
-var mode_panel: PanelContainer  # the live mode banner, in front of the video and HUD widgets
+const NAMES := {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check", "booths": "Booths"}
+var score_label: Label  # the current player's score, as big as the screen allows
+var sub_line: RichTextLabel  # player, ball and the other players' scores
+var card: PanelContainer  # the one goal card: the nickel hunt, a mode, Rent Party or the bonus
+var card_bar: ProgressBar  # time left in the song, along the top of the card
+var card_label: Label
+var card_title: RichTextLabel
+var card_pips: Pips
+var card_line: Label
+var card_detail: Label
+var lock_chip: PanelContainer
+var lock_pips: Pips
+var lock_state: Label
 var caption: Label
-var task_panel: PanelContainer
-var task_title: Label
-var task_detail: Label
+var song_live := false
+var song_artist := ""
+var task_title_text := ""
+var task_detail_text := ""
+var mode_status := ""
+var mode_done := 0
+var mode_goal := 0
+var rent_live := false
+var rent_text := ""
+var rent_done := 0
+var rent_goal := 0
+var bonus_text := ""
 var overlay_root: Control
 var selector: Control
 var selector_cells: Array = []
@@ -141,6 +155,45 @@ func _panel(color: Color, border: Color = GOLD) -> PanelContainer:
 	return p
 
 
+func _rich(size: int, font: Font = null) -> RichTextLabel:
+	var r := RichTextLabel.new()
+	r.bbcode_enabled = true
+	r.fit_content = true
+	r.scroll_active = false
+	r.autowrap_mode = TextServer.AUTOWRAP_OFF
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.add_theme_font_override("normal_font", font if font else body_font)
+	r.add_theme_font_size_override("normal_font_size", size)
+	r.add_theme_color_override("default_color", CREAM)
+	r.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	r.add_theme_constant_override("shadow_offset_x", 2)
+	r.add_theme_constant_override("shadow_offset_y", 2)
+	return r
+
+
+class Pips extends Control:
+	## Progress dots: filled gold for each step done, an empty ring for each to go.
+	var done := 0
+	var total := 0
+	var radius := 16.0
+
+	func set_count(d: int, t: int) -> void:
+		done = d
+		total = t
+		visible = t > 0
+		custom_minimum_size = Vector2(t * (radius * 2.0 + 12.0), radius * 2.0 + 8.0)
+		queue_redraw()
+
+	func _draw() -> void:
+		for i in total:
+			var c := Vector2(radius + 4.0 + i * (radius * 2.0 + 12.0), size.y / 2.0)
+			if i < done:
+				draw_circle(c, radius + 4.0, Color(1.0, 0.81, 0.35, 0.3))
+				draw_circle(c, radius, Color("#ffcf5a"))
+			else:
+				draw_arc(c, radius - 1.5, 0, TAU, 40, Color("#ffcf5a"), 3.0)
+
+
 func _place(node: Control, x: float, y: float, w: float, h: float) -> Control:
 	node.position = Vector2(x, y)
 	node.size = Vector2(w, h)
@@ -158,54 +211,60 @@ func _build() -> void:
 
 	_new_artist_video(bg)
 
-	scores = HBoxContainer.new()
-	scores.add_theme_constant_override("separation", 12)
-	scores.alignment = BoxContainer.ALIGNMENT_CENTER
-	_place(scores, 20, 10, 1240, 70)
-	for player in MPF.game.players:
-		var p := _panel(Color(BURGUNDY, 0.85))
-		p.custom_minimum_size = Vector2(290, 64)
-		p.add_child(_label("", 34))
-		scores.add_child(p)
-	ball_label = _place(_label("", 24, GOLD), 540, 82, 200, 30)
+	score_label = _place(_label("", 150, GOLD, title_font), 0, 0, 1280, 170)
+	score_label.add_theme_color_override("font_outline_color", Color(GOLD, 0.22))
+	score_label.add_theme_constant_override("outline_size", 16)
+	score_label.add_theme_constant_override("shadow_offset_x", 3)
+	score_label.add_theme_constant_override("shadow_offset_y", 3)
+	sub_line = _place(_rich(30), 0, 176, 1280, 44)
 
-	var side := VBoxContainer.new()
-	side.add_theme_constant_override("separation", 6)
-	var side_panel := _panel(Color(TEAL, 0.85))
-	side_panel.add_child(side)
-	_place(side_panel, 1040, 130, 220, 400)
-	for key in ["nickel", "target", "locks", "guests"]:
-		var l := _label("", 22)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD
-		l.custom_minimum_size = Vector2(190, 0)
-		side.add_child(l)
-		side_labels[key] = l
+	card = _panel(Color(BURGUNDY, 0.9))
+	card.custom_minimum_size = Vector2(800, 0)
+	var card_box := VBoxContainer.new()
+	card_box.add_theme_constant_override("separation", 4)
+	card.add_child(card_box)
+	card_bar = ProgressBar.new()
+	card_bar.show_percentage = false
+	card_bar.custom_minimum_size = Vector2(0, 10)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = GOLD
+	fill.set_corner_radius_all(5)
+	var back := StyleBoxFlat.new()
+	back.bg_color = Color(1, 1, 1, 0.15)
+	back.set_corner_radius_all(5)
+	card_bar.add_theme_stylebox_override("fill", fill)
+	card_bar.add_theme_stylebox_override("background", back)
+	card_box.add_child(card_bar)
+	card_label = _label("", 20, GOLD)
+	card_box.add_child(card_label)
+	card_title = _rich(66, title_font)
+	card_box.add_child(card_title)
+	var line := HBoxContainer.new()
+	line.alignment = BoxContainer.ALIGNMENT_CENTER
+	line.add_theme_constant_override("separation", 14)
+	card_pips = Pips.new()
+	line.add_child(card_pips)
+	card_line = _label("", 30)
+	line.add_child(card_line)
+	card_box.add_child(line)
+	card_detail = _label("", 24, Color("#d8ccb4"))
+	card_detail.autowrap_mode = TextServer.AUTOWRAP_WORD
+	card_box.add_child(card_detail)
+	_place(card, 240, 250, 800, 0)
 
-	song_panel = _panel(Color(0, 0, 0, 0.6))
-	var song_box := VBoxContainer.new()
-	song_panel.add_child(song_box)
-	song_title = _label("", 26, GOLD, title_font)
-	song_box.add_child(song_title)
-	song_bar = ProgressBar.new()
-	song_bar.show_percentage = false
-	song_bar.custom_minimum_size = Vector2(560, 14)
-	song_box.add_child(song_bar)
-	_place(song_panel, 330, 120, 620, 80)
-	song_panel.visible = false
+	lock_chip = _panel(Color(0.03, 0.02, 0.02, 0.82), Color(GOLD, 0.55))
+	var lock_box := HBoxContainer.new()
+	lock_box.add_theme_constant_override("separation", 14)
+	lock_chip.add_child(lock_box)
+	lock_box.add_child(_label("LOCKS", 30, GOLD))
+	lock_pips = Pips.new()
+	lock_pips.radius = 13.0
+	lock_box.add_child(lock_pips)
+	lock_state = _label("", 28)
+	lock_box.add_child(lock_state)
+	_place(lock_chip, 440, 530, 0, 0)
 
-	task_panel = _panel(Color(BURGUNDY, 0.85))
-	var task_box := VBoxContainer.new()
-	task_panel.add_child(task_box)
-	task_title = _label("", 24, GOLD, title_font)
-	task_box.add_child(task_title)
-	task_detail = _label("", 21, CREAM)
-	task_detail.autowrap_mode = TextServer.AUTOWRAP_WORD
-	task_detail.custom_minimum_size = Vector2(780, 0)
-	task_box.add_child(task_detail)
-	_place(task_panel, 200, 420, 820, 110)
-	task_panel.visible = false
-
-	caption = _place(_label("", 22, CREAM), 140, 585, 1000, 34)
+	caption = _place(_label("", 26, CREAM), 90, 640, 1100, 40)
 
 	select_ring = ProgressBar.new()
 	select_ring.show_percentage = false
@@ -253,14 +312,6 @@ func _build() -> void:
 	hurry_value.position = Vector2(0, 282)
 	hurry_value.size = Vector2(280, 56)
 	hurry_root.visible = false
-
-	mode_panel = _panel(Color(0, 0, 0, 0.75))
-	mode_banner = _label("", 26, CREAM)
-	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
-	mode_banner.custom_minimum_size = Vector2(812, 0)
-	mode_panel.add_child(mode_banner)
-	_place(mode_panel, 200, 532, 840, 48)
-	mode_panel.visible = false
 
 	overlay_root = Control.new()
 	_place(overlay_root, 0, 0, 1280, 720)
@@ -314,37 +365,108 @@ func _on_player_update(_variable: String, _value: Variant) -> void:
 func _render() -> void:
 	var active: Dictionary = MPF.game.player
 	var number := int(active.get("number", 1))
-	for i in range(scores.get_child_count()):
-		var player: Dictionary = MPF.game.players[i] if i < MPF.game.players.size() else {}
-		var p: PanelContainer = scores.get_child(i)
-		var l: Label = p.get_child(0)
-		l.text = "P%d  %s" % [i + 1, MPF.util.comma_sep(int(player.get("score", 0)))]
-		l.add_theme_color_override("font_color", GOLD if i + 1 == number else CREAM)
-	ball_label.text = "BALL %d" % int(active.get("ball", 1))
-	var held := int(active.get("modern_nickel", 0)) > 0
-	side_labels.nickel.text = "NICKEL: HELD" if held else "NICKEL: %d / %d" % [
-		int(active.get("modern_nickel_progress", 0)), int(active.get("modern_nickel_cost", 1))]
-	side_labels.target.text = "Shoot a lit crater!" if held else _target_name(str(active.get("modern_nickel_target", "")))
-	side_labels.locks.text = "LOCKS %d / 3" % int(active.get("modern_locked_balls", 0))
-	side_labels.guests.text = "LOCK IS LIT" if int(active.get("modern_lock_lit", 0)) else "LOCK: TOP BANK"
+	var big := 120 if song_live or rent_live else 150
+	score_label.text = commas(int(active.get("score", 0)))
+	var font_size := big
+	while font_size > 60 and title_font.get_string_size(score_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > 1200:
+		font_size -= 6
+	score_label.add_theme_font_size_override("font_size", font_size)
+	score_label.size.y = big + 20
+	var others := ""
+	for i in range(MPF.game.players.size()):
+		if i + 1 != number:
+			others += "     [color=#a89a86]P%d %s[/color]" % [i + 1, commas(int(MPF.game.players[i].get("score", 0)))]
+	sub_line.text = "[center]PLAYER %d  •  BALL %d%s[/center]" % [number, int(active.get("ball", 1)), others]
+	sub_line.position.y = big + 26
+	lock_pips.set_count(int(active.get("modern_locked_balls", 0)), 3)
+	var lit := int(active.get("modern_lock_lit", 0)) == 1
+	lock_state.text = "LOCK IS LIT" if lit else "Lock at the top bank"
+	lock_state.add_theme_color_override("font_color", GOLD if lit else CREAM)
+	lock_chip.visible = not rent_live and bonus_text == ""
+	lock_chip.modulate = Color(1, 1, 1, 0.35) if song_live else Color.WHITE  # locks don't advance during a song
+	_render_card(active)
+
+
+func _accent(text: String) -> String:
+	## The last word in gold, as on the jukebox signs.
+	var cut := text.rfind(" ")
+	if cut < 0:
+		return "[color=#ffcf5a]%s[/color]" % text
+	return "%s [color=#ffcf5a]%s[/color]" % [text.left(cut), text.substr(cut + 1)]
+
+
+func _render_card(active: Dictionary) -> void:
+	var label := "NEXT"
+	var title := ""
+	var line := ""
+	var detail := ""
+	var done := 0
+	var goal := 0
+	var song_mode := task_title_text.begins_with("SONG MODE: ")
+	if bonus_text != "":
+		label = "END OF BALL"
+		title = _accent("BONUS")
+		line = bonus_text
+	elif rent_live:
+		label = "MULTIBALL"
+		title = _accent("RENT PARTY")
+		line = rent_text
+		done = rent_done
+		goal = rent_goal
+	elif song_live or song_mode:
+		label = "UP NEXT"
+		title = _accent(task_title_text.trim_prefix("SONG MODE: "))
+		detail = task_detail_text.trim_suffix(" Finish before the record ends.")
+		if song_live:
+			line = mode_status
+			done = mode_done
+			goal = mode_goal
+	elif int(active.get("modern_nickel", 0)) > 0:
+		title = "SHOOT A " + _accent("LIT CRATER")
+		line = "Nickel ready  •  play the jukebox"
+	else:
+		var target := str(active.get("modern_nickel_target", ""))
+		if target in NAMES:
+			title = "SHOOT THE " + _accent(str(NAMES[target]).to_upper())
+			line = "Nickel"
+			done = int(active.get("modern_nickel_progress", 0))
+			goal = int(active.get("modern_nickel_cost", 1))
+		else:
+			title = "GET A " + _accent("NICKEL")
+			line = "Visit the club staff"
+	if not song_live:
+		card_label.text = label
+	card_title.text = "[center]%s[/center]" % title
+	card_title.add_theme_font_size_override("normal_font_size", 56 if song_live or rent_live else 66)
+	card_pips.set_count(done, goal if goal <= 6 else 0)  # long counts such as 25 dancers stay in the text
+	card_line.text = line
+	card_line.visible = line != ""
+	card_detail.text = detail
+	card_detail.visible = detail != ""
+	card_bar.visible = song_live
+	card.position.y = sub_line.position.y + 56
 
 
 func _extra_ball_lit() -> bool:
 	return int(MPF.game.player.get("modern_extra_ball_lit", 0)) == 1
 
 
-func _target_name(key: String) -> String:
-	var names := {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check", "booths": "Booths"}
-	return ("Go to the %s" % names[key]) if key in names else ""
-
-
 func _process(delta: float) -> void:
 	_spin_process(delta)
 	_hurry_process(delta)
-	mode_panel.visible = mode_banner.text != ""
-	if song_panel.visible and not song_paused and song_length_ms > 0:
-		song_elapsed_ms += delta * 1000.0
-		song_bar.value = 100.0 * song_elapsed_ms / song_length_ms
+	if song_live and song_length_ms > 0:
+		if not song_paused:
+			song_elapsed_ms += delta * 1000.0
+		card_bar.value = 100.0 * (1.0 - min(1.0, song_elapsed_ms / song_length_ms))
+		var left := int(ceil(max(0.0, song_length_ms - song_elapsed_ms) / 1000.0))
+		card_label.text = "%s  •  %d:%02d LEFT" % [song_artist.to_upper(), left / 60, left % 60]
+	var side := hurry_root.visible or spin_root.visible  # Louis Jordan's clock and Big Joe's record sit on the left
+	var w := 720.0 if side else 800.0
+	card.custom_minimum_size.x = w
+	card.size = Vector2(w, 0)
+	card.position.x = 320.0 if side else (1280.0 - w) / 2.0
+	lock_chip.size = Vector2.ZERO
+	lock_chip.position = Vector2((1280.0 - lock_chip.size.x) / 2.0, min(card.position.y + card.size.y + 24.0, 580.0))
 	if selector.visible:
 		var left: float = max(0.0, selector_deadline - Time.get_ticks_msec() / 1000.0)
 		selector_timer.text = "TAP GREEN TO MOVE  •  HOLD GREEN TO PLAY  •  %d" % ceil(left)
@@ -847,12 +969,12 @@ func _on_event(payload: Dictionary = {}) -> void:
 				music.stop()
 		"modern_song_started":
 			selector.visible = false
-			song_title.text = "%s — %s" % [payload.get("title", ""), payload.get("artist", "")]
+			song_artist = str(payload.get("artist", ""))
 			song_length_ms = float(payload.get("length_ms", 60000))
 			song_elapsed_ms = 0.0
 			song_paused = false
-			song_panel.visible = true
-			show_overlay("NOW PLAYING", song_title.text, 1800, TEAL)
+			song_live = true
+			show_overlay("NOW PLAYING", "%s — %s" % [payload.get("title", ""), song_artist], 1800, TEAL)
 			_play_song(str(payload.get("path", "")))
 			_play_artist_video(str(payload.get("path", "")))
 		"modern_song_ended":
@@ -860,8 +982,9 @@ func _on_event(payload: Dictionary = {}) -> void:
 			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
 				hurry_live = false
 				hurry_root.visible = false
-			song_panel.visible = false
-			mode_banner.text = ""
+			song_live = false
+			mode_status = ""
+			mode_goal = 0
 			if not between_balls:
 				_fade_out_music(SONG_FADE_S, func():
 					if not between_balls:
@@ -912,7 +1035,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 			show_overlay("SPECIAL!", "Free game  •  +%s" % MPF.util.comma_sep(int(payload.get("points", 0))), 3000)
 		"modern_bonus_line":
 			bonus_lines.append("%s  %d × %s" % [payload.get("label", ""), int(payload.get("count", 0)), MPF.util.comma_sep(int(payload.get("value", 0)))])
-			mode_banner.text = "BONUS   " + bonus_lines[-1]
+			bonus_text = bonus_lines[-1]
 		"modern_bonus_total":
 			show_overlay("STANDING OVATION ×%d" % int(payload.get("ovation", 1)),
 				"Bonus %s" % MPF.util.comma_sep(int(payload.get("points", 0))), 1600, TEAL)
@@ -927,10 +1050,11 @@ func _on_event(payload: Dictionary = {}) -> void:
 			between_balls = true
 			effects.stop()
 			_stop_artist_video()
-			song_panel.visible = false
+			song_live = false
 			_play_between_balls()
 		"ball_started":
-			mode_banner.text = ""
+			bonus_text = ""
+			rent_live = false
 			bonus_lines.clear()
 			if between_balls:
 				between_balls = false
@@ -943,28 +1067,34 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_rent_party_started":
 			if not between_balls:
 				_play_rent_party()
-			mode_banner.text = "RENT PARTY  •  LIT CRATERS = JACKPOT %s" % MPF.util.comma_sep(int(payload.get("jackpot", 0)))
+			rent_live = true
+			rent_text = "Lit craters pay %s" % commas(int(payload.get("jackpot", 0)))
+			rent_done = 0
+			rent_goal = 3
 		"modern_song_shot":
 			flash_screen(GOLD)
 		"modern_jackpot":
 			flash_screen(GOLD, 2)
-			mode_banner.text = "RENT PARTY  •  JACKPOT %s  •  %d/3 TO SUPER" % [MPF.util.comma_sep(int(payload.get("next_value", 0))), int(payload.get("count", 0))]
+			rent_text = "Next jackpot %s" % commas(int(payload.get("next_value", 0)))
+			rent_done = int(payload.get("count", 0))
 		"modern_super_jackpot_lit":
-			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT AT THE BAR!"
+			rent_text = "SUPER JACKPOT AT THE BAR!"
+			rent_goal = 0
 		"modern_super_jackpot":
-			mode_banner.text = "RENT PARTY  •  SUPER JACKPOT COLLECTED!"
+			rent_text = "SUPER JACKPOT COLLECTED!"
 		"modern_rent_party_ended":
-			mode_banner.text = ""
+			rent_live = false
 			if not between_balls and music.stream == rent_party_song:
 				_fade_out_music(1.0, func():
 					if not between_balls:
 						_play_house_band())
 		"modern_task":
-			task_title.text = str(payload.get("title", ""))
-			task_detail.text = str(payload.get("detail", ""))
-			task_panel.visible = true
+			task_title_text = str(payload.get("title", ""))
+			task_detail_text = str(payload.get("detail", ""))
 		"modern_mode_status":
-			mode_banner.text = str(payload.get("text", ""))
+			mode_status = str(payload.get("text", ""))
+			mode_done = int(payload.get("done", 0))
+			mode_goal = int(payload.get("goal", 0))
 		"game_ending":
 			show_overlay("LAST CALL", "Thanks for coming to the juke joint", 3000)
 	_render()

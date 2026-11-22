@@ -60,6 +60,10 @@ class SongRule:
     def status(self):
         return ""
 
+    def progress(self):
+        """(done, goal) for the HUD's progress dots; (0, 0) when the mode has no count."""
+        return 0, 0
+
     def ambient_speed(self):
         return 1.0
 
@@ -110,7 +114,7 @@ class HurryUp(SongRule):
             self.complete()
 
     def status(self):
-        return f"HURRY-UP  {S.LOCATIONS[self.target][0]}  {self.value():,}"
+        return f"SHOOT {S.LOCATIONS[self.target][0].upper()}  •  {self.value():,}"
 
 
 class Ladder(SongRule):
@@ -141,10 +145,12 @@ class Ladder(SongRule):
                 self.complete()
 
     def status(self):
-        rungs = len(S.LADDER_RUNGS)
         after = self.next_value()
         where = f"NEXT {after // 1000}K AT THE KITCHEN" if after else "TOP RUNG"
-        return f"LADDER  RUNG {self.rung} / {rungs}  •  {where}"
+        return where
+
+    def progress(self):
+        return self.rung, len(S.LADDER_RUNGS)
 
 
 class BuildAndCollect(SongRule):
@@ -170,7 +176,10 @@ class BuildAndCollect(SongRule):
                 self.complete()
 
     def status(self):
-        return f"POT {self.pot:,}  •  collects {self.collects} / {S.POT_COLLECTS}"
+        return f"POT {self.pot:,}  •  collect at the Bar"
+
+    def progress(self):
+        return self.collects, S.POT_COLLECTS
 
 
 class RovingShot(SongRule):
@@ -211,7 +220,10 @@ class RovingShot(SongRule):
         self.machine.modes["modern"].release_green("song")
 
     def status(self):
-        return f"ROVING SHOT  {S.LOCATIONS[self.target][0]}  •  {self.hits} / {S.ROVE_HITS}"
+        return f"SHOOT {S.LOCATIONS[self.target][0].upper()}"
+
+    def progress(self):
+        return self.hits, S.ROVE_HITS
 
 
 class JukeboxJackpot(SongRule):
@@ -243,7 +255,10 @@ class JukeboxJackpot(SongRule):
 
     def status(self):
         values = "  ".join(f"{n}: {self.value(n) // 1000}K" for n in range(1, len(S.JACKPOT_VALUES) + 1))
-        return f"JACKPOTS {self.jackpots} / {S.JACKPOTS_TO_COMPLETE}  •  CRATER {values}"
+        return f"CRATER {values}"
+
+    def progress(self):
+        return self.jackpots, S.JACKPOTS_TO_COMPLETE
 
 
 class PartyTime(SongRule):
@@ -267,7 +282,7 @@ class PartyTime(SongRule):
         self.machine.game.player.modern_score_factor = 1
 
     def status(self):
-        return "PARTY TIME  ×2 everything  •  Bouncer ready"
+        return "Everything scores double  •  play anywhere"
 
 
 class OrderUp(SongRule):
@@ -343,7 +358,10 @@ class RequestNight(SongRule):
         return 1 + 0.2 * (len(LOC) - len(self.remaining))
 
     def status(self):
-        return f"REQUESTS {len(LOC) - len(self.remaining)} / {len(LOC)}"
+        return "STILL TO VISIT: " + ", ".join(S.LOCATIONS[loc][0].removeprefix("the ").upper() for loc in self.remaining)
+
+    def progress(self):
+        return len(LOC) - len(self.remaining), len(LOC)
 
 
 class DanceFloor(SongRule):
@@ -368,6 +386,9 @@ class DanceFloor(SongRule):
 
     def status(self):
         return f"DANCERS {self.hits} / {S.DANCE_HITS}"
+
+    def progress(self):
+        return self.hits, S.DANCE_HITS
 
 
 class HitMe(SongRule):
@@ -419,8 +440,10 @@ class HitMe(SongRule):
         self.machine.modes["modern"].release_green("song")
 
     def status(self):
-        where = "spinning..." if self.spinning else S.LOCATIONS[self.target][0]
-        return f"HIT ME!  {where}  •  {self.hits} / {S.HIT_ME_HITS}"
+        return "THE DIAL IS SPINNING..." if self.spinning else f"SHOOT {S.LOCATIONS[self.target][0].upper()}"
+
+    def progress(self):
+        return self.hits, S.HIT_ME_HITS
 
 
 SLOT_RULES = {1: HurryUp, 2: Ladder, 3: BuildAndCollect, 4: RovingShot, 5: JukeboxJackpot,
@@ -478,7 +501,8 @@ class ModernSongs(Mode):
         if self.paused_at is None:
             self.rule.tick()
         if self.rule:
-            self.machine.events.post("modern_mode_status", text=self.rule.status())
+            done, goal = self.rule.progress()
+            self.machine.events.post("modern_mode_status", text=self.rule.status(), done=done, goal=goal)
             self.delay.reset(ms=TICK_MS, name="tick", callback=self._tick)
 
     def _forward(self, method, arg=None, **kwargs):
@@ -522,7 +546,7 @@ class ModernSongs(Mode):
                 self.machine.events.post("modern_song_failed", title=rule.title)
                 self.machine.events.post("modern_overlay", title="SONG OVER", subtitle=rule.title, ms=1500)
         rule.stop()
-        self.machine.events.post("modern_mode_status", text="")
+        self.machine.events.post("modern_mode_status", text="", done=0, goal=0)
 
     def _tilt(self, **kwargs):
         self.machine.modes["modern_jukebox"].end_song(reason="tilt")

@@ -73,7 +73,8 @@ class TestModernSongs(ModernTestCase):
         self.hit_location("kitchen")
         self.assertEventCalled("modern_song_shot")
         self.assertIn(("RUNG 1!", "75,000  •  Next 150,000"), [(o["title"], o["subtitle"]) for o in overlays])
-        self.assertEqual(rule.status(), "LADDER  RUNG 1 / 4  •  NEXT 150K AT THE KITCHEN")
+        self.assertEqual(rule.status(), "NEXT 150K AT THE KITCHEN")
+        self.assertEqual(rule.progress(), (1, 4))
 
     def test_full_length_songs_are_capped_at_60_seconds(self):
         from unittest.mock import patch

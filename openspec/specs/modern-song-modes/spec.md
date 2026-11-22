@@ -73,7 +73,7 @@ One random location SHALL light with a value draining from 1,000,000 to 100,000 
 - **THEN** the mode fails and ends
 
 ### Requirement: Mode 2 Ladder
-The round SHALL last 60 s. The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung, hold the ball 2 s, and show the rung climbed with the next rung's value. The mode banner SHALL show the rungs climbed and the next rung's value. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
+The round SHALL last 60 s. The Kitchen SHALL light for four rungs worth 75,000, 150,000, 225,000, and 300,000. Each Kitchen hit SHALL pay the next rung, hold the ball 2 s, and show the rung climbed with the next rung's value. The goal card SHALL show the rungs climbed as progress dots and the next rung's value. The fourth rung SHALL complete and end the mode. If the song ends first, the player SHALL keep the rungs earned.
 
 #### Scenario: The top rung is reached
 - **WHEN** the player makes the fourth Kitchen hit
@@ -102,7 +102,7 @@ One location SHALL light and move to a different random location every 6 s. Hitt
 - **THEN** the lit location stops moving
 
 ### Requirement: Mode 5 Jukebox jackpot
-The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry SHALL pay a jackpot of 150,000, 200,000, 250,000, or 300,000 for craters 1-4, plus 25,000 per jackpot already collected. The ball SHALL kick straight back without locking or opening the selector. Three jackpots SHALL complete and end the mode. The mode banner SHALL show the jackpots collected and the current value of each crater.
+The round SHALL last 45 s. All four crater lamps SHALL light. Each crater entry SHALL pay a jackpot of 150,000, 200,000, 250,000, or 300,000 for craters 1-4, plus 25,000 per jackpot already collected. The ball SHALL kick straight back without locking or opening the selector. Three jackpots SHALL complete and end the mode. The goal card SHALL show the jackpots collected as progress dots and the current value of each crater.
 
 #### Scenario: The second jackpot
 - **WHEN** the player has one jackpot and enters crater 4
