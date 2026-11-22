@@ -85,14 +85,14 @@ class ModernRentParty(Mode):
             player.modern_lock_lit = 1
             award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
             self.machine.events.post("modern_lock_lit")
-            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
+            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot a lit crater!",
                                      ms=2200)
             self.machine.events.post("modern_callout", pool="mc_lock_lit")
 
     # Locks -----------------------------------------------------------------
-    def qualify_lock(self):
+    def qualify_lock(self, lit):
         """Called by the jukebox on any crater entry; returns whether this ball will be locked."""
-        if (self.player.modern_lock_lit and not self.multiball
+        if (lit and self.player.modern_lock_lit and not self.multiball
                 and self.machine.game.balls_in_play == 1 and self.locked_balls < S.LOCKS_FOR_MULTIBALL):
             self.machine.events.post("modern_lock_qualified")
             return True
@@ -101,6 +101,9 @@ class ModernRentParty(Mode):
     def _locked(self, total_balls_locked=0, **kwargs):
         self.lock_owners.append(self.player.number)
         self._update_locks()
+        # One lock per full guest list: the next lock needs a new list.
+        self.player.modern_lock_lit = 0
+        self.player.modern_guests = 0
         award(self.machine, S.SCORE_BALL_LOCKED, "ball_locked")
         count = self.locked_balls
         self.machine.events.post("modern_ball_locked", count=count)

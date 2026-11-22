@@ -280,7 +280,7 @@ func _render() -> void:
 	var guests := 0
 	for i in 7:
 		guests += (guest_bits >> i) & 1
-	side_labels.guests.text = "GUEST LIST " + "●".repeat(guests) + "○".repeat(max(0, 5 - guests))
+	side_labels.guests.text = "GUEST LIST " + "●".repeat(guests) + "○".repeat(max(0, 3 - guests))
 	if int(active.get("modern_lock_lit", 0)):
 		side_labels.guests.text = "LOCK IS LIT"
 	side_labels.ovation.text = "OVATION ×%d" % min(4, 1 + int(active.get("modern_ovation", 0)) + int(active.get("modern_songs_completed_ball", 0)))

@@ -55,7 +55,7 @@ class ModernJukebox(Mode):
         if self.machine.game.balls_in_play > 1:
             return
         rent_party = self.machine.modes["modern_rent_party"]
-        if rent_party.active and rent_party.qualify_lock():
+        if rent_party.active and rent_party.qualify_lock(lit):
             return  # the lock takes the ball; a nickel is kept for the next lit crater
         if not player.modern_nickel or not lit:
             if not player.modern_nickel:

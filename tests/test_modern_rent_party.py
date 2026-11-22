@@ -44,27 +44,49 @@ class TestModernRentParty(ModernTestCase):
         self.assertEqual(self.player.modern_guests, 0)
         self.assertEqual(self.player.modern_lock_lit, 0)
 
-    def test_unlit_crater_locks_while_lock_is_lit(self):
+    def test_unlit_crater_does_not_lock(self):
+        self.start_modern()
+        self.fill_guest_list()
+        self.mock_event("modern_lock_qualified")
+        targets = self.machine.modes["modern_targets"]
+        targets.delay.remove("craters")
+        targets.crater_index = 4  # only crater 4 is lit
+        self.hit_and_release_switch(targets.CRATER_SWITCHES[0])
+        self.advance_time_and_run(.1)
+        self.assertEventNotCalled("modern_lock_qualified")
+        self.assertEqual(self.player.modern_lock_lit, 1)
+
+    def test_a_lock_uses_up_the_guest_list(self):
         self.start_modern()
         self.fill_guest_list()
         self.mock_event("modern_ball_locked")
-        targets = self.machine.modes["modern_targets"]
-        switch = targets.CRATER_SWITCHES[0]
-        targets.crater_index = 4  # only crater 4 is lit
-        self.hit_and_release_switch(switch)
-        self.hit_switch_and_run("s_subway_lock_10", 5)
+        self.lock_ball()
         self.assertEventCalled("modern_ball_locked")
         self.assertEqual(self.lock.balls, 1)
         self.assertEqual(self.player.modern_locked_balls, 1)
         self.assertEqual(self.machine.game.balls_in_play, 1)
+        self.assertEqual(self.player.modern_lock_lit, 0)
+        self.assertEqual(self.player.modern_guests, 0)
+        self.mock_event("modern_lock_qualified")
+        self.shoot_crater(2)
+        self.assertEventNotCalled("modern_lock_qualified")
+
+    def test_three_guests_light_the_lock(self):
+        self.start_modern()
+        for guest in ("bar", "bar", "booths"):
+            self.party._guest(guest)
+        self.assertEqual(self.player.modern_lock_lit, 0)
+        self.party._guest("right_bank")
+        self.assertEqual(self.player.modern_lock_lit, 1)
 
     def test_three_locks_start_rent_party_and_jackpots(self):
         self.start_modern()
-        self.fill_guest_list()
         for _ in range(2):
+            self.fill_guest_list()
             self.lock_ball()
             self.advance_time_and_run(3)
         self.mock_event("modern_rent_party_started")
+        self.fill_guest_list()
         self.mock_event("modern_rent_party_build_up")
         self.lock_ball()
         self.advance_time_and_run(5)
@@ -97,6 +119,7 @@ class TestModernRentParty(ModernTestCase):
         self.fill_guest_list()
         self.lock_ball()
         self.advance_time_and_run(3)
+        self.fill_guest_list()
         self.lock_ball()
         self.advance_time_and_run(3)
         self.assertEqual(self.lock.balls, 2)
@@ -123,11 +146,16 @@ class TestModernRentParty(ModernTestCase):
         self.assertFalse(jukebox.selector_open)
         self.assertEventNotCalled("modern_nickel_spent")
         self.assertEqual(self.player.modern_nickel, 1)
+        self.hit_and_release_switch("s_10_points_15")
+        self.shoot_crater(2)
+        self.advance_time_and_run(1)
+        self.assertTrue(jukebox.selector_open)
+        self.assertEventCalled("modern_nickel_spent")
 
     def test_tilt_during_build_up_releases_the_back_room(self):
         self.start_modern()
-        self.fill_guest_list()
         for _ in range(3):
+            self.fill_guest_list()
             self.lock_ball()
             self.advance_time_and_run(3)
         self.assertEqual(self.lock.balls, 3)
