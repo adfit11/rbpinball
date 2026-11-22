@@ -425,12 +425,30 @@ class TestModernBallFeatures(ModernTestCase):
         nickels._show()
         return self.machine.modes["modern_targets"], director(self.machine)
 
-    def test_booths_flash_the_right_bank_lamp_and_every_standing_target(self):
+    def test_booths_flash_only_the_right_bank_lamp(self):
         targets, lamps = self._hunt_booths()
-        for light in (settings.BANK_LAMPS["right_bank"], *settings.DROP_LAMPS):
-            self.assertEqual(lamps.state(light), FLASH)
-        self.hit_switch_and_run("s_right_drop_3_21", .1)
-        self.assertEqual(lamps.state(settings.DROP_LAMPS[2]), OFF)
+        self.assertEqual(lamps.state(settings.BANK_LAMPS["right_bank"]), FLASH)
+        self.assertEqual([l for l in settings.DROP_LAMPS if lamps.state(l) == FLASH], [])
+
+    def test_booths_leave_the_skill_shot_lamp_alone(self):
+        self.start_modern()
+        targets = self.machine.modes["modern_targets"]
+        lamps = director(self.machine)
+        self.player.modern_nickel_target = "booths"
+        self.machine.modes["modern_nickels"]._show()
+        targets._serve(target=self.machine.playfield)
+        self.advance_time_and_run(.1)
+        lit = [l for l in settings.DROP_LAMPS if lamps.state(l)]
+        self.assertEqual(lit, [settings.DROP_LAMPS[targets.drop_index - 1]])
+
+    def test_right_bank_target_never_counts_as_the_skill_shot(self):
+        self.start_modern()
+        targets = self.machine.modes["modern_targets"]
+        targets._serve(target=self.machine.playfield)
+        self.advance_time_and_run(.1)
+        self.mock_event("modern_drop_the_needle")
+        self.hit_switch_and_run(targets.DROP_SWITCHES["right_bank"][targets.drop_index - 1], .1)
+        self.assertEventNotCalled("modern_drop_the_needle")
 
     def test_any_right_drop_target_visits_the_booths(self):
         targets, lamps = self._hunt_booths()
@@ -451,22 +469,6 @@ class TestModernBallFeatures(ModernTestCase):
         self.advance_time_and_run(settings.REFUSAL_GAP_MS / 1000)
         self.hit_switch_and_run("s_right_drop_4_31", .1)
         self.assertEqual(self._events["modern_nickel_refused"], 2)
-
-    def test_booths_lamps_return_when_the_bank_resets(self):
-        self.start_modern()
-        nickels = self.machine.modes["modern_nickels"]
-        targets = self.machine.modes["modern_targets"]
-        lamps = director(self.machine)
-        self.player.modern_nickel_target = "bar"
-        nickels._show()
-        for switch in targets.DROP_SWITCHES["right_bank"]:
-            self.hit_switch_and_run(switch, .05)
-        self.player.modern_nickel_target = "booths"
-        nickels._show()
-        self.assertEqual([l for l in settings.DROP_LAMPS if lamps.state(l)], [])
-        self.advance_time_and_run(1)
-        for light in settings.DROP_LAMPS:
-            self.assertEqual(lamps.state(light), FLASH)
 
     def test_each_right_bank_completion_raises_standing_ovation(self):
         self.start_modern()

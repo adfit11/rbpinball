@@ -6,7 +6,7 @@ LOCATIONS = {
     "kitchen": ("the Kitchen", "l_xxx_45", "cook"),
     "bandstand": ("the Bandstand", "l_xxx_46", "bandleader"),
     "coat_check": ("the Coat Check", "l_xxx_43", "coat_check"),
-    # The Booths are the whole right drop bank: its bank lamp and every standing target's lamp.
+    # The Booths are the whole right drop bank, shown by its bank lamp (L29).
     "booths": ("the Booths", "booths", "hostess"),
 }
 LOCATION_NAMES = tuple(LOCATIONS)
@@ -42,7 +42,8 @@ SONG_LAMPS = tuple(f"l_xxx_{n}" for n in range(33, 43))
 MULTIPLIER_LAMPS = ("l_xxx_04", "l_xxx_05", "l_xxx_06", "l_xxx_07")
 OVATION_LAMPS = ("l_xxx_30", "l_xxx_31", "l_xxx_32")
 CRATER_LAMPS = ("l_xxx_27", "l_xxx_26", "l_xxx_25", "l_xxx_24")  # craters 1..4
-DROP_LAMPS = tuple(f"l_xxx_{n}" for n in range(19, 24))
+DROP_LAMPS = tuple(f"l_xxx_{n}" for n in range(19, 24))  # beside the top bank, left to right
+SKILL_BANK = "top_bank"  # the bank the skill-shot cascade lights
 BOOTHS_LAMP = "booths"  # virtual: the lamp director maps it to L29 and the standing right-bank drop lamps
 BOOTHS_BANK = "right_bank"
 BANK_LAMPS = {"top_bank": "l_xxx_28", "right_bank": "l_xxx_29"}
