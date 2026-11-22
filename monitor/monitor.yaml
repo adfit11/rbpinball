@@ -1,13 +1,5 @@
 device_size: 0.04
 light:
-  l_xxx_01:
-    x: 0.4566
-    y: 0.8569
-    shape: CIRCLE
-    size: 0.04
-  l_xxx_02:
-    x: 0.0935
-    y: 0.906
   l_xxx_03:
     x: 0.1469
     y: 0.906

@@ -357,6 +357,10 @@ class TestModernBallFeatures(ModernTestCase):
         self.hit_location("kitchen")
         self.assertEqual(self.player.extra_balls, 1)
         self.assertEqual(self.player.modern_extra_balls_earned, 1)
+        self.advance_time_and_run(.1)
+        self.assertLightColor("l_xxx_03", "white")  # Same Player Shoot Again
+        # L0-L2 are the game-over relay, tilt relay and coin lockout, never lamps.
+        self.assertFalse([l.name for l in self.machine.lights.values() if int(l.config["number"]) < 3])
 
     def test_bar_and_kitchen_speak_when_the_nickel_hunt_is_quiet(self):
         self.start_modern()
