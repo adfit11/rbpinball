@@ -52,3 +52,23 @@ class VolcanoTroughCounter(EntranceSwitchCounter):
         self.mark_count_as_stable_and_trigger_activity()
         self.machine.events.post("trough_startup_empty_reconciled")
         return True
+
+    def reconcile_partial_at_start(self):
+        """Switch 40 stays closed with three balls, so a settled open switch 40 means a stale full count.
+
+        Count one ball: an undercount corrects itself when switch 40 closes for good, an overcount
+        would leave the outhole waiting for room forever.
+        """
+        if self.machine.game or self._last_count != 3 or self.ball_device.state != "idle":
+            return False
+        switches = self.machine.switches
+        controller = self.machine.switch_controller
+        if not (controller.is_inactive(switches["s_trough_1_40"], ms=1000)
+                and controller.is_active(switches["s_trough_2_30"], ms=1000)):
+            return False
+        self._last_count = 1
+        for _ in range(2):
+            self.record_activity(BallLostActivity())
+        self.mark_count_as_stable_and_trigger_activity()
+        self.machine.events.post("trough_startup_partial_reconciled")
+        return True

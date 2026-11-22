@@ -521,6 +521,22 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
         self.assertFalse(trough.ball_count_handler.counter.reconcile_empty_at_start())
         self.assertEqual(trough.balls, 3)
 
+    def test_open_entrance_switch_reconciles_stale_full_count_and_accepts_drain(self):
+        # One ball in the trough, one in the outhole: LISY reported switch 40 closed at boot, then open.
+        trough = self.machine.ball_devices["bd_trough"]
+        counter = trough.ball_count_handler.counter
+        outhole_coil = self.machine.coils["c_outhole"]
+        self.assertEqual(trough.balls, 3)
+        self.mock_event("trough_startup_partial_reconciled")
+        with patch.object(outhole_coil, "pulse", wraps=outhole_coil.pulse) as pulse:
+            self.release_switch_and_run("s_trough_1_40", .5)
+            self.assertEqual(counter._last_count, 3)
+            self.hit_switch_and_run("s_trough_3_20", .7)
+            self.assertEventCalled("trough_startup_partial_reconciled")
+            self.advance_time_and_run(8)
+            pulse.assert_called_once()
+            self.assertEqual(trough.balls, 2)
+
 
 class TestSubwayBootClosed(MpfGameTestCase):
     def __init__(self, methodName="runTest"):
