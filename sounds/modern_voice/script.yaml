@@ -86,7 +86,7 @@ characters:
       mode_request_night: ["Request night! Take every request in the house!", "Everybody's got a request tonight!"]
       mode_dance_floor: ["Pack that dance floor!", "Get those dancers moving!"]
       mode_hit_me: ["Hit me! Stop that dial!", "Spin it and hit it!"]
-      lock_lit: ["Guest list is full! The back room is open!", "Lock is lit! Shoot any crater!"]
+      lock_lit: ["Guest list is full! The back room is open!", "Lock is lit! Shoot a lit crater!"]
       ball_locked: ["One more in the back room!", "Ball locked! Keep 'em coming!"]
       rent_party: ["Rent party! Everybody in!", "It's a rent party, and the whole block is here!"]
       jackpot: ["Jackpot!", "Pay the rent!"]

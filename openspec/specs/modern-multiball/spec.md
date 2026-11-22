@@ -6,7 +6,7 @@ Defines how a Modern player lights and makes physical subway locks through the g
 ## Requirements
 
 ### Requirement: Fill the guest list
-Each club location and each completed drop bank SHALL count once as a guest, making seven possible guests. A guest SHALL count at most once per list, and five guests SHALL fill it. The screen SHALL show the list. A location hit SHALL count toward the guest list and the nickel hunt at the same time.
+Each club location and each completed drop bank SHALL count once as a guest, making seven possible guests. A guest SHALL count at most once per list, and three guests SHALL fill it. Guests SHALL count during a song. The screen SHALL show the list. A location hit SHALL count toward the guest list and the nickel hunt at the same time.
 
 #### Scenario: A guest arrives
 - **WHEN** the player hits the Bandstand for the first time on this list
@@ -20,15 +20,15 @@ Each club location and each completed drop bank SHALL count once as a guest, mak
 The guest list and its progress SHALL reset at the end of every ball, and a lit lock SHALL go out with it.
 
 #### Scenario: The ball drains with four guests
-- **WHEN** the ball ends with four guests on the list
+- **WHEN** the ball ends with two guests on the list
 - **THEN** the player's next ball starts with an empty list and no lit lock
 
 ### Requirement: Lock balls at a lit crater
-Filling the guest list SHALL light the lock for the current player for the rest of the ball. If the list fills during a song, the "lock is lit" overlay and callout SHALL wait until the song ends, because craters do not lock during a song. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Locking SHALL continue until the subway holds three balls.
+Filling the guest list SHALL light the lock for the current player until one ball is locked or the ball ends. If the list fills during a song, the "lock is lit" overlay and callout SHALL wait until the song ends, because craters do not lock during a song. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Each lock SHALL put the lock out and empty the guest list, so every lock needs a full list. An unlit crater SHALL NOT lock.
 
 #### Scenario: The first lock
 - **WHEN** the lock is lit, the subway is empty, and the ball enters a lit crater
-- **THEN** the ball stays in the subway, the lock count shows 1, and a replacement ball is served
+- **THEN** the ball stays in the subway, the lock count shows 1, a replacement ball is served, the lock goes out, and the guest list is empty
 
 #### Scenario: An unlit crater with the lock lit
 - **WHEN** the lock is lit and the ball enters an unlit crater
@@ -40,6 +40,10 @@ When a crater entry locks a ball while the player holds a nickel, Modern SHALL l
 #### Scenario: Lock and nickel together
 - **WHEN** the lock is lit, the player holds a nickel, and the ball enters a lit crater
 - **THEN** the ball is locked, a replacement is served, the selector stays closed, and the player still holds the nickel
+
+#### Scenario: The nickel after a lock
+- **WHEN** the player locked a ball holding a nickel and the replacement ball enters a lit crater
+- **THEN** the selector opens, because the lock is no longer lit
 
 ### Requirement: Keep locks physical and stealable
 Locked balls SHALL stay in the subway across turn changes and SHALL NOT be ejected to return them to their owner. The screen SHALL show the subway's lock count at all times. A player's lock SHALL start counting from the balls already in the subway.

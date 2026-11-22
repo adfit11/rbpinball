@@ -100,7 +100,7 @@ DIAL_STEP_MS, DIAL_AUTO_STOP_MS, HIT_ME_VALUE, HIT_ME_HITS = 250, 5_000, 250_000
 GUESTS = LOCATION_NAMES + ("top_bank", "right_bank")
 GUEST_NAMES = {"bar": "Bar", "kitchen": "Kitchen", "bandstand": "Bandstand", "coat_check": "Coat Check",
                "booths": "Booths", "top_bank": "Top Bank", "right_bank": "Right Bank"}
-GUESTS_TO_FILL = 5
+GUESTS_TO_FILL = 3
 LOCKS_FOR_MULTIBALL = 3
 SCORE_LOCK_LIT = 25_000
 SCORE_BALL_LOCKED = 50_000

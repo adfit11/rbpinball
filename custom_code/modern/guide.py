@@ -36,7 +36,7 @@ def current_task(machine):
     title, detail = _nickel_task(player)
     if player.modern_lock_lit:
         title += " + LOCK IS LIT"
-        detail += " Lock is lit: any crater locks a ball for Rent Party."
+        detail += " Lock is lit: a lit crater locks a ball for Rent Party."
     return title, detail
 
 
