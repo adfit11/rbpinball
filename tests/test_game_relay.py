@@ -38,6 +38,17 @@ class TestGameRelay(MpfGameTestCase):
         self.post_event('game_will_end', 0.1)
         self.assertEqual(relay.current_brightness, 0)
 
+    def test_attract_switches_the_relay_off(self):
+        relay = self.machine.digital_outputs['game_over_relay']
+        relay.enable()  # as LISY can leave it from an earlier run
+        self.advance_time_and_run(.1)
+        self.assertEqual(relay.hw_driver.current_brightness, 1)
+        self.machine.modes['attract'].stop()
+        self.advance_time_and_run(.1)
+        self.machine.modes['attract'].start()
+        self.advance_time_and_run(.1)
+        self.assertEqual(relay.hw_driver.current_brightness, 0)
+
     def test_three_ball_game(self):
         relay = self.machine.digital_outputs['game_over_relay'].hw_driver
         self.hit_switch_and_run('s_trough_1_40', 1)
