@@ -135,7 +135,8 @@ class SubwayStartupClear:
         kicker = controller.is_active(switches["s_subway_kicker_0"])
         release = self.machine.ball_devices["bd_classic_subway_lock"].ejector
         outhole = controller.is_active(switches["s_trough_3_20"])
-        if (self.status == "running" and lock and not kicker and release.guard.state == "failed"
+        if (self.status == "running" and not self.machine.game and lock and not kicker
+                and release.guard.state == "failed"
                 and release.guard.reason == MISSED_KICKER):
             # A release (often MPF's own boot eject) left the ball on the lock switch: rearm and release again.
             self._missed_handoffs += 1

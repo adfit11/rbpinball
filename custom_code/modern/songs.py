@@ -185,7 +185,10 @@ class JukeboxJackpot(SongRule):
         value = S.JACKPOT_VALUES[crater - 1] + S.JACKPOT_STEP * self.jackpots
         self.pay(value, "jukebox_jackpot")
         self.jackpots += 1
-        self.machine.events.post("modern_overlay", title="JACKPOT!", subtitle=f"Crater {crater}", ms=1200)
+        self.machine.events.post("modern_song_jackpot", crater=crater, value=value, count=self.jackpots)
+        self.machine.events.post("modern_callout", pool="mc_song_jackpot")
+        self.machine.events.post("modern_overlay", title="JACKPOT!", subtitle=f"{value:,}  •  Crater {crater}",
+                                 ms=1500, style="gold")
         if self.jackpots >= S.JACKPOTS_TO_COMPLETE:
             self.complete()
 

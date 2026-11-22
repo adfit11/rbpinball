@@ -86,6 +86,15 @@ class TestModernSongs(ModernTestCase):
         self.assertEqual(rule.jackpots, 1)
         self.assertEqual(self.player.modern_nickel, 1)  # no selector during a song
 
+    def test_jukebox_jackpot_celebrates_each_hit(self):
+        self.start_slot(5)
+        self.mock_event("modern_song_jackpot")
+        callouts = []
+        self.machine.events.add_handler("modern_callout", lambda pool, **kwargs: callouts.append(pool))
+        self.shoot_crater(3)
+        self.assertEventCalledWith("modern_song_jackpot", crater=3, value=S.JACKPOT_VALUES[2], count=1)
+        self.assertIn("mc_song_jackpot", callouts)
+
     def test_party_time_doubles_and_pays_last_dance(self):
         rule = self.start_slot(6)
         self.assertEqual(self.player.modern_ball_saver_ready, 1)

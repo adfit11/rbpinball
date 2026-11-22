@@ -200,6 +200,7 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
             self.assertEqual(pulse.call_count, 2)
 
     def test_missed_release_is_retried_mid_game_until_the_ball_arrives(self):
+        self.machine.modes["attract"].subway_startup.stop()  # attract never runs during a game
         ejector = self.machine.ball_devices["bd_classic_subway_lock"].ejector
         coil = self.machine.coils["c_subway_lock"]
         lock = self.machine.switches["s_subway_lock_10"]
@@ -215,9 +216,11 @@ class TestSubwayEjectorMpf(MpfGameTestCase):
             self.machine.clock.loop.create_task(ejector.eject_one_ball(False, 1, 1))
             self.advance_time_and_run(.01)
             self.assertEqual(pulse.call_count, 1)
-            self.advance_time_and_run(4.5)  # missed the kicker, retried after a second
+            self.advance_time_and_run(1.0)  # a ball normally arrives in about 0.5 s
+            self.assertEqual(pulse.call_count, 1)
+            self.advance_time_and_run(1.0)  # missed after 1.5 s, retried 0.25 s later
             self.assertEqual(pulse.call_count, 2)
-            self.advance_time_and_run(4.5)
+            self.advance_time_and_run(2.0)
             self.assertEqual(pulse.call_count, 3)
             self.hit_switch_and_run("s_subway_kicker_0", .01)  # the ball finally arrives
             self.advance_time_and_run(6)

@@ -5,7 +5,9 @@ from mpf.devices.ball_device.pulse_coil_ejector import PulseCoilEjector
 from custom_code.subway_recovery import SubwayReleaseInterlock
 
 MISSED_KICKER = "Released ball did not reach the kicker"
-RETRY_DELAY_S = 1.0
+RETRY_DELAY_S = 0.25
+# A released ball reaches the kicker in about 0.5 s on the cabinet, so call it missed after 1.5 s.
+ARRIVAL_TIMEOUT_S = 1.5
 
 
 class InterlockedSubwayEjector(PulseCoilEjector):
@@ -18,7 +20,7 @@ class InterlockedSubwayEjector(PulseCoilEjector):
 
     def __init__(self, config, ball_device, machine):
         super().__init__(config, ball_device, machine)
-        self.guard = SubwayReleaseInterlock()
+        self.guard = SubwayReleaseInterlock(arrival_timeout=ARRIVAL_TIMEOUT_S)
         self._timer = None
         self._reported_fault = False
         self._retry_timer = None
