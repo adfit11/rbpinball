@@ -94,7 +94,8 @@ class ModernNickels(Mode):
         self.machine.events.post("modern_callout", pool=f"{settings.LOCATIONS[location][2]}_{pool}", **kwargs)
 
     def _location_hit(self, location, **kwargs):
-        if not self.hunting():
+        # No target until the ball's first playfield switch; a plunge through the spinner comes first.
+        if not self.hunting() or not self.player.modern_nickel_target:
             return
         if location != self.player.modern_nickel_target:
             if self.delay.check(f"refused_{location}"):
