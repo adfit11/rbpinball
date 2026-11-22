@@ -88,6 +88,7 @@ characters:
       mode_hit_me: ["Hit me! Stop that dial!", "Spin it and hit it!"]
       lock_lit: ["Guest list is full! The back room is open!", "Lock is lit! Shoot any crater!"]
       ball_locked: ["One more in the back room!", "Ball locked! Keep 'em coming!"]
+      rent_party_build_up: ["Ladies and gentlemen, the back room is full! The whole block is coming! Get ready, get ready... it's a rent party!", "Hold on to your hats! The guest list is full, the band is warming up, and here it comes... rent party!"]
       rent_party: ["Rent party! Everybody in!", "It's a rent party, and the whole block is here!"]
       jackpot: ["Jackpot!", "Pay the rent!"]
       super_jackpot: ["Super jackpot! The rent is paid!", "Super jackpot! Landlord's smiling now!"]

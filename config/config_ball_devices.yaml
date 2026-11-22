@@ -3,7 +3,12 @@
 ball_devices:
   bd_outhole:
     ball_switches: s_trough_3_20
-    eject_coil: c_outhole
+    # One switch can't count a pile of drained balls; a failed kick retries harder to push them all up.
+    ejector:
+      class: mpf.devices.ball_device.pulse_coil_ejector.PulseCoilEjector
+      eject_coil: c_outhole
+      eject_coil_retry_pulse: 120ms
+      retries_before_increasing_pulse: 1
     eject_targets: bd_trough
     eject_timeouts: 4s
     tags: drain

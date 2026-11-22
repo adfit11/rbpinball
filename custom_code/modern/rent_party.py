@@ -3,6 +3,7 @@
 from mpf.core.mode import Mode
 
 from custom_code.modern import settings as S
+from custom_code.modern.jukebox import song_mode_running
 from custom_code.modern.lamps import FLASH, director
 from custom_code.modern.scoring import award
 
@@ -28,8 +29,8 @@ class ModernRentParty(Mode):
         self.jackpots = 0
         self.super_lit = False
         self.total = 0
-        self.lock_news = False
-        self.add_mode_event_handler("modern_song_ended", self._song_ended)
+        self.building = False
+        self.add_mode_event_handler("multiball_lock_modern_subway_lock_full", self._build_up)
         self.add_mode_event_handler("modern_location_hit", self._location)
         self.add_mode_event_handler("modern_bank_completed", self._bank)
         self.add_mode_event_handler("modern_crater_entered", self._crater)
@@ -71,7 +72,7 @@ class ModernRentParty(Mode):
 
     def _guest(self, guest):
         player = self.player
-        if guest not in S.GUESTS or player.modern_lock_lit or self.multiball:
+        if guest not in S.GUESTS or player.modern_lock_lit or self.multiball or song_mode_running(self.machine):
             return
         bit = 1 << S.GUESTS.index(guest)
         if player.modern_guests & bit:
@@ -84,22 +85,9 @@ class ModernRentParty(Mode):
             player.modern_lock_lit = 1
             award(self.machine, S.SCORE_LOCK_LIT, "lock_lit")
             self.machine.events.post("modern_lock_lit")
-            jukebox = self.machine.modes["modern_jukebox"]
-            if jukebox.active and jukebox.busy:
-                self.lock_news = True  # craters can't lock during a song; say so once it ends
-            else:
-                self._announce_lock()
-
-    def _announce_lock(self):
-        self.lock_news = False
-        self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
-                                 ms=2200)
-        self.machine.events.post("modern_callout", pool="mc_lock_lit")
-
-    def _song_ended(self, reason=None, **kwargs):
-        if self.lock_news and self.player.modern_lock_lit and reason not in ("drain", "tilt"):
-            self._announce_lock()
-        self.lock_news = False
+            self.machine.events.post("modern_overlay", title="GUEST LIST FULL", subtitle="LOCK IS LIT. Shoot any crater!",
+                                     ms=2200)
+            self.machine.events.post("modern_callout", pool="mc_lock_lit")
 
     # Locks -----------------------------------------------------------------
     def qualify_lock(self):
@@ -122,10 +110,21 @@ class ModernRentParty(Mode):
             self.machine.events.post("modern_callout", pool="mc_ball_locked")
 
     # Rent Party --------------------------------------------------------------
+    def _build_up(self, **kwargs):
+        """The third lock holds every ball while the riser plays; the multiball starts when it peaks."""
+        self.building = True
+        self.machine.events.post("modern_rent_party_build_up", ms=S.RENT_PARTY_BUILD_UP_MS)
+        self.machine.events.post("modern_overlay", title="THE BACK ROOM IS FULL!", subtitle="Get ready for the RENT PARTY…",
+                                 ms=S.RENT_PARTY_BUILD_UP_MS, style="gold")
+        self.machine.events.post("modern_callout", pool="mc_rent_party_build_up")
+        self.delay.reset(ms=S.RENT_PARTY_BUILD_UP_MS, name="build_up",
+                         callback=self.machine.events.post, event="modern_rent_party_go")
+
     def _party_started(self, **kwargs):
         owners = self.lock_owners
         crasher = any(owner != self.player.number for owner in owners)
         self._owners = []
+        self.building = False
         self.multiball, self.jackpots, self.super_lit, self.total = True, 0, False, 0
         self.player.modern_lock_lit = 0
         self.player.modern_guests = 0
@@ -167,3 +166,7 @@ class ModernRentParty(Mode):
 
     def mode_stop(self, **kwargs):
         self.lamps.clear("rent_party")
+        if self.building:  # a tilt cancelled the party; free the back room so the next ball can be served
+            self.building = False
+            self.lock_owners.clear()
+            self.machine.ball_devices[LOCK_DEVICE].eject_all()

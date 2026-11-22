@@ -4,6 +4,7 @@ from mpf.core.mode import Mode
 from mpf.platforms.virtual import VirtualHardwarePlatform
 
 from custom_code.modern import settings
+from custom_code.modern.jukebox import song_mode_running
 from custom_code.modern.lamps import FLASH, SOLID, director
 from custom_code.modern.scoring import award
 
@@ -43,13 +44,14 @@ class ModernHoles(Mode):
         self.machine.events.post("modern_ball_held", hole=hole)
         spoke = self._nickel_hunt_spoke()
         self.machine.modes["modern"].location_hit(hole)
-        if hole == "kitchen" and self.player.modern_extra_ball_lit:
+        song = song_mode_running(self.machine)  # a lit extra ball or special waits for the song to end
+        if hole == "kitchen" and self.player.modern_extra_ball_lit and not song:
             self.player.modern_extra_ball_lit = 0
             self.player.modern_extra_balls_earned += 1
             self.machine.events.post("modern_award_extra_ball")
             self.machine.events.post("modern_callout", pool="cook_extra_ball")
             spoke = True
-        if hole == "bar" and self.player.modern_special_state == 1:
+        if hole == "bar" and self.player.modern_special_state == 1 and not song:
             self.player.modern_special_state = 2
             self.machine.coils["c_Replay_Knock"].pulse()
             points = award(self.machine, settings.SCORE_SPECIAL, "special")

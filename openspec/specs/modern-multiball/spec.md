@@ -24,7 +24,7 @@ The guest list and its progress SHALL reset at the end of every ball, and a lit 
 - **THEN** the player's next ball starts with an empty list and no lit lock
 
 ### Requirement: Lock balls at a lit crater
-Filling the guest list SHALL light the lock for the current player for the rest of the ball. If the list fills during a song, the "lock is lit" overlay and callout SHALL wait until the song ends, because craters do not lock during a song. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Locking SHALL continue until the subway holds three balls.
+Filling the guest list SHALL light the lock for the current player for the rest of the ball. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Locking SHALL continue until the subway holds three balls.
 
 #### Scenario: The first lock
 - **WHEN** the lock is lit, the subway is empty, and the ball enters a lit crater
@@ -53,11 +53,11 @@ Locked balls SHALL stay in the subway across turn changes and SHALL NOT be eject
 - **THEN** the screen shows two balls locked
 
 ### Requirement: Start Rent Party with three balls
-The third locked ball SHALL start Rent Party, releasing the subway to put three balls in play. The jukebox SHALL stay closed during Rent Party.
+The third locked ball SHALL start an 8 s build-up: every ball stays in the subway while a rising effect plays and the MC announces the Rent Party over it. When the build-up ends, Rent Party SHALL start, releasing the subway to put three balls in play, and the Rent Party music SHALL loop until the multiball ends. The jukebox SHALL stay closed during Rent Party.
 
 #### Scenario: The third lock
 - **WHEN** the subway holds two balls and a third is locked
-- **THEN** Rent Party starts with three balls in play
+- **THEN** the build-up plays for 8 s with all three balls held, then Rent Party starts with three balls in play and its music
 
 ### Requirement: Pay Rent Party jackpots
 During Rent Party, entering a lit crater SHALL pay a jackpot of 250,000 plus 50,000 for each jackpot already paid. After three jackpots, the Bar SHALL light for a 1,000,000 super jackpot. Values are before the song multiplier.
