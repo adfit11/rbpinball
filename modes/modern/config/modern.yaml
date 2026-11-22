@@ -22,6 +22,12 @@ sound_player:
   modern_super_jackpot:
     jackpot:
       bus: effects
+  modern_award_extra_ball:
+    jackpot:
+      bus: effects
+  modern_ball_locked:
+    jackpot:
+      bus: effects
   modern_artist_chosen:
     record_crackle:
       bus: effects
@@ -38,3 +44,18 @@ show_player:
     modern_song_shot:
       loops: 0
       priority: 10
+  modern_award_extra_ball:
+    modern_song_shot:
+      loops: 0
+      priority: 10
+  modern_ball_locked:
+    modern_song_shot:
+      loops: 0
+      priority: 10
+  modern_party_time_lights:
+    modern_party_time:
+      loops: -1
+      priority: 5  # under the shot burst
+  modern_party_time_lights_stop:
+    modern_party_time:
+      action: stop

@@ -43,7 +43,7 @@ func _initialize() -> void:
 			failed += 1
 	var hud_script: GDScript = load("res://slides/modern/modern_hud.gd")
 	var paths: PackedStringArray = hud_script.artist_video_paths("res://sounds/music/jukebox/03_big_joe_turner/song_2.mp3")
-	if paths[0] != "res://videos/modern/jukebox/03_big_joe_turner/video_2.ogv" or paths[2] != "res://videos/modern/jukebox/club.ogv":
+	if paths[0] != "res://videos/modern/jukebox/03_big_joe_turner/video_2.ogv" or paths.size() != 2:
 		push_error("Bad artist video paths %s" % [paths])
 		failed += 1
 	var dir := DirAccess.open("res://videos/modern/jukebox")
@@ -53,8 +53,8 @@ func _initialize() -> void:
 		if not (load(first) is VideoStream):
 			push_error("Cannot load video for %s" % folder)
 			failed += 1
-	if not (load("res://videos/modern/jukebox/club.ogv") is VideoStream):
-		push_error("Cannot load club video")
+	if hud_script.commas(1234567) != "1,234,567" or hud_script.commas(750) != "750":
+		push_error("Bad commas")
 		failed += 1
 	print("FAILED %d" % failed)
 	quit(failed)

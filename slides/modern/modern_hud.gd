@@ -60,6 +60,12 @@ var selector_deadline := 0.0
 var overlay_queue: Array = []
 var overlay_busy := false
 var bonus_lines: Array = []
+var spin_root: Control  # Big Joe Turner's spinning record: shows while the spinner builds the pot
+var spin_record: SpinRecord
+var spin_pot: Label
+var spin_gain: Label
+var spin_hide_ms := 0
+const SPIN_SHOW_MS := 1500
 
 const EVENTS := [
 	"modern_splash_show", "modern_splash_hide", "modern_nickel_directed", "modern_nickel_refused",
@@ -67,10 +73,10 @@ const EVENTS := [
 	"modern_selector_highlight", "modern_artist_chosen", "modern_selector_closed", "modern_song_started",
 	"modern_song_ended", "modern_song_paused", "modern_song_resumed", "modern_voice",
 	"modern_select_progress", "modern_drop_the_needle", "modern_ball_saver_ready", "modern_ball_saved",
-	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_special_lit", "modern_special_awarded",
+	"modern_extra_ball_lit", "modern_award_extra_ball", "modern_ball_locked", "modern_special_lit", "modern_special_awarded",
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
-	"modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
+	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 ]
 
 
@@ -203,6 +209,26 @@ func _build() -> void:
 	_place(select_ring, 1040, 540, 220, 14)
 	select_ring.visible = false
 
+	spin_root = Control.new()
+	_place(spin_root, 30, 120, 260, 300)
+	spin_pot = _label("", 30, GOLD, title_font)
+	spin_pot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	spin_root.add_child(spin_pot)
+	spin_pot.position = Vector2(0, 0)
+	spin_pot.size = Vector2(260, 44)
+	spin_record = SpinRecord.new()
+	spin_record.position = Vector2(30, 50)
+	spin_record.size = Vector2(200, 200)
+	spin_record.pivot_offset = Vector2(100, 100)
+	spin_root.add_child(spin_record)
+	spin_gain = _label("", 34, CREAM, title_font)
+	spin_gain.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	spin_root.add_child(spin_gain)
+	spin_gain.position = Vector2(0, 256)
+	spin_gain.size = Vector2(260, 44)
+	spin_gain.pivot_offset = Vector2(130, 22)
+	spin_root.visible = false
+
 	mode_panel = _panel(Color(0, 0, 0, 0.75))
 	mode_banner = _label("", 26, CREAM)
 	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -295,6 +321,7 @@ func _target_name(key: String) -> String:
 
 
 func _process(delta: float) -> void:
+	_spin_process(delta)
 	mode_panel.visible = mode_banner.text != ""
 	if song_panel.visible and not song_paused and song_length_ms > 0:
 		song_elapsed_ms += delta * 1000.0
@@ -302,6 +329,52 @@ func _process(delta: float) -> void:
 	if selector.visible:
 		var left: float = max(0.0, selector_deadline - Time.get_ticks_msec() / 1000.0)
 		selector_timer.text = "TAP GREEN TO MOVE  •  HOLD GREEN TO PLAY  •  %d" % ceil(left)
+
+
+# Big Joe Turner's spinner ------------------------------------------------
+class SpinRecord extends Control:
+	## A 78 on the turntable: grooves, a gold label and a shine line so the spin reads.
+	var speed := 0.0  # radians per second; each spin kicks it, then it coasts down
+
+	func _draw() -> void:
+		var c := size / 2.0
+		var r: float = min(size.x, size.y) / 2.0
+		draw_circle(c, r, Color("#111111"))
+		for i in range(6):
+			draw_arc(c, r * (0.92 - i * 0.08), 0, TAU, 64, Color(0.3, 0.3, 0.3, 0.8), 1.5)
+		draw_circle(c, r * 0.36, Color("#ffcf5a"))
+		draw_circle(c, r * 0.05, Color("#111111"))
+		draw_line(c + Vector2(r * 0.4, 0), c + Vector2(r * 0.95, 0), Color(1, 1, 1, 0.6), 4.0)
+		draw_line(c - Vector2(r * 0.4, 0), c - Vector2(r * 0.95, 0), Color(1, 1, 1, 0.25), 3.0)
+
+
+static func commas(n: int) -> String:
+	var s := str(abs(n))
+	var out := ""
+	while s.length() > 3:
+		out = "," + s.right(3) + out
+		s = s.left(s.length() - 3)
+	return ("-" if n < 0 else "") + s + out
+
+
+func _show_spin(payload: Dictionary) -> void:
+	spin_pot.text = "POT " + commas(int(payload.get("pot", 0)))
+	spin_gain.text = "+" + commas(int(payload.get("gain", 0)))
+	spin_record.speed = min(spin_record.speed + 14.0, 40.0)
+	spin_root.visible = true
+	spin_hide_ms = Time.get_ticks_msec() + SPIN_SHOW_MS
+	spin_gain.scale = Vector2(1.5, 1.5)
+	create_tween().tween_property(spin_gain, "scale", Vector2.ONE, 0.2)
+
+
+func _spin_process(delta: float) -> void:
+	if not spin_root.visible:
+		return
+	spin_record.rotation += spin_record.speed * delta
+	spin_record.speed *= exp(-1.2 * delta)
+	if Time.get_ticks_msec() >= spin_hide_ms:
+		spin_root.visible = false
+		spin_record.speed = 0.0
 
 
 # Overlays ---------------------------------------------------------------
@@ -501,11 +574,11 @@ static func artist_clip_paths(song_path: String) -> PackedStringArray:
 
 
 static func artist_video_paths(song_path: String) -> PackedStringArray:
-	## res://sounds/music/jukebox/<folder>/song_<n>.mp3 -> song video, artist video, club video.
+	## res://sounds/music/jukebox/<folder>/song_<n>.mp3 -> song video, artist video. Only the artist's own footage plays.
 	var folder := song_path.get_base_dir().get_file()
 	var base := "res://videos/modern/jukebox/"
 	var name := song_path.get_file().get_basename().replace("song_", "video_")
-	return PackedStringArray([base + folder + "/" + name + ".ogv", base + folder + "/video.ogv", base + "club.ogv"])
+	return PackedStringArray([base + folder + "/" + name + ".ogv", base + folder + "/video.ogv"])
 
 
 func _new_artist_video(below: Control) -> void:
@@ -693,13 +766,20 @@ func _on_event(payload: Dictionary = {}) -> void:
 			select_ring.visible = p > 0.0 and p < 1.0
 			select_ring.value = p
 		"modern_drop_the_needle":
-			show_overlay("DROP THE NEEDLE!", "+50,000  •  Bouncer ready  •  Ovation up", 1800)
+			show_overlay("DROP THE NEEDLE!", "+50,000  •  Ovation up", 1800)
+		"modern_ball_saver_ready":
+			show_overlay("BALL SAVER LIT!", "The Bouncer has your back", 2000, TEAL)
 		"modern_ball_saved":
 			show_overlay("THE BOUNCER SAVED YOU!", "", 1500, TEAL)
 		"modern_extra_ball_lit":
 			show_overlay("EXTRA BALL IS LIT", "Shoot the Kitchen", 1500, TEAL, _extra_ball_lit)
+		"modern_pot_spin":
+			_show_spin(payload)
+		"modern_ball_locked":
+			flash_screen(GOLD, 2)
 		"modern_award_extra_ball":
-			show_overlay("EXTRA BALL!", "Shoot again", 2000)
+			flash_screen(GOLD, 4)
+			show_overlay("EXTRA BALL!", "You earned another ball  •  Shoot again", 3000, BRASS)
 		"modern_special_lit":
 			show_overlay("SPECIAL IS LIT", "Shoot the Bar", 1500, TEAL)
 		"modern_special_awarded":

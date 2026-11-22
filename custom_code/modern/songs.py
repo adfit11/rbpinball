@@ -138,6 +138,7 @@ class BuildAndCollect(SongRule):
 
     def on_spin(self):
         self.pot += self.per_spin
+        self.machine.events.post("modern_pot_spin", pot=self.pot, gain=self.per_spin)
         self.per_spin += S.POT_STEP
 
     def on_location(self, location):
@@ -230,6 +231,7 @@ class PartyTime(SongRule):
     def start(self):
         self.machine.game.player.modern_score_factor = S.PARTY_FACTOR
         self.machine.modes["modern_ball_saver"].ready()
+        self.machine.events.post("modern_party_time_lights")
 
     def on_ball_saved(self):
         self.machine.modes["modern_ball_saver"].ready()
@@ -240,6 +242,7 @@ class PartyTime(SongRule):
 
     def stop(self):
         super().stop()
+        self.machine.events.post("modern_party_time_lights_stop")
         self.machine.game.player.modern_score_factor = 1
 
     def status(self):
