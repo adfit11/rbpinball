@@ -254,6 +254,17 @@ class TestModernSongs(ModernTestCase):
         for light in S.CRATER_LAMPS:
             self.assertEqual(director(self.machine).state(light), FLASH)
 
+    def test_kitchen_lamp_flashes_as_a_target_but_is_solid_while_extra_ball_is_lit(self):
+        from custom_code.modern.lamps import FLASH, SOLID, director
+        self.start_slot(2)
+        lamps = director(self.machine)
+        self.assertEqual(lamps.state(S.EXTRA_BALL_LAMP), FLASH)
+        self.post_event("modern_light_extra_ball", .1)
+        self.assertEqual(lamps.state(S.EXTRA_BALL_LAMP), SOLID)
+        for _ in range(4):
+            self.advance_time_and_run(S.FLASH_MS / 1000)
+            self.assertTrue(lamps.shown[S.EXTRA_BALL_LAMP])
+
     def test_next_song_is_not_frozen_by_a_hold_left_from_the_last(self):
         self.start_slot(2)
         self.post_event("modern_song_paused", .1)
