@@ -36,6 +36,11 @@ class VolcanoAttract(Attract):
         else:
             self.add_mode_event_handler("s_green_button_right_56_active", self._cycle_selection)
         super().mode_start(**kwargs)
+        # LISY keeps L0 from before MPF started. Switch it off so the bumpers, slingshots and flippers
+        # are dead while the subway clear drains balls; the game turns it on again.
+        relay = self.machine.digital_outputs.get("game_over_relay")
+        if relay is not None:
+            relay.disable()
         self.subway_startup = None
         subway = self.machine.ball_devices.get("bd_classic_subway_lock")
         if subway is not None and isinstance(subway.ejector, InterlockedSubwayEjector):
