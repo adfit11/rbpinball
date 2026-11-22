@@ -28,11 +28,33 @@ The nickels a player earns by location shots SHALL cost 1, 2, 3, 4, and 5 succes
 - **THEN** the next nickel costs 1 shot and its award points are double the first cycle's
 
 ### Requirement: Refuse shots to the wrong location
-When the player hits a club location that is not the flashing one, Modern SHALL score its normal points and play a random refusal line in that location's voice. The line SHALL question the player and point them toward another location, without changing which location is lit.
+When the player hits a club location that is not the flashing one, Modern SHALL score its normal points and play a random refusal line in that location's voice. The line SHALL question the player without changing which location is lit. A refusal SHALL name no location other than the one hit and the flashing one; when the voice has no such line, the MC SHALL name the flashing location instead.
 
 #### Scenario: The wrong location is hit
 - **WHEN** the Kitchen is flashing and the player hits the Bar
 - **THEN** the Bar scores normal points, the Bar's voice plays a random refusal such as "What are you doing here?", and the Kitchen stays lit
+
+#### Scenario: A refusal never points the wrong way
+- **WHEN** the Coat Check is flashing and the player hits the Bar
+- **THEN** the refusal does not send the player to the Kitchen, the Bandstand, or the Booths
+
+### Requirement: Only the current target is directed
+From the moment the selector opens until the song ends, Modern SHALL NOT flash, show, or speak nickel-hunt directions or refusals. Only the song mode's own instructions SHALL direct the player. The nickel hunt SHALL resume when the song ends.
+
+#### Scenario: Picking a song
+- **WHEN** the selector is open and the nickel reminder comes due, or the player hits a club location
+- **THEN** no location direction or refusal plays
+
+#### Scenario: During Ruth Brown's Ladder
+- **WHEN** the Ladder is running and the player hits the Booths
+- **THEN** no voice sends the player anywhere but the Kitchen, and the nickel target is shown again after the song ends
+
+### Requirement: A quick return to the Bar or Kitchen counts
+An eject from the Bar or the Kitchen SHALL be confirmed by any playfield switch, or after 3 s with none, so that a ball which comes straight back is counted as a new entry.
+
+#### Scenario: Straight back into the Kitchen
+- **WHEN** the Kitchen ejects during the Ladder and the ball drops back in 4 s later without touching another switch
+- **THEN** the player climbs the next rung
 
 ### Requirement: Find a nickel on the floor
 Each completed drop bank SHALL stay down and count as half a nickel. When both banks are down, Modern SHALL award a "nickel on the floor" if the player holds no nickel, then reset both banks. The floor nickel SHALL NOT change the location-shot cost.

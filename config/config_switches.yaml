@@ -67,45 +67,60 @@ switches:
   s_top_drop_5_42:
     number: 42
 
+  # Switches tagged playfield_active confirm that an ejected ball reached the playfield.
   # RAMP -------------------------------------
   s_ramp_1_34:
     number: 34 
+    tags: playfield_active
   s_ramp_2_24:
     number: 24    
+    tags: playfield_active
   s_ramp_3_14:
     number: 14    
+    tags: playfield_active
   s_ramp_4_4:
     number: 4
+    tags: playfield_active
 
   # OUTLANES ------------------------------------
   s_outlane_right_5:
     number: 5
+    tags: playfield_active
   s_outlane_left_6:
     number: 6
+    tags: playfield_active
 
   # POP BUMPERS --------------------------------
   s_top_bumpers_35:
     number: 35
+    tags: playfield_active
   s_bottom_bumpers_13:
     number: 13
+    tags: playfield_active
 
   # OTHER SWITCHES ------------------------------
   s_10_points_15:
     number: 15
+    tags: playfield_active
   s_return_left_16:
     number: 16
+    tags: playfield_active
   s_hole_kicker_top_23:
     number: 23
   s_rollunder_25:
     number: 25
+    tags: playfield_active
   s_kicking_target_26:
     number: 26
+    tags: playfield_active
   s_spot_target_36:
     number: 36
+    tags: playfield_active
   s_side_kicker_left_43:
     number: 43
   s_spinner_44:
     number: 44
+    tags: playfield_active
   s_tilt_46:
     number: 46
     tags: tilt

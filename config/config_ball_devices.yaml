@@ -27,11 +27,14 @@ ball_devices:
     ball_switches: s_hole_kicker_top_23
     eject_coil: c_hole_kicker_top
     eject_targets: playfield
+    # No playfield switch may follow an eject; confirm soon so a quick return counts as a new entry.
+    eject_timeouts: 3s
 
   bd_classic_firepit:
     ball_switches: s_side_kicker_left_43
     eject_coil: c_side_kicker_left
     eject_targets: playfield
+    eject_timeouts: 3s
 
   bd_classic_subway_lock:
     counter:

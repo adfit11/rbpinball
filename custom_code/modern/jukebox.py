@@ -44,7 +44,7 @@ class ModernJukebox(Mode):
         lit = targets.crater_entered(crater)
         self.machine.events.post("modern_crater_entered", crater=crater, lit=lit)
         player = self.player
-        if self.blockers or self.selector_open or self.chosen or self.song or self.pending_song:
+        if self.blockers or self.busy:
             return
         if self.machine.game.balls_in_play > 1:
             return
@@ -56,9 +56,14 @@ class ModernJukebox(Mode):
                 self.machine.events.post("modern_jukebox_no_nickel")
                 self.machine.events.post("modern_callout", pool="mc_needs_nickel")
             return
-        self.machine.events.post("modern_nickel_spent")
         self.machine.events.post("modern_jukebox_hold_enable")
         self._open_selector()
+        self.machine.events.post("modern_nickel_spent")
+
+    @property
+    def busy(self):
+        """From the selector opening until the song ends: the song mode owns the directions."""
+        return bool(self.selector_open or self.chosen or self.song or self.pending_song)
 
     # Selector --------------------------------------------------------------
     def played(self, slot_index):

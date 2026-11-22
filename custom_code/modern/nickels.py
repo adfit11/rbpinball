@@ -40,7 +40,9 @@ class ModernNickels(Mode):
         return settings.NICKEL_COSTS[self.player.modern_nickel_step % len(settings.NICKEL_COSTS)]
 
     def hunting(self):
-        return not self.suspended and not self.player.modern_nickel
+        jukebox = self.machine.modes["modern_jukebox"]
+        busy = jukebox.active and jukebox.busy
+        return not self.suspended and not busy and not self.player.modern_nickel
 
     def _suspend(self, **kwargs):
         self.suspended += 1
@@ -88,8 +90,8 @@ class ModernNickels(Mode):
                                      location_name=settings.LOCATIONS[target][0],
                                      progress=self.player.modern_nickel_progress, cost=self.cost())
 
-    def _callout(self, pool, location):
-        self.machine.events.post("modern_callout", pool=f"{settings.LOCATIONS[location][2]}_{pool}")
+    def _callout(self, pool, location, **kwargs):
+        self.machine.events.post("modern_callout", pool=f"{settings.LOCATIONS[location][2]}_{pool}", **kwargs)
 
     def _location_hit(self, location, **kwargs):
         if not self.hunting():
@@ -98,7 +100,9 @@ class ModernNickels(Mode):
             if self.delay.check(f"refused_{location}"):
                 return
             self.delay.add(ms=settings.REFUSAL_GAP_MS, name=f"refused_{location}", callback=lambda: None)
-            self._callout("refusal", location)
+            # Staff may only name the real target; otherwise the MC points the way.
+            self._callout("refusal", location, allow=(location, self.player.modern_nickel_target),
+                          fallback=f"mc_target_{self.player.modern_nickel_target}")
             self.machine.events.post("modern_nickel_refused", location=location,
                                      location_name=settings.LOCATIONS[location][0],
                                      target=settings.LOCATIONS[self.player.modern_nickel_target][0])

@@ -24,7 +24,7 @@ The guest list and its progress SHALL reset at the end of every ball, and a lit 
 - **THEN** the player's next ball starts with an empty list and no lit lock
 
 ### Requirement: Lock balls at a lit crater
-Filling the guest list SHALL light the lock for the current player for the rest of the ball. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Locking SHALL continue until the subway holds three balls.
+Filling the guest list SHALL light the lock for the current player for the rest of the ball. If the list fills during a song, the "lock is lit" overlay and callout SHALL wait until the song ends, because craters do not lock during a song. While the lock is lit, entering a crater lit by the cascading crater lights SHALL lock the ball in the subway and serve a replacement to the shooter lane. Locking SHALL continue until the subway holds three balls.
 
 #### Scenario: The first lock
 - **WHEN** the lock is lit, the subway is empty, and the ball enters a lit crater

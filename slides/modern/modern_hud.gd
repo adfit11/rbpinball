@@ -613,6 +613,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 		"modern_jukebox_no_nickel":
 			caption.text = "The jukebox needs a nickel"
 		"modern_selector_opened":
+			caption.text = ""  # the nickel hunt's direction no longer applies
 			_show_selector(payload)
 			_play_artist_pick()
 		"modern_selector_highlight":
