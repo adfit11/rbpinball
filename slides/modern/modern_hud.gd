@@ -22,7 +22,6 @@ var body_font: Font = load("res://fonts/modern/Oswald-Variable.ttf")
 var scores: HBoxContainer
 var ball_label: Label
 var side_labels := {}
-var record_row: HBoxContainer
 var song_panel: PanelContainer
 var song_title: Label
 var song_bar: ProgressBar
@@ -208,15 +207,6 @@ func _build() -> void:
 
 	caption = _place(_label("", 22, CREAM), 140, 585, 1000, 34)
 
-	record_row = HBoxContainer.new()
-	record_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	record_row.add_theme_constant_override("separation", 14)
-	_place(record_row, 200, 632, 880, 70)
-	for i in range(10):
-		var rec := ColorRect.new()
-		rec.custom_minimum_size = Vector2(60, 60)
-		record_row.add_child(rec)
-
 	select_ring = ProgressBar.new()
 	select_ring.show_percentage = false
 	select_ring.max_value = 1.0
@@ -337,10 +327,6 @@ func _render() -> void:
 	side_labels.target.text = "Shoot a lit crater!" if held else _target_name(str(active.get("modern_nickel_target", "")))
 	side_labels.locks.text = "LOCKS %d / 3" % int(active.get("modern_locked_balls", 0))
 	side_labels.guests.text = "LOCK IS LIT" if int(active.get("modern_lock_lit", 0)) else "LOCK: TOP BANK"
-	var lit := int(active.get("modern_round_songs", 0))
-	for i in range(record_row.get_child_count()):
-		var rec: ColorRect = record_row.get_child(i)
-		rec.color = GOLD if i < lit else Color(0.08, 0.05, 0.05, 0.9)
 
 
 func _extra_ball_lit() -> bool:
