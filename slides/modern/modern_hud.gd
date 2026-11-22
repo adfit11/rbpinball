@@ -13,6 +13,7 @@ const OVERLAY_STYLES := {"teal": TEAL, "gold": BRASS, "red": RED}
 const DUCK_DB := -12.0
 const VOICE_CUT_MS := 600  # lines posted together play one after another instead of cutting each other off
 const LOCATIONS := ["Bar", "Kitchen", "Bandstand", "Coat Check", "Back Door"]
+const SONG_FADE_S := 2.0  # a song fades out when its round ends instead of cutting off
 
 var title_font: Font = load("res://fonts/modern/Limelight-Regular.ttf")
 var neon_font: Font = load("res://fonts/modern/Monoton-Regular.ttf")
@@ -26,6 +27,7 @@ var song_panel: PanelContainer
 var song_title: Label
 var song_bar: ProgressBar
 var mode_banner: Label
+var mode_panel: PanelContainer  # the live mode banner, in front of the video and HUD widgets
 var caption: Label
 var task_panel: PanelContainer
 var task_title: Label
@@ -36,7 +38,7 @@ var selector_cells: Array = []
 var selector_timer: Label
 var select_ring: ProgressBar
 var music: AudioStreamPlayer
-var music_fade: Tween  # fades the house band out while the record crackles
+var music_fade: Tween  # fades the house band out while the record crackles, and a song out when its round ends
 var voice: AudioStreamPlayer
 var artist_video: VideoStreamPlayer  # muted performer loop behind the HUD while a song is live
 var voice_queue: Array = []  # [caption, file] lines waiting for the current voice to finish
@@ -179,8 +181,6 @@ func _build() -> void:
 	_place(task_panel, 200, 420, 820, 110)
 	task_panel.visible = false
 
-	mode_banner = _place(_label("", 26, CREAM), 200, 540, 840, 40)
-	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
 	caption = _place(_label("", 22, CREAM), 140, 585, 1000, 34)
 
 	record_row = HBoxContainer.new()
@@ -197,6 +197,14 @@ func _build() -> void:
 	select_ring.max_value = 1.0
 	_place(select_ring, 1040, 540, 220, 14)
 	select_ring.visible = false
+
+	mode_panel = _panel(Color(0, 0, 0, 0.75))
+	mode_banner = _label("", 26, CREAM)
+	mode_banner.autowrap_mode = TextServer.AUTOWRAP_WORD
+	mode_banner.custom_minimum_size = Vector2(812, 0)
+	mode_panel.add_child(mode_banner)
+	_place(mode_panel, 200, 532, 840, 48)
+	mode_panel.visible = false
 
 	overlay_root = Control.new()
 	_place(overlay_root, 0, 0, 1280, 720)
@@ -281,6 +289,7 @@ func _target_name(key: String) -> String:
 
 
 func _process(delta: float) -> void:
+	mode_panel.visible = mode_banner.text != ""
 	if song_panel.visible and not song_paused and song_length_ms > 0:
 		song_elapsed_ms += delta * 1000.0
 		song_bar.value = 100.0 * song_elapsed_ms / song_length_ms
@@ -379,13 +388,18 @@ func _load_audio(path: String) -> AudioStream:
 	return null
 
 
-func _fade_out_music() -> void:
+func _fade_out_music(seconds: float = 1.0, then: Callable = Callable()) -> void:
 	_stop_music_fade()
-	if not music.playing:
+	if not music.playing or music.stream_paused:
+		music.stop()
+		if then.is_valid():
+			then.call()
 		return
 	music_fade = create_tween()
-	music_fade.tween_property(music, "volume_db", -60.0, 1.0)
+	music_fade.tween_property(music, "volume_db", -60.0, seconds)
 	music_fade.tween_callback(music.stop)
+	if then.is_valid():
+		music_fade.tween_callback(then)
 
 
 func _stop_music_fade() -> void:
@@ -416,6 +430,7 @@ func _play_between_balls() -> void:
 		between_balls_song = _load_audio("res://sounds/modern_music/between_balls.mp3")
 	if between_balls_song is AudioStreamMP3:
 		between_balls_song.loop = true
+	_stop_music_fade()
 	music.stop()
 	if between_balls_song:
 		music.stream = between_balls_song
@@ -551,7 +566,9 @@ func _on_event(payload: Dictionary = {}) -> void:
 			song_panel.visible = false
 			mode_banner.text = ""
 			if not between_balls:
-				_play_house_band()
+				_fade_out_music(SONG_FADE_S, func():
+					if not between_balls:
+						_play_house_band())
 		"modern_song_paused":
 			song_paused = true
 			music.stream_paused = true

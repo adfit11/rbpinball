@@ -20,6 +20,7 @@ class SongRule:
     title = ""
     goal = ""
     ends_on_complete = False
+    round_ms = None  # None: the round lasts the whole song cut
 
     def __init__(self, songs):
         self.songs, self.machine, self.mode = songs, songs.machine, songs
@@ -174,15 +175,21 @@ class RovingShot(SongRule):
 
 class JukeboxJackpot(SongRule):
     key = "jukebox_jackpot"
-    title, goal = "JUKEBOX JACKPOT", "Every crater is a jackpot!"
+    title, goal, ends_on_complete = "JUKEBOX JACKPOT", "Every crater is a jackpot!", True
+    round_ms = S.JACKPOT_ROUND_MS
 
     def start(self):
         self.jackpots = 0
         for light in S.CRATER_LAMPS:
             self.lamps.set("song", light, FLASH)
 
+    def value(self, crater):
+        return S.JACKPOT_VALUES[crater - 1] + S.JACKPOT_STEP * self.jackpots
+
     def on_crater(self, crater, lit):
-        value = S.JACKPOT_VALUES[crater - 1] + S.JACKPOT_STEP * self.jackpots
+        if self.completed:
+            return
+        value = self.value(crater)
         self.pay(value, "jukebox_jackpot")
         self.jackpots += 1
         self.machine.events.post("modern_song_jackpot", crater=crater, value=value, count=self.jackpots)
@@ -193,7 +200,8 @@ class JukeboxJackpot(SongRule):
             self.complete()
 
     def status(self):
-        return f"JACKPOTS {self.jackpots} / {S.JACKPOTS_TO_COMPLETE}  •  any crater"
+        values = "  ".join(f"{n}: {self.value(n) // 1000}K" for n in range(1, len(S.JACKPOT_VALUES) + 1))
+        return f"JACKPOTS {self.jackpots} / {S.JACKPOTS_TO_COMPLETE}  •  CRATER {values}"
 
 
 class PartyTime(SongRule):
