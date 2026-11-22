@@ -71,11 +71,46 @@ class TestGameRelay(MpfGameTestCase):
         self.hit_switch_and_run('s_trough_2_30', 1)
         self.hit_and_release_switch('s_start_47')
         self.start_game(start_switch='s_start_47')
-        self.assertEqual(type(self.machine.ball_devices['bd_trough'].ejector).__name__, 'PulseCoilEjector')
+        self.assertEqual(type(self.machine.ball_devices['bd_trough'].ejector).__name__, 'RetryingTroughEjector')
         self.hit_and_release_switch('s_start_47')  # skip the Modern rules splash
         self.advance_time_and_run(1)
         self.assertEqual(calls[:1], ['pulse'])
         self.assertNotIn('on', calls)
+
+    def _serve_on_cabinet(self):
+        self.machine.variables.set_machine_var('lisy_hardware', 'LISY80')
+        coil = self.machine.coils['c_trough_release']
+        pulses = []
+        coil.pulse = lambda *a, **k: pulses.append(self.machine.clock.get_time())
+        self.mock_event('trough_serve_failed')
+        self.hit_switch_and_run('s_trough_1_40', 1)
+        self.hit_switch_and_run('s_trough_2_30', 1)
+        self.hit_and_release_switch('s_start_47')
+        self.start_game(start_switch='s_start_47')
+        self.hit_and_release_switch('s_start_47')  # skip the Modern rules splash
+        self.advance_time_and_run(.1)
+        return pulses
+
+    def test_missed_trough_serve_is_pulsed_again_up_to_three_times(self):
+        pulses = self._serve_on_cabinet()
+        self.advance_time_and_run(6)
+        self.assertEqual(len(pulses), 3)
+        self.assertAlmostEqual(pulses[1] - pulses[0], 1.5, places=1)
+        self.assertEventCalled('trough_serve_failed', 1)
+
+    def test_trough_serve_that_moves_a_switch_is_not_pulsed_again(self):
+        pulses = self._serve_on_cabinet()
+        self.release_switch_and_run('s_trough_1_40', 6)
+        self.assertEqual(len(pulses), 1)
+        self.assertEventNotCalled('trough_serve_failed')
+
+    def test_second_pulse_that_serves_stops_the_retries(self):
+        pulses = self._serve_on_cabinet()
+        self.advance_time_and_run(1.5)
+        self.assertEqual(len(pulses), 2)
+        self.release_switch_and_run('s_trough_1_40', 6)
+        self.assertEqual(len(pulses), 2)
+        self.assertEventNotCalled('trough_serve_failed')
 
     def test_trough_counts_each_arrival_once(self):
         trough = self.machine.ball_devices['bd_trough']
