@@ -38,6 +38,10 @@ A lit lock SHALL stay lit until one ball is locked or the ball ends. While the l
 - **WHEN** the lock is lit and the ball enters an unlit crater
 - **THEN** the ball is not locked and returns to play
 
+#### Scenario: A crater entry the switches missed
+- **WHEN** a ball rests on subway switch 10 for 1 s, the subway count is empty, and no crater passage in the last 2.5 s explains it
+- **THEN** Modern treats it as an unlit crater entry: the ball is not locked and returns to play through the kicker
+
 ### Requirement: A lock takes priority over the jukebox
 When a crater entry locks a ball while the player holds a nickel, Modern SHALL lock the ball and serve the replacement without opening the selector. The player SHALL keep the nickel for a later lit crater.
 

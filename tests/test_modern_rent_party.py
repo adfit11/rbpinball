@@ -80,6 +80,30 @@ class TestModernRentParty(ModernTestCase):
         self.assertEventNotCalled("modern_lock_qualified")
         self.assertEqual(self.player.modern_lock_lit, 1)
 
+    def test_ball_the_craters_missed_is_returned_from_switch_10(self):
+        self.start_modern()
+        self.light_lock()
+        self.mock_event("modern_subway_unexplained_ball")
+        self.mock_event("modern_lock_qualified")
+        self.mock_event("balldevice_bd_classic_subway_lock_ball_eject_success")
+        self.hit_switch_and_run("s_subway_lock_10", 1.2)
+        self.assertEventCalled("modern_subway_unexplained_ball", 1)
+        self.release_switch_and_run("s_subway_lock_10", 5)
+        self.assertEventCalled("balldevice_bd_classic_subway_lock_ball_eject_success")
+        self.assertEventNotCalled("modern_lock_qualified")
+        self.assertEqual(self.lock.balls, 0)
+        self.assertEqual(self.player.modern_lock_lit, 1)
+
+    def test_crater_passage_explains_a_ball_on_switch_10(self):
+        self.start_modern()
+        self.mock_event("modern_subway_unexplained_ball")
+        targets = self.machine.modes["modern_targets"]
+        self.hit_and_release_switch(targets.CRATER_SWITCHES[0])
+        self.advance_time_and_run(.5)
+        self.hit_switch_and_run("s_subway_lock_10", 1.2)
+        self.release_switch_and_run("s_subway_lock_10", 5)
+        self.assertEventNotCalled("modern_subway_unexplained_ball")
+
     def test_a_lock_puts_the_lock_out(self):
         self.start_modern()
         self.light_lock()
