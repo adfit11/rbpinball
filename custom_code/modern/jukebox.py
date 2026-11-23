@@ -32,6 +32,7 @@ class ModernJukebox(Mode):
         self.song_started_at = None
         self.awaiting_kickback = False  # the jukebox has the ball until the subway kicker returns it
         self.clock_waiting = False  # a song is playing but its round clock waits for the ball
+        self.kick_armed = False  # the subway kicker is firing the held ball back to the player
         self.pauses = set()
         self.blockers = set()
         self.add_mode_event_handler("modern_tap", self._tap)
@@ -41,6 +42,8 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("modern_ball_released", self._resume)
         self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ball_eject_success",
                                     self._start_pending)
+        self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ejecting_ball", self._kicking)
+        self.add_mode_event_handler("s_subway_kicker_0_inactive", self._kicked)
         for name in ("player_modern_ovation", "player_modern_songs_completed_ball"):
             self.add_mode_event_handler(name, self._show_ovation)
         self._show()
@@ -150,9 +153,19 @@ class ModernJukebox(Mode):
         self.machine.events.post("modern_jukebox_hold_disable")
         self.machine.events.post("modern_release_jukebox")
 
+    def _kicking(self, **kwargs):
+        self.kick_armed = self.awaiting_kickback
+
+    def _kicked(self, **kwargs):
+        """The held ball has left the subway kicker: its first playfield hit already counts for the mode."""
+        if self.kick_armed:
+            self.kick_armed = self.awaiting_kickback = False
+            if self.clock_waiting:
+                self._start_clock()
+
     def _start_pending(self, **kwargs):
         """Start the chosen song, or its round clock, once the subway kicker has returned the ball to play."""
-        self.awaiting_kickback = False
+        self.awaiting_kickback = self.kick_armed = False
         if self.clock_waiting:
             self._start_clock()
         if self.pending_song:

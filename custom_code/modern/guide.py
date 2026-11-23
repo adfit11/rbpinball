@@ -28,9 +28,10 @@ def current_task(machine):
         return "PICK A SONG", "Tap green to move to the next artist. Hold green to play it."
     songs = modes["modern_songs"]
     rule = songs.rule if songs.active else None
-    if not rule and jukebox.active and jukebox.chosen:
+    song = (jukebox.chosen or jukebox.song) if jukebox.active else None
+    if not rule and song:  # chosen, or playing while the ball is still on its way back
         from custom_code.modern.songs import SLOT_RULES
-        rule = SLOT_RULES[jukebox.chosen.slot]
+        rule = SLOT_RULES[song.slot]
     if rule:
         return f"SONG MODE: {rule.title}", f"{rule.goal} Finish before the record ends."
     title, detail = _nickel_task(player)

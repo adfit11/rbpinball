@@ -32,6 +32,25 @@ class TestModernSongs(ModernTestCase):
         self.assertEventCalled("modern_hurry_up_started")
         self.assertLess(jukebox.song_remaining(), jukebox.song_remaining_ms)
 
+    def test_the_first_bumper_after_the_kickback_counts_for_dance_floor(self):
+        from custom_code.modern.guide import current_task
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        jukebox.awaiting_kickback = True
+        jukebox._start_song(jukebox.slots[8][1][0])
+        self.advance_time_and_run(.5)
+        self.assertEqual(current_task(self.machine)[0], "SONG MODE: DANCE FLOOR")
+        jukebox._kicking()  # balldevice_bd_classic_subway_kicker_ejecting_ball
+        self.advance_time_and_run(.1)
+        self.assertIsNone(songs.rule)
+        self.hit_switch_and_run("s_subway_kicker_0", .1)
+        self.release_switch_and_run("s_subway_kicker_0", .1)  # the ball leaves the kicker
+        self.hit_and_release_switch("s_top_bumpers_35")  # and confirms the eject on a bumper
+        self.advance_time_and_run(.1)
+        self.assertEqual(songs.rule.hits, 1)
+        self.assertEqual(current_task(self.machine)[0], "SONG MODE: DANCE FLOOR")
+
     def test_round_clock_starts_anyway_if_the_kicker_never_reports(self):
         self.start_modern()
         self.player.modern_nickel = 1
