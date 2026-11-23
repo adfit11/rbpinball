@@ -83,11 +83,11 @@ Modern SHALL show a designed screen, not plain debug text, for each state: the r
 - **THEN** its own screen or overlay is shown in the juke-joint style
 
 ### Requirement: Keep the base HUD visible
-During play, the base HUD SHALL show the player, ball, score, nickel progress or held nickel, the lock state, and the subway lock count. The songs played, the song multiplier, Standing Ovation, and the Bouncer ball saver SHALL be shown only by their playfield lamps, not on the HUD. Feature screens SHALL overlay it rather than hide it, except the selector, the splash, and the bonus.
+During play, the base HUD SHALL show the current player's score as the largest item on screen, with the player, ball, and other players' scores beneath it; one goal card that says what to do next; a locks chip with the subway lock count and lock state; and the voice caption. The goal card SHALL show the nickel hunt, the chosen mode's intro, the running mode with its progress dots and time left, Rent Party, or the end-of-ball bonus. The songs played, the song multiplier, Standing Ovation, and the Bouncer ball saver SHALL be shown only by their playfield lamps, not on the HUD. Feature screens SHALL overlay it rather than hide it, except the selector, the splash, and the bonus.
 
 #### Scenario: A mode is running
 - **WHEN** a song mode is active
-- **THEN** the mode's overlay shows its timer and goal, and the score and lock count remain visible
+- **THEN** the goal card shows the mode, its progress, and the time left, and the score and lock count remain visible
 
 ### Requirement: Transition between screens
 Modern SHALL animate changes between screens and overlays, using entrance and exit transitions such as a slide, a fade, or a jukebox flip. Award callouts SHALL appear briefly and then clear without player input.

@@ -73,7 +73,8 @@ class TestModernSongs(ModernTestCase):
         self.hit_location("kitchen")
         self.assertEventCalled("modern_song_shot")
         self.assertIn(("RUNG 1!", "75,000  •  Next 150,000"), [(o["title"], o["subtitle"]) for o in overlays])
-        self.assertEqual(rule.status(), "LADDER  RUNG 1 / 4  •  NEXT 150K AT THE KITCHEN")
+        self.assertEqual(rule.status(), "NEXT 150K AT THE KITCHEN")
+        self.assertEqual(rule.progress(), (1, 4))
 
     def test_full_length_songs_are_capped_at_60_seconds(self):
         from unittest.mock import patch
@@ -205,12 +206,17 @@ class TestModernSongs(ModernTestCase):
         self.assertTrue(rule.completed)
 
     def test_hit_me_dial_green_stops_without_freezing(self):
+        self.mock_event("modern_hit_me_dial")
         rule = self.start_slot(10)
         self.mock_event("modern_lamps_frozen")
         self.advance_time_and_run(.6)
+        self.assertTrue(self._last_event_kwargs["modern_hit_me_dial"]["spinning"])
         self.hit_and_release_switch("s_green_button_right_56")
         self.advance_time_and_run(.1)
         self.assertFalse(rule.spinning)
+        dial = self._last_event_kwargs["modern_hit_me_dial"]
+        self.assertEqual((dial["index"], dial["spinning"]), (rule.index, False))
+        self.assertEqual(dial["names"].split("|")[rule.index], S.LOCATIONS[rule.target][0].removeprefix("the "))
         self.assertEventNotCalled("modern_lamps_frozen")
         for _ in range(3):
             rule.stop_dial()
