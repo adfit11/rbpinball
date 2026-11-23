@@ -14,6 +14,34 @@ class TestModernSongs(ModernTestCase):
         self.advance_time_and_run(.2)
         return self.machine.modes["modern_songs"].rule
 
+    def test_round_and_mode_counters_wait_for_the_kickback(self):
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        self.mock_event("modern_hurry_up_started")
+        jukebox.awaiting_kickback = True  # the jukebox is holding the ball in the subway
+        jukebox._start_song(jukebox.slots[0][1][0])
+        self.advance_time_and_run(5)
+        self.assertIsNotNone(jukebox.song)
+        self.assertIsNone(songs.rule)
+        self.assertEventNotCalled("modern_hurry_up_started")
+        self.assertEqual(jukebox.song_remaining(), jukebox.song_remaining_ms)
+        jukebox._start_pending()  # balldevice_bd_classic_subway_kicker_ball_eject_success
+        self.advance_time_and_run(1)
+        self.assertIsNotNone(songs.rule)
+        self.assertEventCalled("modern_hurry_up_started")
+        self.assertLess(jukebox.song_remaining(), jukebox.song_remaining_ms)
+
+    def test_round_clock_starts_anyway_if_the_kicker_never_reports(self):
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        jukebox.awaiting_kickback = True
+        jukebox._start_song(jukebox.slots[1][1][0])
+        self.advance_time_and_run(S.KICKBACK_TIMEOUT_MS / 1000 + .5)
+        self.assertIsNotNone(songs.rule)
+        self.assertFalse(jukebox.clock_waiting)
+
     def test_songs_are_not_introduced_but_mode_instructions_play(self):
         voices = []
         self.machine.events.add_handler("modern_voice", lambda **kwargs: voices.append(kwargs))

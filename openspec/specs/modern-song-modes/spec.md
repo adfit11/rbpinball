@@ -6,7 +6,7 @@ Gives each Modern jukebox song a short, artist-neutral challenge, with comparabl
 ## Requirements
 
 ### Requirement: Time each mode by its song
-A song mode SHALL run for its round length: 60 s unless the mode sets a shorter round, or the whole song if the song file is shorter. Full-length song files SHALL NOT lengthen a round. When the round ends before the song, the song SHALL fade out over 2 s instead of stopping abruptly. The timer and the song SHALL pause while the ball is held in the saucer or the fire pit, and resume when the ball is released. Subway trips SHALL NOT pause them.
+A song mode SHALL run for its round length: 60 s unless the mode sets a shorter round, or the whole song if the song file is shorter. Full-length song files SHALL NOT lengthen a round. When the round ends before the song, the song SHALL fade out over 2 s instead of stopping abruptly. The round timer and the mode's own counters (targets, drains, dials and delivery timers) SHALL NOT start until the subway kicker returns the ball to play after the pick; the song itself starts over the record crackle as before. If the kicker never reports the ball, they SHALL start after 15 s. The timer and the song SHALL pause while the ball is held in the saucer or the fire pit, and resume when the ball is released. Later subway trips SHALL NOT pause them.
 
 #### Scenario: The ball is held during a song
 - **WHEN** the ball is held for 1 s in the fire pit during a song

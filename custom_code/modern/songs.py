@@ -467,6 +467,7 @@ class ModernSongs(Mode):
     def mode_start(self, **kwargs):
         self.rule = None
         self.add_mode_event_handler("modern_song_started", self._song_started)
+        self.add_mode_event_handler("modern_song_clock_started", self._clock_started)
         self.add_mode_event_handler("modern_song_ended", self._song_ended)
         self.add_mode_event_handler("modern_location_hit", self._forward, method="on_location", arg="location")
         self.add_mode_event_handler("modern_crater_entered", self._crater)
@@ -498,15 +499,20 @@ class ModernSongs(Mode):
             self.paused_at = None
 
     def _song_started(self, slot, **kwargs):
+        """The music and the mode's introduction; the rule itself starts with the round clock."""
+        rule = SLOT_RULES[slot]
+        self.machine.events.post("modern_song_mode_started", slot=slot, title=rule.title, goal=rule.goal)
+        self.machine.events.post("modern_callout", pool="mc_song_start", queue=True)
+        self.machine.events.post("modern_callout", pool=f"mc_mode_{rule.key}", queue=True)
+        if rule.intro_pool:
+            self.machine.events.post("modern_callout", pool=rule.intro_pool, queue=True)
+
+    def _clock_started(self, slot, **kwargs):
+        """The ball is back in play: targets, timers and drains begin."""
         self.paused_total, self.paused_at = 0, None  # a hold left over from the previous song
         self.rule = SLOT_RULES[slot](self)
         self.rule.start()
         self.rule.lamps.set_ambient("song", self.rule.ambient, self.rule)
-        self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
-        self.machine.events.post("modern_callout", pool="mc_song_start", queue=True)
-        self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)
-        if self.rule.intro_pool:
-            self.machine.events.post("modern_callout", pool=self.rule.intro_pool, queue=True)
         self._tick()
 
     def _tick(self):
