@@ -589,7 +589,7 @@ class TestModernBallFeatures(ModernTestCase):
         spoken = []
         self.machine.events.add_handler("modern_voice", lambda pool=None, **kwargs: spoken.append(pool))
         self.start_modern()
-        self.assertEqual(spoken[0], "mc_game_start")
+        self.assertEqual(spoken.count("mc_game_start"), 1)
         self.assertNotIn("mc_ball_start", spoken)
         del spoken[:]
         self.drain_one_ball()

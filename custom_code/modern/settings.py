@@ -78,6 +78,7 @@ QUIP_GAP_MS = 20_000
 TARGET_REMINDER_MS = 12_000  # repeat the nickel target callout this often while hunting
 QUIP_CHANCE = 0.35
 QUIP_CHECK_MS = 5_000
+GAME_START_CALLOUT_MS = 1_000  # the welcome waits for the new game's HUD to be listening
 
 # Splash
 
