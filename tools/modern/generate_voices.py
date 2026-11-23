@@ -19,7 +19,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 def render(text, info, model, out, number):
     if "elevenlabs" in info and os.environ.get("ELEVENLABS_API_KEY"):
         voices = info["elevenlabs"] if isinstance(info["elevenlabs"], list) else [info["elevenlabs"]]
-        raw = tts.temp_wav().replace(".wav", ".mp3")
+        raw = tts.temp_wav(".mp3")
         tts.speak_elevenlabs(text, voices[(number - 1) % len(voices)], model, raw)
         tts.to_mp3(raw, out, "96k", ["-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "44100"])
         os.remove(raw)

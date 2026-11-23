@@ -66,7 +66,7 @@ def to_mp3(in_wav, out_mp3, bitrate="64k", extra=()):
                     "-codec:a", "libmp3lame", "-b:a", bitrate, out_mp3], check=True)
 
 
-def temp_wav():
-    handle, path = tempfile.mkstemp(suffix=".wav")
+def temp_wav(suffix=".wav"):
+    handle, path = tempfile.mkstemp(suffix=suffix)
     os.close(handle)
     return path
