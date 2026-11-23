@@ -30,6 +30,9 @@ class ModernJukebox(Mode):
         self.pending_song = None
         self.song_remaining_ms = 0
         self.song_started_at = None
+        self.awaiting_kickback = False  # the jukebox has the ball until the subway kicker returns it
+        self.clock_waiting = False  # a song is playing but its round clock waits for the ball
+        self.kick_armed = False  # the subway kicker is firing the held ball back to the player
         self.pauses = set()
         self.blockers = set()
         self.add_mode_event_handler("modern_tap", self._tap)
@@ -39,6 +42,8 @@ class ModernJukebox(Mode):
         self.add_mode_event_handler("modern_ball_released", self._resume)
         self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ball_eject_success",
                                     self._start_pending)
+        self.add_mode_event_handler("balldevice_bd_classic_subway_kicker_ejecting_ball", self._kicking)
+        self.add_mode_event_handler("s_subway_kicker_0_inactive", self._kicked)
         for name in ("player_modern_ovation", "player_modern_songs_completed_ball"):
             self.add_mode_event_handler(name, self._show_ovation)
         self._show()
@@ -130,6 +135,7 @@ class ModernJukebox(Mode):
 
     def _ball_held(self, **kwargs):
         self.ball_waiting = True
+        self.awaiting_kickback = True
 
     def _start_chosen(self):
         if not self.chosen:
@@ -147,8 +153,21 @@ class ModernJukebox(Mode):
         self.machine.events.post("modern_jukebox_hold_disable")
         self.machine.events.post("modern_release_jukebox")
 
+    def _kicking(self, **kwargs):
+        self.kick_armed = self.awaiting_kickback
+
+    def _kicked(self, **kwargs):
+        """The held ball has left the subway kicker: its first playfield hit already counts for the mode."""
+        if self.kick_armed:
+            self.kick_armed = self.awaiting_kickback = False
+            if self.clock_waiting:
+                self._start_clock()
+
     def _start_pending(self, **kwargs):
-        """Start the chosen song once the subway kicker has returned the ball to play."""
+        """Start the chosen song, or its round clock, once the subway kicker has returned the ball to play."""
+        self.awaiting_kickback = self.kick_armed = False
+        if self.clock_waiting:
+            self._start_clock()
         if self.pending_song:
             self.delay.remove("transfer")
             song, self.pending_song = self.pending_song, None
@@ -158,11 +177,14 @@ class ModernJukebox(Mode):
     def _count_song(self, step=1):
         """Song progression and multiplier; counted as the ball is released so new scores use it."""
         player = self.player
+        before = player.modern_song_multiplier
         player.modern_songs_played += step
         player.modern_round_songs += step
         player.modern_bonus_songs += step
         player.modern_song_multiplier = min(settings.MAX_SONG_MULTIPLIER,
                                             1 + player.modern_songs_played // settings.MULTIPLIER_EVERY)
+        if player.modern_song_multiplier > before:
+            self.machine.events.post("modern_callout", pool="mc_multiplier", queue=True)
         self._show()
 
     def _refund(self, song, counted):
@@ -187,6 +209,20 @@ class ModernJukebox(Mode):
         self._show()
         self.machine.events.post("modern_song_started", slot=song.slot, artist=song.artist, title=song.title,
                                  path=song.res_path, length_ms=length)
+        if self.awaiting_kickback:
+            self.clock_waiting = True  # the music plays; the round and the mode wait for the ball
+            self.delay.reset(ms=settings.KICKBACK_TIMEOUT_MS, name="kickback", callback=self._start_clock)
+        else:
+            self._start_clock()
+
+    def _start_clock(self):
+        """The round clock and the mode's own counters start together, once the ball is back in play."""
+        self.clock_waiting = False
+        self.delay.remove("kickback")
+        if not self.song:
+            return
+        self.machine.events.post("modern_song_clock_started", slot=self.song.slot,
+                                 length_ms=int(self.song_remaining_ms))
         self._run_song_timer()
 
     def _run_song_timer(self):
@@ -194,6 +230,8 @@ class ModernJukebox(Mode):
         self.delay.reset(ms=self.song_remaining_ms, name="song", callback=self.end_song)
 
     def _pause(self, hole=None, **kwargs):
+        if self.clock_waiting:
+            return
         if self.song and hole and not self.pauses:
             self.delay.remove("song")
             elapsed = (self.machine.clock.get_time() - self.song_started_at) * 1000
@@ -213,7 +251,7 @@ class ModernJukebox(Mode):
     def song_remaining(self):
         if not self.song:
             return 0
-        if self.pauses:
+        if self.pauses or self.clock_waiting:
             return int(self.song_remaining_ms)
         elapsed = (self.machine.clock.get_time() - self.song_started_at) * 1000
         return int(max(0, self.song_remaining_ms - elapsed))
@@ -223,6 +261,8 @@ class ModernJukebox(Mode):
             return
         song, self.song = self.song, None
         self.delay.remove("song")
+        self.clock_waiting = False
+        self.delay.remove("kickback")
         self.player.modern_song_active = 0
         self.machine.events.post("modern_song_ended", slot=song.slot, reason=reason)
         if reason not in ("drain", "tilt") and self.player.modern_songs_played in settings.EXTRA_BALL_SONGS:

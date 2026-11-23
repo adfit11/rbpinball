@@ -48,6 +48,8 @@ class ModernCallouts(Mode):
         self.last = {}
         self.last_spoken = self.machine.clock.get_time()
         self.add_mode_event_handler("modern_callout", self._callout)
+        self.add_mode_event_handler("tilt_warning", self._callout, pool="mc_tilt_warning")
+        self.add_mode_event_handler("tilt", self._callout, pool="mc_tilt")
         self.delay.reset(ms=settings.QUIP_CHECK_MS, name="quip", callback=self._quip)
 
     def _callout(self, pool=None, queue=False, allow=None, fallback=None, **kwargs):

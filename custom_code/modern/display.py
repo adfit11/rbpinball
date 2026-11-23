@@ -18,8 +18,12 @@ class ModernDisplay(Mode):
 
     def _ball_starting(self, queue=None, **kwargs):
         if self.splash_shown or queue is None:
+            self.machine.events.post("modern_callout", pool="mc_ball_start")
             return
         self.splash_shown = True
+        # The HUD slide is created as the game starts and subscribes to voice lines over BCP a moment later.
+        self.delay.add(ms=settings.GAME_START_CALLOUT_MS, name="welcome",
+                       callback=self.machine.events.post, event="modern_callout", pool="mc_game_start")
         queue.wait()
         self.splash_queue = queue
         self.machine.events.post("modern_splash_show")

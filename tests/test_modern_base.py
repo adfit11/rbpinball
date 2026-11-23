@@ -288,6 +288,8 @@ class TestModernJukebox(ModernTestCase):
         jukebox = self.machine.modes["modern_jukebox"]
         song = jukebox.slots[0][1][0]
         self.mock_event("modern_light_special")
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         for count in range(1, 11):
             jukebox._start_song(song)
             if count == 3:
@@ -299,6 +301,7 @@ class TestModernJukebox(ModernTestCase):
                 self.assertEqual(self.player.modern_extra_ball_lit, 1)
         self.advance_time_and_run(.1)
         self.assertEqual(self.player.modern_song_multiplier, 3)
+        self.assertEqual(pools.count("mc_multiplier"), 2)  # 2x at five songs, 3x at ten
         self.assertEventCalled("modern_light_special")
         self.assertEqual(self.player.modern_special_state, 1)
         self.mock_event("modern_special_awarded")
@@ -328,7 +331,7 @@ class TestModernBallFeatures(ModernTestCase):
         pools = []
         self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.hit_switch_and_run(switch, .1)
-        self.assertIn("mc_ball_saver_lit", pools)
+        self.assertLess(pools.index("mc_drop_the_needle"), pools.index("mc_ball_saver_lit"))
         self.assertEventCalled("modern_drop_the_needle")
         self.assertEqual(self.player.score - start, settings.SCORE_DROP + settings.SCORE_DROP_THE_NEEDLE)
         self.assertEqual(self.player.modern_ovation, 1)
@@ -346,9 +349,12 @@ class TestModernBallFeatures(ModernTestCase):
         self.player.modern_songs_completed_ball = 1
         self.player.modern_bonus_bumpers = 10
         self.mock_event("modern_bonus_total")
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.drain_one_ball()
         self.advance_time_and_run(8)
         self.assertEventCalled("modern_bonus_total")
+        self.assertIn("mc_bonus", pools)
         kwargs = self._last_event_kwargs["modern_bonus_total"]
         self.assertEqual(kwargs["ovation"], 2)
         self.assertEqual(kwargs["points"], kwargs["subtotal"] * 2)
@@ -379,7 +385,10 @@ class TestModernBallFeatures(ModernTestCase):
         self.start_modern()
         self.post_event("modern_light_extra_ball", .1)
         self.assertEqual(self.player.modern_extra_ball_lit, 1)
+        pools = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: pools.append(pool))
         self.hit_location("kitchen")
+        self.assertLess(pools.index("mc_extra_ball"), pools.index("cook_extra_ball"))
         self.assertEqual(self.player.extra_balls, 1)
         self.assertEqual(self.player.modern_extra_balls_earned, 1)
         self.advance_time_and_run(.1)
@@ -565,12 +574,28 @@ class TestModernBallFeatures(ModernTestCase):
     def test_one_warning_tilt_in_modern(self):
         self.start_modern()
         self.mock_event("tilt")
+        spoken = []
+        self.machine.events.add_handler("modern_voice", lambda pool=None, **kwargs: spoken.append(pool))
         self.hit_and_release_switch("s_tilt_46")
         self.advance_time_and_run(2)
         self.assertEventNotCalled("tilt")
+        self.assertIn("mc_tilt_warning", spoken)
         self.hit_and_release_switch("s_tilt_46")
         self.advance_time_and_run(.5)
         self.assertEventCalled("tilt")
+        self.assertIn("mc_tilt", spoken)
+
+    def test_game_and_ball_start_callouts(self):
+        spoken = []
+        self.machine.events.add_handler("modern_voice", lambda pool=None, **kwargs: spoken.append(pool))
+        self.start_modern()
+        self.assertEqual(spoken.count("mc_game_start"), 1)
+        self.assertNotIn("mc_ball_start", spoken)
+        del spoken[:]
+        self.drain_one_ball()
+        self.advance_time_and_run(10)
+        self.assertIn("mc_ball_start", spoken)
+        self.assertNotIn("mc_game_start", spoken)
 
     def test_callouts_never_repeat_last_line(self):
         self.start_modern()

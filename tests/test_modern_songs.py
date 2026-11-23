@@ -14,6 +14,53 @@ class TestModernSongs(ModernTestCase):
         self.advance_time_and_run(.2)
         return self.machine.modes["modern_songs"].rule
 
+    def test_round_and_mode_counters_wait_for_the_kickback(self):
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        self.mock_event("modern_hurry_up_started")
+        jukebox.awaiting_kickback = True  # the jukebox is holding the ball in the subway
+        jukebox._start_song(jukebox.slots[0][1][0])
+        self.advance_time_and_run(5)
+        self.assertIsNotNone(jukebox.song)
+        self.assertIsNone(songs.rule)
+        self.assertEventNotCalled("modern_hurry_up_started")
+        self.assertEqual(jukebox.song_remaining(), jukebox.song_remaining_ms)
+        jukebox._start_pending()  # balldevice_bd_classic_subway_kicker_ball_eject_success
+        self.advance_time_and_run(1)
+        self.assertIsNotNone(songs.rule)
+        self.assertEventCalled("modern_hurry_up_started")
+        self.assertLess(jukebox.song_remaining(), jukebox.song_remaining_ms)
+
+    def test_the_first_bumper_after_the_kickback_counts_for_dance_floor(self):
+        from custom_code.modern.guide import current_task
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        jukebox.awaiting_kickback = True
+        jukebox._start_song(jukebox.slots[8][1][0])
+        self.advance_time_and_run(.5)
+        self.assertEqual(current_task(self.machine)[0], "SONG MODE: DANCE FLOOR")
+        jukebox._kicking()  # balldevice_bd_classic_subway_kicker_ejecting_ball
+        self.advance_time_and_run(.1)
+        self.assertIsNone(songs.rule)
+        self.hit_switch_and_run("s_subway_kicker_0", .1)
+        self.release_switch_and_run("s_subway_kicker_0", .1)  # the ball leaves the kicker
+        self.hit_and_release_switch("s_top_bumpers_35")  # and confirms the eject on a bumper
+        self.advance_time_and_run(.1)
+        self.assertEqual(songs.rule.hits, 1)
+        self.assertEqual(current_task(self.machine)[0], "SONG MODE: DANCE FLOOR")
+
+    def test_round_clock_starts_anyway_if_the_kicker_never_reports(self):
+        self.start_modern()
+        self.player.modern_nickel = 1
+        jukebox, songs = self.machine.modes["modern_jukebox"], self.machine.modes["modern_songs"]
+        jukebox.awaiting_kickback = True
+        jukebox._start_song(jukebox.slots[1][1][0])
+        self.advance_time_and_run(S.KICKBACK_TIMEOUT_MS / 1000 + .5)
+        self.assertIsNotNone(songs.rule)
+        self.assertFalse(jukebox.clock_waiting)
+
     def test_songs_are_not_introduced_but_mode_instructions_play(self):
         voices = []
         self.machine.events.add_handler("modern_voice", lambda **kwargs: voices.append(kwargs))
@@ -239,12 +286,16 @@ class TestModernSongs(ModernTestCase):
         self.start_modern()
         pools = self.machine.modes["modern_callouts"].pools
         jukebox = self.machine.modes["modern_jukebox"]
-        self.mock_event("modern_callout")
+        posted = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: posted.append(pool))
         for slot, rule in SLOT_RULES.items():
             self.assertIn(f"mc_mode_{rule.key}", pools)
+            del posted[:]
             jukebox._start_song(jukebox.slots[slot - 1][1][0])
             self.advance_time_and_run(.2)
-            self.assertEqual(self._last_event_kwargs["modern_callout"]["pool"], f"mc_mode_{rule.key}")
+            intro = ["mc_song_start", f"mc_mode_{rule.key}"] + ([rule.intro_pool] if rule.intro_pool else [])
+            self.assertEqual([p for p in posted if p in intro], intro)
+            self.assertTrue(all(p in pools for p in intro))
             jukebox.end_song()
             self.advance_time_and_run(.1)
 

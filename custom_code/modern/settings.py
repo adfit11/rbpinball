@@ -33,6 +33,7 @@ TAP_SWITCH = "s_green_button_right_56"
 SELECT_HOLD_MS = 2000
 SONG_READ_MS = 8000  # the jukebox holds the ball (and the record crackles) while the instructions are read
 SONG_START_MS = 4000  # the artist's song starts this long after the pick, over the crackle
+KICKBACK_TIMEOUT_MS = 15_000  # a round clock waiting for the subway kicker starts anyway after this
 SELECT_PROGRESS_MS = 100
 
 # Lamps
@@ -78,6 +79,7 @@ QUIP_GAP_MS = 20_000
 TARGET_REMINDER_MS = 12_000  # repeat the nickel target callout this often while hunting
 QUIP_CHANCE = 0.35
 QUIP_CHECK_MS = 5_000
+GAME_START_CALLOUT_MS = 1_000  # the welcome waits for the new game's HUD to be listening
 
 # Splash
 

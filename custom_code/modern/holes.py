@@ -53,6 +53,7 @@ class ModernHoles(Mode):
             self.player.modern_extra_balls_earned += 1
             self.machine.events.post("modern_award_extra_ball")
             self.machine.events.post("modern_callout", pool="mc_extra_ball")
+            self.machine.events.post("modern_callout", pool="cook_extra_ball", queue=True)
             spoke = True
         if hole == "bar" and self.player.modern_special_state == 1 and not song:
             self.player.modern_special_state = 2

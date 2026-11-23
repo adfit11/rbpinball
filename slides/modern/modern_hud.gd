@@ -68,6 +68,7 @@ var artist_pick_song: AudioStream  # loops while the jukebox artist selector is 
 var between_balls := false  # a drained ball plays its own song until the next ball starts
 var song_length_ms := 0.0
 var song_elapsed_ms := 0.0
+var song_clock_live := false  # the round clock starts when the subway kicks the ball back
 var song_paused := false
 var selector_deadline := 0.0
 var overlay_queue: Array = []
@@ -106,7 +107,7 @@ const EVENTS := [
 	"modern_bonus_line", "modern_bonus_total", "modern_bonus_void", "tilt_warning", "tilt",
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
-	"modern_hurry_up_started", "modern_hurry_up_ended", "modern_hit_me_dial",
+	"modern_hurry_up_started", "modern_hurry_up_ended", "modern_hit_me_dial", "modern_song_clock_started",
 ]
 
 
@@ -473,7 +474,7 @@ func _process(delta: float) -> void:
 	_hurry_process(delta)
 	_dial_process(delta)
 	if song_live and song_length_ms > 0:
-		if not song_paused:
+		if not song_paused and song_clock_live:
 			song_elapsed_ms += delta * 1000.0
 		card_bar.value = 100.0 * (1.0 - min(1.0, song_elapsed_ms / song_length_ms))
 		var left := int(ceil(max(0.0, song_length_ms - song_elapsed_ms) / 1000.0))
@@ -1072,11 +1073,17 @@ func _on_event(payload: Dictionary = {}) -> void:
 			song_length_ms = float(payload.get("length_ms", 60000))
 			song_elapsed_ms = 0.0
 			song_paused = false
+			song_clock_live = false
 			song_live = true
 			show_overlay("NOW PLAYING", "%s — %s" % [payload.get("title", ""), song_artist], 1800, TEAL)
 			_play_song(str(payload.get("path", "")))
 			_play_artist_video(str(payload.get("path", "")))
+		"modern_song_clock_started":
+			song_length_ms = float(payload.get("length_ms", song_length_ms))
+			song_elapsed_ms = 0.0
+			song_clock_live = true
 		"modern_song_ended":
+			song_clock_live = false
 			_stop_artist_video()
 			dial_root.visible = false
 			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
