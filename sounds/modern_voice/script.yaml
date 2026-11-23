@@ -1,8 +1,12 @@
 # Modern voice script. Each line renders to sounds/modern_voice/<character>/<character>_<pool>_<nn>.mp3.
 # Replace any generated file with a recording of the same name. Never imitate real performers.
+# Characters with `elevenlabs` voice IDs render through ElevenLabs (voices designed from the prompts in
+# tools/modern/elevenlabs_voice_prompts.md); `voice` is the Piper fallback.
+elevenlabs_model: eleven_v4
 characters:
   bartender:
     name: Velma, the bartender
+    elevenlabs: {voice_id: jj0MvrsyDpDaiSorLbOJ}
     voice: {model: en_US-hfc_female-medium, length_scale: 1.1}
     pools:
       direction: ["Come on up to the bar, sugar.", "Bar's open, honey. Step on up.", "Belly up to the bar, baby."]
@@ -12,6 +16,7 @@ characters:
       held: ["Sit a spell, sugar. What are you drinking?", "Pull up a stool, honey.", "Another round for my friend here!"]
   cook:
     name: Earl, the cook
+    elevenlabs: {voice_id: x656q2sOK8JNNYaoV9Gr}
     voice: {model: en_US-hfc_male-medium, length_scale: 1.15}
     pools:
       direction: ["Kitchen's hot! Come on back!", "Get on back here to the kitchen!", "Smell that? Kitchen's calling."]
@@ -26,6 +31,7 @@ characters:
       held: ["Mind the grease, now!", "Fresh off the skillet!", "Something good cooking back here!"]
   bandleader:
     name: Cornelius, the bandleader
+    elevenlabs: {voice_id: kWN4dhCPXvjPxe69Skt7}
     voice: {model: en_US-joe-medium, length_scale: 1.1}
     pools:
       direction: ["Swing by the bandstand, cat!", "Bandstand, daddy-o! Give it a spin!", "Come dig the band, Jack!"]
@@ -33,6 +39,7 @@ characters:
       nickel: ["Here's a nickel, hepcat. Make it swing.", "Nickel from the hat. Go spin something hot.", "Dig it, a nickel. Go feed that jukebox."]
   coat_check:
     name: Hattie, the coat check girl
+    elevenlabs: {voice_id: ndOnGsX7X00XHtwpkAtY}
     voice: {model: en_US-kristin-medium, length_scale: 1.1}
     pools:
       direction: ["Check your coat, darling!", "Coat check, honey! Over here!", "Don't forget your hat, sweetie!"]
@@ -40,12 +47,14 @@ characters:
       nickel: ["Found a nickel in your pocket, darling.", "Here's a nickel, sweetie. Go dance.", "A nickel for your trouble, honey."]
   doorman:
     name: Big Otis, the doorman
+    elevenlabs: {voice_id: rgJliBY7mpixQWV3r0xY}
     voice: {model: en_US-ryan-high, length_scale: 1.15}
     pools:
       gate_crasher: ["Hey! Those weren't your guests! Gate crasher!", "Sneaking in the back? Gate crasher!"]
       ball_saved: ["I got you, friend! Back in you go!", "Not tonight! Back on the floor!"]
   hostess:
     name: Lena, the hostess
+    elevenlabs: {voice_id: 3AXWxwilkcYcpKzvHm7z}
     voice: {model: en_US-amy-medium, length_scale: 1.1}
     pools:
       direction: ["Right this way to the booths, darling.", "Your booth is ready, sugar!", "Table for one? Over here, honey."]
@@ -54,6 +63,7 @@ characters:
       booths_full: ["Every booth is full! On your feet, everybody!", "Standing room only! Give 'em a hand!", "We're packed to the rafters, darling!"]
   mc:
     name: Smooth Sam, the MC
+    elevenlabs: {voice_id: TTwUbm4TN6UnBN3HUYtX}
     voice: {model: en_US-john-medium, length_scale: 1.05}
     pools:
       game_start: ["Welcome to the juke joint! Earn a nickel, play the jukebox, and dance all night!", "Ladies and gentlemen, the joint is jumping! Find yourself a nickel!"]
@@ -99,6 +109,8 @@ characters:
       super_jackpot: ["Super jackpot! The rent is paid!", "Super jackpot! Landlord's smiling now!"]
   regulars:
     name: The regulars
+    # Lines alternate between the two regulars: odd lines the man, even lines the woman.
+    elevenlabs: [{voice_id: Czu1MeIJuRkG5e0Mydqc}, {voice_id: xydDRQybphHQ9UonhYuu}]
     voice: {model: en_US-libritts_r-medium, speaker: 20, length_scale: 1.1}
     pools:
       quips: ["Man, this joint is jumping tonight!", "Somebody play something with a beat!", "Ooh, I love this song!", "You gonna dance or just stand there?", "This place is hotter than July!", "Mind your manners, now.", "Somebody get that cat a drink!", "I'm gonna dance till my shoes fall off!"]
