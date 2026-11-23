@@ -5,6 +5,7 @@ Existing files are kept unless --force is given, so recorded replacements surviv
 Characters with an `elevenlabs` voice render through ElevenLabs when ELEVENLABS_API_KEY is set; others use Piper.
 """
 
+import argparse
 import os
 import sys
 
@@ -50,6 +51,8 @@ def main(force=False, only=None):
 
 
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    chosen = args[args.index("--only") + 1].split(",") if "--only" in args else None
-    main("--force" in args, chosen)
+    parser = argparse.ArgumentParser(description="Render the Modern voice script.")
+    parser.add_argument("--force", action="store_true", help="re-render files that already exist")
+    parser.add_argument("--only", help="comma-separated characters to render, e.g. mc,cook")
+    args = parser.parse_args()
+    main(args.force, args.only.split(",") if args.only else None)
