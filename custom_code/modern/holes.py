@@ -10,6 +10,7 @@ from custom_code.modern.scoring import award
 
 HOLES = {"bar": "ball_hold_modern_saucer_held_ball", "kitchen": "ball_hold_modern_firepit_held_ball"}
 DEVICES = ("bd_classic_saucer", "bd_classic_firepit")
+BALL_HOLDS = {"bar": ("modern_saucer", "bd_classic_saucer"), "kitchen": ("modern_firepit", "bd_classic_firepit")}
 
 
 def plain_virtual(machine):
@@ -25,6 +26,8 @@ class ModernHoles(Mode):
             self.add_mode_event_handler(event, self._captured, hole=hole)
         for device in DEVICES:
             self.add_mode_event_handler(f"balldevice_{device}_ejecting_ball", self._ejecting, device=device)
+        for hole, (_, device) in BALL_HOLDS.items():
+            self.add_mode_event_handler(f"balldevice_{device}_ball_eject_success", self._resync, hole=hole)
         self.add_mode_event_handler("modern_light_extra_ball", self._light_extra_ball)
         self.add_mode_event_handler("modern_light_special", self._light_special)
         self._show()
@@ -77,6 +80,18 @@ class ModernHoles(Mode):
     def _release(self, hole):
         self.machine.events.post("modern_ball_released", hole=hole)
         self.machine.events.post(f"modern_release_{hole}")
+        self._resync(hole)
+
+    def _resync(self, hole, **kwargs):
+        """A hole that kicked its ball out on a stale eject would otherwise stay "full" and ignore every later ball."""
+        hold_name, device_name = BALL_HOLDS[hole]
+        hold, device = self.machine.ball_holds[hold_name], self.machine.ball_devices[device_name]
+        if hold.balls_held > device.balls:
+            self.info_log("%s holds %s balls but %s has %s; resyncing", hold_name, hold.balls_held,
+                          device_name, device.balls)
+            hold.balls_held = device.balls
+            if not device.balls:
+                hold.hold_queue.clear()
 
     def _light_extra_ball(self, **kwargs):
         player = self.player

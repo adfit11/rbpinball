@@ -186,3 +186,20 @@ class TestKitchenReturns(ModernTestCase):
         self.hit_and_release_switch("s_10_points_15")
         self.advance_time_and_run(.1)
         self.assertTrue(self.player.modern_nickel_target)
+
+
+class TestHoleResync(ModernTestCase):
+
+    def test_a_kitchen_ball_kicked_out_on_a_stale_eject_does_not_jam_the_hold(self):
+        self.start_modern()
+        device, hold = self.machine.ball_devices["bd_classic_firepit"], self.machine.ball_holds["modern_firepit"]
+        self.machine.default_platform.add_ball_to_device(device)
+        self.advance_time_and_run(1.2)
+        self.assertEqual(hold.balls_held, 1)
+        device.eject(balls=1)  # an eject the hold didn't ask for, as on the cabinet
+        self.advance_time_and_run(S.HOLE_HOLD_MS / 1000 + 5)
+        self.assertEqual(device.balls, 0)
+        self.assertEqual(hold.balls_held, 0)
+        self.mock_event("modern_hole_held")
+        self.hit_location("kitchen")
+        self.assertEventCalled("modern_hole_held")
