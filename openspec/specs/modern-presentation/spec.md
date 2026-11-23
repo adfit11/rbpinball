@@ -13,7 +13,7 @@ Modern SHALL play voice callouts on a voice channel that is mixed over the music
 - **THEN** the music is lowered, the callout is heard clearly, and the music returns to its level when the callout ends
 
 ### Requirement: Trigger callouts at game events
-Modern SHALL play a callout from a matching pool at key game events, such as game start, ball start, a nickel earned, the jukebox opening, a song starting, completing or failing, a lock, Rent Party, a jackpot, Gate Crasher, Drop the Needle, an extra ball, the special, a tilt warning, and the ball's bonus. Within a pool, lines SHALL be chosen at random, without repeating the last line played.
+Modern SHALL play a callout from a matching pool at key game events, such as game start, ball start, a nickel earned, the jukebox opening, a song starting, completing or failing, a lock, Rent Party, a jackpot, Gate Crasher, Drop the Needle, an extra ball, the special, the song multiplier rising, a tilt warning, a tilt, and the ball's bonus. Every pool in the voice script SHALL have an event that plays it. Within a pool, lines SHALL be chosen at random, without repeating the last line played.
 
 #### Scenario: A nickel is earned
 - **WHEN** the player earns a nickel

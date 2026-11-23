@@ -46,6 +46,7 @@ class ModernBonus(Mode):
         points = self.total * times
         self.player.score += points
         self.machine.events.post("modern_bonus_total", subtotal=self.total, ovation=times, points=points)
+        self.machine.events.post("modern_callout", pool="mc_bonus")
         self.delay.add(ms=STEP_MS * 3, callback=self.stop)
 
     def mode_stop(self, **kwargs):

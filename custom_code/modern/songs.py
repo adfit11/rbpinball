@@ -23,6 +23,7 @@ class SongRule:
     ends_on_complete = False
     round_ms = S.ROUND_MS  # the song fades out here if it is longer
     ambient = "guide"  # the background lamp pattern while this rule runs (custom_code/modern/ambient.py)
+    intro_pool = None  # a character's line after the MC introduces the mode
 
     def __init__(self, songs):
         self.songs, self.machine, self.mode = songs, songs.machine, songs
@@ -288,6 +289,7 @@ class PartyTime(SongRule):
 class OrderUp(SongRule):
     key = "order_up"
     title, goal, ends_on_complete = "ORDER UP", "Pick up at the Kitchen, deliver before it gets cold", True
+    intro_pool = "cook_order_up"
 
     def start(self):
         self.destination, self.started = None, 0
@@ -501,7 +503,10 @@ class ModernSongs(Mode):
         self.rule.start()
         self.rule.lamps.set_ambient("song", self.rule.ambient, self.rule)
         self.machine.events.post("modern_song_mode_started", slot=slot, title=self.rule.title, goal=self.rule.goal)
+        self.machine.events.post("modern_callout", pool="mc_song_start", queue=True)
         self.machine.events.post("modern_callout", pool=f"mc_mode_{self.rule.key}", queue=True)
+        if self.rule.intro_pool:
+            self.machine.events.post("modern_callout", pool=self.rule.intro_pool, queue=True)
         self._tick()
 
     def _tick(self):

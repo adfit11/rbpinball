@@ -158,11 +158,14 @@ class ModernJukebox(Mode):
     def _count_song(self, step=1):
         """Song progression and multiplier; counted as the ball is released so new scores use it."""
         player = self.player
+        before = player.modern_song_multiplier
         player.modern_songs_played += step
         player.modern_round_songs += step
         player.modern_bonus_songs += step
         player.modern_song_multiplier = min(settings.MAX_SONG_MULTIPLIER,
                                             1 + player.modern_songs_played // settings.MULTIPLIER_EVERY)
+        if player.modern_song_multiplier > before:
+            self.machine.events.post("modern_callout", pool="mc_multiplier", queue=True)
         self._show()
 
     def _refund(self, song, counted):

@@ -239,12 +239,16 @@ class TestModernSongs(ModernTestCase):
         self.start_modern()
         pools = self.machine.modes["modern_callouts"].pools
         jukebox = self.machine.modes["modern_jukebox"]
-        self.mock_event("modern_callout")
+        posted = []
+        self.machine.events.add_handler("modern_callout", lambda pool=None, **kwargs: posted.append(pool))
         for slot, rule in SLOT_RULES.items():
             self.assertIn(f"mc_mode_{rule.key}", pools)
+            del posted[:]
             jukebox._start_song(jukebox.slots[slot - 1][1][0])
             self.advance_time_and_run(.2)
-            self.assertEqual(self._last_event_kwargs["modern_callout"]["pool"], f"mc_mode_{rule.key}")
+            intro = ["mc_song_start", f"mc_mode_{rule.key}"] + ([rule.intro_pool] if rule.intro_pool else [])
+            self.assertEqual([p for p in posted if p in intro], intro)
+            self.assertTrue(all(p in pools for p in intro))
             jukebox.end_song()
             self.advance_time_and_run(.1)
 

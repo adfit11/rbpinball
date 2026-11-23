@@ -93,7 +93,7 @@ class ModernTargets(Mode):
                 self._schedule("drops", SCAN_MS, self._advance_drops)
                 self._show_lamps()
             self.machine.events.post("modern_skill_shot_ready")
-            self.machine.events.post("modern_callout", pool="mc_skill_shot")
+            self.machine.events.post("modern_callout", pool="mc_skill_shot", queue=True)
 
     def _playfield_hit(self, **kwargs):
         self.skill_window = False
@@ -135,6 +135,7 @@ class ModernTargets(Mode):
             award(self.machine, settings.SCORE_DROP_THE_NEEDLE, "drop_the_needle")
             self.player.modern_ovation = min(settings.MAX_OVATION - 1, self.player.modern_ovation + 1)
             self.machine.events.post("modern_drop_the_needle")
+            self.machine.events.post("modern_callout", pool="mc_drop_the_needle")
             self.machine.events.post("modern_ball_saver_qualified")
         self.skill_window = False
         self._playfield_hit()

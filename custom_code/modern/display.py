@@ -18,8 +18,10 @@ class ModernDisplay(Mode):
 
     def _ball_starting(self, queue=None, **kwargs):
         if self.splash_shown or queue is None:
+            self.machine.events.post("modern_callout", pool="mc_ball_start")
             return
         self.splash_shown = True
+        self.machine.events.post("modern_callout", pool="mc_game_start")
         queue.wait()
         self.splash_queue = queue
         self.machine.events.post("modern_splash_show")
