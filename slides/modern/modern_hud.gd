@@ -96,6 +96,9 @@ var dial_label: Label
 const HURRY_GREEN := Color("#5ad65a")
 const HURRY_RED := Color("#ff3b30")
 const HURRY_PANIC_MS := 5000.0
+const SongStage := preload("res://slides/modern/song_stage.gd")
+var stage: SongStage  # the artist-mode screen: handbill frame, device, instructions and the video window
+var pending_video := ""  # the song's video waits until the stage's instructions are read
 
 const EVENTS := [
 	"modern_splash_show", "modern_splash_hide", "modern_nickel_directed", "modern_nickel_refused",
@@ -108,6 +111,7 @@ const EVENTS := [
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 	"modern_hurry_up_started", "modern_hurry_up_ended", "modern_hit_me_dial", "modern_song_clock_started",
+	"modern_song_intro",
 ]
 
 
@@ -331,6 +335,9 @@ func _build() -> void:
 	dial_root.add_child(dial)
 	dial_root.visible = false
 
+	stage = SongStage.new()
+	add_child(stage)
+
 	overlay_root = Control.new()
 	_place(overlay_root, 0, 0, 1280, 720)
 	_build_selector()
@@ -403,6 +410,19 @@ func _render() -> void:
 	lock_chip.visible = not rent_live and bonus_text == ""
 	lock_chip.modulate = Color(1, 1, 1, 0.35) if song_live else Color.WHITE  # locks don't advance during a song
 	_render_card(active)
+	var staged := stage.visible
+	for node in [score_label, sub_line, card]:
+		node.visible = not staged
+	lock_chip.visible = lock_chip.visible and not staged
+	if staged:
+		var scores := []
+		for pl in MPF.game.players:
+			scores.append(int(pl.get("score", 0)))
+		var ovation := mini(5, 1 + int(active.get("modern_ovation", 0)) + int(active.get("modern_songs_completed_ball", 0)))
+		stage.set_players(scores, number, int(active.get("ball", 1)), [
+			["OVATION", "×%d" % ovation],
+			["LOCKS", "%d OF 3" % int(active.get("modern_locked_balls", 0))],
+			["NICKEL", "READY" if int(active.get("modern_nickel", 0)) > 0 else "NONE"]])
 
 
 func _accent(text: String) -> String:
@@ -473,6 +493,15 @@ func _process(delta: float) -> void:
 	_spin_process(delta)
 	_hurry_process(delta)
 	_dial_process(delta)
+	if stage.visible:
+		stage.tick(delta)
+		stage.caption.text = caption.text
+		hurry_root.visible = false
+		stage.device.visible = not dial_root.visible
+		if stage.slot == 1 and hurry_secs.text != "":
+			stage.set_hurry(hurry_secs.text, hurry_value.text)
+		if song_length_ms > 0:
+			stage.set_clock(int(ceil(max(0.0, song_length_ms - song_elapsed_ms) / 1000.0)))
 	if song_live and song_length_ms > 0:
 		if not song_paused and song_clock_live:
 			song_elapsed_ms += delta * 1000.0
@@ -930,8 +959,52 @@ func _new_artist_video(below: Control) -> void:
 	artist_video.volume_db = -80.0
 	artist_video.modulate = Color(0.55, 0.55, 0.55)
 	artist_video.visible = false
-	_place(artist_video, 0, 0, 1280, 720)
-	move_child(artist_video, below.get_index() + 1)
+	var parent := below.get_parent()
+	parent.add_child(artist_video)
+	parent.move_child(artist_video, below.get_index() + 1)
+	_fit_video()
+
+
+func _fit_video() -> void:
+	var staged := stage != null and artist_video.get_parent() == stage.video_slot
+	artist_video.position = Vector2.ZERO
+	artist_video.size = stage.video_slot.size if staged else Vector2(1280, 720)
+	artist_video.modulate = Color.WHITE if staged else Color(0.55, 0.55, 0.55)
+
+
+func _stage_video(on: bool) -> void:
+	## The artist video plays in the stage's window while the stage shows, and full screen otherwise.
+	var parent: Node = stage.video_slot if on else self
+	if artist_video.get_parent() != parent:
+		artist_video.reparent(parent, false)
+		if not on:
+			move_child(artist_video, score_label.get_index())
+	_fit_video()
+
+
+func _open_stage(payload: Dictionary) -> void:
+	stage.open(payload)
+	_stage_video(true)
+	for root in [dial_root, spin_root]:
+		move_child(root, stage.get_index() + 1)
+	dial_root.position = Vector2(34, 200)
+	spin_root.position = Vector2(44, 215)
+
+
+func _end_stage_intro() -> void:
+	if stage.end_intro() and pending_video != "":
+		_play_artist_video(pending_video)
+	pending_video = ""
+
+
+func _close_stage() -> void:
+	if not stage.visible:
+		return
+	stage.close()
+	pending_video = ""
+	_stage_video(false)
+	dial_root.position = Vector2(30, 170)
+	spin_root.position = Vector2(30, 120)
 
 
 func _play_artist_video(song_path: String) -> void:
@@ -1075,16 +1148,24 @@ func _on_event(payload: Dictionary = {}) -> void:
 			song_paused = false
 			song_clock_live = false
 			song_live = true
-			show_overlay("NOW PLAYING", "%s — %s" % [payload.get("title", ""), song_artist], 1800, TEAL)
 			_play_song(str(payload.get("path", "")))
-			_play_artist_video(str(payload.get("path", "")))
+			if stage.visible and stage.intro.visible:
+				pending_video = str(payload.get("path", ""))
+			else:
+				if not stage.visible:
+					show_overlay("NOW PLAYING", "%s — %s" % [payload.get("title", ""), song_artist], 1800, TEAL)
+				_play_artist_video(str(payload.get("path", "")))
 		"modern_song_clock_started":
 			song_length_ms = float(payload.get("length_ms", song_length_ms))
 			song_elapsed_ms = 0.0
 			song_clock_live = true
+			_end_stage_intro()
+		"modern_song_intro":
+			_open_stage(payload)
 		"modern_song_ended":
 			song_clock_live = false
 			_stop_artist_video()
+			_close_stage()
 			dial_root.visible = false
 			if hurry_live:  # a drain or tilt ended the song mid hurry-up; a collect or miss fades out on its own
 				hurry_live = false
@@ -1159,6 +1240,7 @@ func _on_event(payload: Dictionary = {}) -> void:
 			between_balls = true
 			effects.stop()
 			_stop_artist_video()
+			_close_stage()
 			song_live = false
 			_play_between_balls()
 		"ball_started":
@@ -1204,6 +1286,8 @@ func _on_event(payload: Dictionary = {}) -> void:
 			mode_status = str(payload.get("text", ""))
 			mode_done = int(payload.get("done", 0))
 			mode_goal = int(payload.get("goal", 0))
+			if stage.visible:
+				stage.set_status(mode_status, mode_done, mode_goal)
 		"game_ending":
 			show_overlay("LAST CALL", "Thanks for coming to the juke joint", 3000)
 	_render()
