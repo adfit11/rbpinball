@@ -1,114 +1,14 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqdj7xxv5d8ks"]
+[gd_scene load_steps=3 format=3 uid="uid://cqdj7xxv5d8ks"]
 
 [ext_resource type="Script" uid="uid://e0s431ts0ccq" path="res://slides/attract.gd" id="1_attract"]
+[ext_resource type="Script" path="res://slides/modern/fit_to_screen.gd" id="2_fit"]
 
 [node name="Attract" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 1280.0
+offset_bottom = 720.0
 script = ExtResource("1_attract")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.055, 0.075, 0.105, 1)
-
-[node name="Center" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Content" type="VBoxContainer" parent="Center"]
-layout_mode = 2
-theme_override_constants/separation = 34
-
-[node name="Title" type="Label" parent="Center/Content"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.816, 0.541, 1)
-theme_override_font_sizes/font_size = 38
-text = "JUKE JOINT"
-horizontal_alignment = 1
-
-[node name="GameSelection" type="VBoxContainer" parent="Center/Content"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 28
-
-[node name="Prompt" type="Label" parent="Center/Content/GameSelection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 54
-text = "Choose a game"
-horizontal_alignment = 1
-
-[node name="Choices" type="HBoxContainer" parent="Center/Content/GameSelection"]
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="Classic" type="Label" parent="Center/Content/GameSelection/Choices"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(330, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 68
-text = "Classic"
-horizontal_alignment = 1
-
-[node name="Modern" type="Label" parent="Center/Content/GameSelection/Choices"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(330, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 68
-text = "[ Modern ]"
-horizontal_alignment = 1
-
-[node name="Instructions" type="Label" parent="Center/Content/GameSelection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Press the right green button to switch games.
-Press Start to continue."
-horizontal_alignment = 1
-
-[node name="PlayerSelection" type="VBoxContainer" parent="Center/Content"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="SelectedGame" type="Label" parent="Center/Content/PlayerSelection"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 54
-text = "Modern"
-horizontal_alignment = 1
-
-[node name="Prompt" type="Label" parent="Center/Content/PlayerSelection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "Choose the number of players"
-horizontal_alignment = 1
-
-[node name="PlayerCount" type="Label" parent="Center/Content/PlayerSelection"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.816, 0.541, 1)
-theme_override_font_sizes/font_size = 72
-text = "1 player"
-horizontal_alignment = 1
-
-[node name="Instructions" type="Label" parent="Center/Content/PlayerSelection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Press the right green button to cycle from 1 to 4 players.
-Press Start to begin."
-horizontal_alignment = 1
+[node name="FitToScreen" type="Node" parent="."]
+script = ExtResource("2_fit")

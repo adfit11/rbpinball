@@ -29,6 +29,7 @@ modes:
   - classic_holes
   - classic_gate
   - classic_subway
+  - classic_high_score
   - modern
   - modern_targets
   - modern_skill_shot
@@ -44,6 +45,12 @@ modes:
   - modern_display
   - modern_high_score
   - tilt
+
+# Each game keeps its own high-score board.
+mpf:
+  paths:
+    classic_high_score: data/classic_high_scores.yaml
+    modern_high_score: data/modern_high_scores.yaml
 
 game:
   balls_per_game: 3

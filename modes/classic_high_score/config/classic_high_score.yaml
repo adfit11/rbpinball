@@ -1,0 +1,38 @@
+#config_version=6
+
+mode:
+  code: custom_code.cabinet_high_score.CabinetHighScore
+  start_events: game_ending{machine.session_game == "classic"}
+  priority: 1500
+  game_mode: false
+  use_wait_queue: true
+
+high_score:
+  enter_initials_timeout: 60
+  award_slide_display_time: 4s
+  categories:
+    score:
+      - GRAND CHAMPION
+      - HIGH SCORE 1
+      - HIGH SCORE 2
+      - HIGH SCORE 3
+  defaults:
+    score:
+      - ADF: 425000
+      - RUTH: 310000
+      - LOUIS: 248000
+      - ETTA: 196000
+
+slide_player:
+  high_score_enter_initials:
+    high_score_entry:
+      action: play
+      tokens:
+        title: NEW HIGH SCORE
+  high_score_award_display:
+    high_score_award:
+      action: play
+      tokens:
+        title: INTO THE HALL OF FAME
+    high_score_entry:
+      action: remove

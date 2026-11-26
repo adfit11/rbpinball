@@ -47,6 +47,17 @@ The cabinet SHALL start one session of the confirmed game with exactly the confi
 - **WHEN** a player presses the right green cabinet button or Start after the session begins
 - **THEN** the cabinet continues the selected game with the confirmed roster
 
+### Requirement: Juke Joint attract poster and Hall of Fame
+The attract screen SHALL be the Juke Joint handbill poster, with the game and player choice printed in its player band and the cabinet instructions under PRESS START. After 30 s without a cabinet press it SHALL rotate the poster with a Hall of Fame board for each game, showing that game's four high scores. A cabinet press during the rotation SHALL only bring the selection back, keeping the chosen game.
+
+#### Scenario: Attract is left idle
+- **WHEN** nobody presses a cabinet button for 30 s on the attract screen
+- **THEN** the poster alternates with the Classic and Modern Hall of Fame boards
+
+#### Scenario: A player walks up
+- **WHEN** the right green button or Start is pressed while the boards are rotating
+- **THEN** the selection poster returns with the previous choice and the press does not change it
+
 ### Requirement: Return to game selection after play
 The cabinet SHALL return to the shared game selection screen when Classic or Modern ends.
 

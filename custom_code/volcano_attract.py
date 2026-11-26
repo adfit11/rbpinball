@@ -11,6 +11,8 @@ class VolcanoAttract(Attract):
 
     GREEN_PRESS_MS = 30
     GREEN_RELEASE_MS = 100
+    # With no input for this long, attract shows its posters and Hall of Fame until a button is pressed.
+    SHOWCASE_IDLE_MS = 30_000
 
     def mode_start(self, retry_selection=None, **kwargs):
         variables = self.machine.variables
@@ -26,6 +28,8 @@ class VolcanoAttract(Attract):
         variables.set_machine_var("selection_game", game)
         variables.set_machine_var("selection_players", count)
         variables.set_machine_var("selection_stage", "players" if retry_selection else "game")
+        variables.set_machine_var("attract_showcase", False)
+        self._idle_from_now()
         self.add_mode_event_handler("s_flipper_left_active", self._select_left)
         self.add_mode_event_handler("s_flipper_right_active", self._select_right)
         if on_cabinet:
@@ -53,7 +57,31 @@ class VolcanoAttract(Attract):
         super().mode_stop(**kwargs)
 
     def _selection_input_ready(self):
-        return not self.start_pending and self.machine.clock.get_time() >= self._cabinet_input_ready_at
+        if self.start_pending or self.machine.clock.get_time() < self._cabinet_input_ready_at:
+            return False
+        # A press during the showcase only brings the selection back.
+        return not self._wake()
+
+    def _idle_from_now(self):
+        self.delay.reset(ms=self.SHOWCASE_IDLE_MS, name="showcase", callback=self._showcase)
+
+    def _wake(self):
+        """Restart the idle clock; return True if this press ended the showcase."""
+        self._idle_from_now()
+        variables = self.machine.variables
+        if not variables.get_machine_var("attract_showcase"):
+            return False
+        variables.set_machine_var("attract_showcase", False)
+        return True
+
+    def _showcase(self):
+        if self.start_pending:
+            self._idle_from_now()
+            return
+        variables = self.machine.variables
+        variables.set_machine_var("selection_stage", "game")
+        variables.set_machine_var("selection_players", 1)
+        variables.set_machine_var("attract_showcase", True)
 
     def _press_green(self):
         if self._green_armed:
