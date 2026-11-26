@@ -406,7 +406,7 @@ class DanceFloor(SongRule):
 class HitMe(SongRule):
     key = "hit_me"
     title, goal, ends_on_complete = "HIT ME!", "Tap green to stop the dial, then hit the lit location", True
-    how = ('Tap green to stop the dial', 'Shoot the location it lands on, three times')
+    how = ('Tap green to stop the dial, then shoot where it lands', 'The dial spins again after each hit; three hits win')
 
     def start(self):
         self.hits = 0
