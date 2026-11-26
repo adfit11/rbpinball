@@ -221,6 +221,7 @@ func close() -> void:
 
 
 func tick(delta: float) -> void:
+	caption.visible = not intro.visible
 	if intro.visible:
 		intro_left_ms = max(0.0, intro_left_ms - delta * 1000.0)
 		intro_count.text = "THE BALL COMES BACK IN %d" % int(ceil(intro_left_ms / 1000.0)) if intro_left_ms > 0 else "HERE IT COMES!"
