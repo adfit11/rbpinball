@@ -111,7 +111,7 @@ const EVENTS := [
 	"modern_overlay", "modern_mode_status", "modern_task", "ball_will_end", "modern_floor_nickel", "game_ending", "ball_started",
 	"modern_pot_spin", "modern_rent_party_build_up", "modern_rent_party_started", "modern_song_shot", "modern_jackpot", "modern_super_jackpot_lit", "modern_super_jackpot", "modern_rent_party_ended",
 	"modern_hurry_up_started", "modern_hurry_up_ended", "modern_hit_me_dial", "modern_song_clock_started",
-	"modern_song_intro", "modern_record_crackle_stop",
+	"modern_song_intro",
 ]
 
 
@@ -1162,8 +1162,6 @@ func _on_event(payload: Dictionary = {}) -> void:
 			_end_stage_intro()
 		"modern_song_intro":
 			_open_stage(payload)
-		"modern_record_crackle_stop":
-			_end_stage_intro()
 		"modern_song_ended":
 			song_clock_live = false
 			_stop_artist_video()
