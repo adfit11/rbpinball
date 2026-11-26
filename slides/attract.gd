@@ -73,11 +73,12 @@ func _page(texture: Texture2D) -> Control:
 	root.size = Vector2(1280, 720)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
-	var art := Handbill.backdrop(root, texture)
-	# A slow push-in, as if walking up to the wall.
+	Handbill.backdrop(root, texture)
+	# A slow push-in, as if walking up to the wall; the whole page moves so overlays stay on the art.
+	root.pivot_offset = root.size / 2
 	var drift := create_tween().set_loops()
-	drift.tween_property(art, "scale", Vector2(1.03, 1.03), 12.0).set_trans(Tween.TRANS_SINE)
-	drift.tween_property(art, "scale", Vector2.ONE, 12.0).set_trans(Tween.TRANS_SINE)
+	drift.tween_property(root, "scale", Vector2(1.03, 1.03), 12.0).set_trans(Tween.TRANS_SINE)
+	drift.tween_property(root, "scale", Vector2.ONE, 12.0).set_trans(Tween.TRANS_SINE)
 	return root
 
 
@@ -102,6 +103,12 @@ func _poster_page() -> Control:
 		var choice := Handbill.label(selection, "", cell, 28)
 		choice.set_meta("chip", chip)
 		choices.append(choice)
+	# Set the instructions into the block's inner rule, on a solid patch of the block's red.
+	var plate := ColorRect.new()
+	plate.color = Color("#71161b")
+	plate.position = HELP_STRIP.position + Vector2(20, -1)
+	plate.size = HELP_STRIP.size - Vector2(40, -2)
+	selection.add_child(plate)
 	help = Handbill.label(selection, "", HELP_STRIP, 19, Handbill.CREAM, Handbill.GOTHIC)
 	return root
 

@@ -56,7 +56,7 @@ func action_update(settings: Dictionary, kwargs: Dictionary = {}) -> void:
 	if values.has("title"):
 		title.text = str(values.title)
 	if values.has("award"):
-		award.text = "PLAYER %s  •  %s  •  %s" % [values.get("player_num", 1), str(values.award).to_upper(),
+		award.text = "PLAYER %s  •  %s  •  %s" % [int(values.get("player_num", 1)), str(values.award).to_upper(),
 				Handbill.comma(values.get("value", 0))]
 	help.text = help_text(MPF.game.machine_vars)
 
