@@ -1,7 +1,7 @@
 #config_version=6
 
 mode:
-  code: mpf.modes.high_score.code.high_score.HighScore
+  code: custom_code.modern.high_score.ModernHighScore
   start_events: game_ending{machine.session_game == "modern"}
   priority: 1500
   game_mode: false
@@ -11,38 +11,28 @@ high_score:
   enter_initials_timeout: 60
   award_slide_display_time: 4s
   categories:
-    modern_score:
+    score:
       - KING OF THE JOINT
       - HIGH SCORE 1
       - HIGH SCORE 2
       - HIGH SCORE 3
   defaults:
-    modern_score:
+    score:
       - LJ: 20000000
       - RB: 15000000
       - BJT: 10000000
       - EJ: 5000000
 
-event_player:
-  modern_hs_tap:
-    text_input:
-      action: right
-  modern_hs_select:
-    text_input:
-      action: select
-  s_flipper_left_active:
-    text_input:
-      action: left
-  s_flipper_right_active:
-    text_input:
-      action: right
-
 slide_player:
   high_score_enter_initials:
-    modern_high_score:
+    high_score_entry:
       action: play
+      tokens:
+        title: SIGN THE GUEST BOOK
   high_score_award_display:
-    modern_high_score_award:
+    high_score_award:
       action: play
-    modern_high_score:
+      tokens:
+        title: WELCOME TO THE GUEST BOOK
+    high_score_entry:
       action: remove

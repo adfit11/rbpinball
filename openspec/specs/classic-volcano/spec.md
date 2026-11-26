@@ -135,3 +135,10 @@ Classic SHALL keep the existing top drop rotation, the green freeze shared with 
 #### Scenario: The ball passes a down target
 - **WHEN** a lock replacement ball travels through the gap of a top drop target that is already down
 - **THEN** play continues with no points or award from that gap
+
+### Requirement: Enter Classic high scores
+When a Classic game ends with a score on the Classic Hall of Fame, Classic SHALL let the player enter initials on its own board, kept apart from Modern's. A tap of the right green button SHALL move to the next letter, a 2 s hold SHALL choose it, and the flippers SHALL move left and right.
+
+#### Scenario: Entering Classic initials
+- **WHEN** a Classic high score is being entered and the player taps green, then holds green for 2 s
+- **THEN** the next letter is highlighted and then chosen, and the finished initials go on the Classic board only
