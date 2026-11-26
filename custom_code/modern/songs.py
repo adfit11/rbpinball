@@ -24,6 +24,7 @@ class SongRule:
     round_ms = S.ROUND_MS  # the song fades out here if it is longer
     ambient = "guide"  # the background lamp pattern while this rule runs (custom_code/modern/ambient.py)
     intro_pool = None  # a character's line after the MC introduces the mode
+    how = ()  # the steps on the stage's instruction card while the ball is held
 
     def __init__(self, songs):
         self.songs, self.machine, self.mode = songs, songs.machine, songs
@@ -88,6 +89,7 @@ class SongRule:
 class HurryUp(SongRule):
     key = "hurry_up"
     title, goal, ends_on_complete = "HURRY-UP", "Shoot the flashing location before it drains!", True
+    how = ('A location flashes and its value starts to drain', 'Shoot it before the clock runs out')
 
     def start(self):
         self.target = random.choice(LOC)
@@ -121,6 +123,7 @@ class HurryUp(SongRule):
 class Ladder(SongRule):
     key = "ladder"
     title, goal, ends_on_complete = "LADDER", "Climb four rungs at the Kitchen", True
+    how = ('Shoot the Kitchen to climb a rung', 'Each rung pays more: 75,000 up to 300,000')
 
     def start(self):
         self.rung = 0
@@ -157,6 +160,7 @@ class Ladder(SongRule):
 class BuildAndCollect(SongRule):
     key = "build_and_collect"
     title, goal = "BUILD AND COLLECT", "Spin the Bandstand to build the pot, collect at the Bar"
+    how = ('Every spin at the Bandstand adds to the pot', 'Shoot the Bar to collect it')
 
     def start(self):
         self.pot, self.per_spin, self.collects = 0, S.POT_START, 0
@@ -186,6 +190,7 @@ class BuildAndCollect(SongRule):
 class RovingShot(SongRule):
     key = "roving_shot"
     title, goal, ends_on_complete = "ROVING SHOT", "Chase the moving shot. Tap green once to freeze it", True
+    how = ('The lit shot moves every few seconds', 'Tap green once to freeze it, then hit it three times')
 
     def start(self):
         self.hits, self.frozen_until, self.freeze_used = 0, 0, False
@@ -230,6 +235,7 @@ class RovingShot(SongRule):
 class JukeboxJackpot(SongRule):
     key = "jukebox_jackpot"
     title, goal, ends_on_complete = "JUKEBOX JACKPOT", "Every crater is a jackpot!", True
+    how = ('Every crater pays a jackpot', 'Each jackpot grows; three complete the song')
     round_ms = S.JACKPOT_ROUND_MS
 
     def start(self):
@@ -265,6 +271,7 @@ class JukeboxJackpot(SongRule):
 class PartyTime(SongRule):
     key = "party_time"
     title, goal = "PARTY TIME", "Double scoring and the Bouncer is ready. Survive the song!"
+    how = ('Every score is doubled', 'The Bouncer stands ready to save your ball')
     ambient = "wander"  # no single target: lamps drift all over the table
 
     def start(self):
@@ -289,6 +296,7 @@ class PartyTime(SongRule):
 class OrderUp(SongRule):
     key = "order_up"
     title, goal, ends_on_complete = "ORDER UP", "Pick up at the Kitchen, deliver before it gets cold", True
+    how = ('Pick up the order at the Kitchen', 'Deliver it to the lit location before it goes cold')
     intro_pool = "cook_order_up"
 
     def start(self):
@@ -341,6 +349,7 @@ class OrderUp(SongRule):
 class RequestNight(SongRule):
     key = "request_night"
     title, goal, ends_on_complete = "REQUEST NIGHT", "Take a request at every location", True
+    how = ('Visit the Bar, Kitchen, Booths, Bandstand and Coat Check', 'Every location takes a request')
 
     def start(self):
         self.remaining = list(LOC)
@@ -369,6 +378,7 @@ class RequestNight(SongRule):
 class DanceFloor(SongRule):
     key = "dance_floor"
     title, goal = "DANCE FLOOR", "Bumpers score 5×. Pack the floor with 25 hits"
+    how = ('Bumpers score five times as much', 'Pack the floor with 25 bumper hits')
     ambient = "ripple"  # rings spread out from the bumpers on every hit
 
     def start(self):
@@ -396,6 +406,7 @@ class DanceFloor(SongRule):
 class HitMe(SongRule):
     key = "hit_me"
     title, goal, ends_on_complete = "HIT ME!", "Tap green to stop the dial, then hit the lit location", True
+    how = ('Tap green to stop the dial', 'Shoot the location it lands on, three times')
 
     def start(self):
         self.hits = 0

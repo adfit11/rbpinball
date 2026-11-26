@@ -254,10 +254,14 @@ class TestModernJukebox(ModernTestCase):
         self.advance_time_and_run(.1)
         self.assertEqual(jukebox.highlight, 2)
         self.mock_event("modern_artist_chosen")
+        self.mock_event("modern_song_intro")
         self.hit_switch_and_run("s_green_button_right_56", 2.2)
         self.release_switch_and_run("s_green_button_right_56", .1)
         self.assertEventCalled("modern_artist_chosen")
         self.assertEqual(self._last_event_kwargs["modern_artist_chosen"]["slot"], 3)
+        intro = self._last_event_kwargs["modern_song_intro"]
+        self.assertEqual((intro["slot"], intro["title"]), (3, "BUILD AND COLLECT"))
+        self.assertIn("|", intro["how"])
 
     def test_green_tap_freezes_cascade_when_unowned(self):
         self.start_modern()

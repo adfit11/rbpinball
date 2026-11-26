@@ -128,8 +128,9 @@ class ModernJukebox(Mode):
                                  artist=self.chosen.artist, title=self.chosen.title)
         from custom_code.modern.songs import SLOT_RULES
         rule = SLOT_RULES[self.highlight + 1]
-        self.machine.events.post("modern_overlay", title=rule.title, subtitle=rule.goal,
-                                 ms=settings.SONG_READ_MS, style="teal")
+        self.machine.events.post("modern_song_intro", slot=self.highlight + 1, artist=self.chosen.artist,
+                                 song=self.chosen.title, title=rule.title, goal=rule.goal, how="|".join(rule.how),
+                                 ms=settings.SONG_READ_MS)
         self.delay.reset(ms=settings.SONG_START_MS, name="song_start", callback=self._start_chosen)
         self.delay.reset(ms=settings.SONG_READ_MS, name="read", callback=self._read_done)
 
